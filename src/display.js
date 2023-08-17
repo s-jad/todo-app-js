@@ -39,9 +39,18 @@ export const Display = ((doc) => {
 
     const renderProjectDashboard = () => {
         const welcomeInput = doc.getElementById("welcome-input");
-        renderHeader(welcomeInput.value);
-        renderProjectGrid();
-        renderSidebar();
+        const dashboardContainer = doc.createElement("div");
+        dashboardContainer.id = "dashboard-container";
+
+        const header = renderHeader(welcomeInput.value);
+        const projectGrid = renderProjectGrid();
+        const sidebar = renderSidebar();
+
+        dashboardContainer.appendChild(header);
+        dashboardContainer.appendChild(sidebar);
+        dashboardContainer.appendChild(projectGrid);
+        app.appendChild(dashboardContainer);
+
         removeWelcomeScreen();
 
     };
@@ -53,21 +62,21 @@ export const Display = ((doc) => {
         userName.innerText = username;
 
 
-        app.appendChild(dashboardHeader);
+        return dashboardHeader;
     };
 
     const renderProjectGrid = () => {
         const projectGrid = doc.createElement('div');
         projectGrid.id = "project-grid";
 
-        app.appendChild(projectGrid);
+        return projectGrid;
     };
 
     const renderSidebar = () => {
         const dashboardSidebar = doc.createElement('div');
         dashboardSidebar.id = "dashboard-sidebar";
 
-        app.appendChild(dashboardSidebar);
+        return dashboardSidebar;
     };
 
     return {
