@@ -1,15 +1,8 @@
 import Todo from "./todo";
 import Project from "./project";
 import User from "./user"
+import { TodoApp } from "./app";
+import { Display } from "./display";
 import "./style.css"
 
-function TodoApp() {
-    const element = document.createElement('div');
-
-    element.innerText = "This is a test from the App";
-
-    return element;
-}
-
-document.body.appendChild(TodoApp());
-
+TodoApp.startApp();

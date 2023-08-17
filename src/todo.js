@@ -8,3 +8,4 @@ export default class Todo {
         this.checklist = checklist;
     };
 }
+
