@@ -42,6 +42,7 @@ export const TodoApp = (() => {
         const currentUser = state.users[userIndex];
 
         currentUser.addProject(project);
+        Display.renderNewProject(project);
     };
 
     return {
@@ -59,7 +60,7 @@ export const UserEvents = (() => {
         Display.renderProjectDashboard();
     };
 
-    const createNewProject = () => {
+    const createNewProject = (ev) => {
         const projectNameInput = document.getElementById('create-project-name-input');
         const projectName = projectNameInput.value;
 
@@ -73,6 +74,7 @@ export const UserEvents = (() => {
         );
 
         TodoApp.addProjectToUser(newProject);
+        closeModal(ev.target.parentNode.parentNode);
     };
 
     const closeModal = (modal) => {
