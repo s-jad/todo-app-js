@@ -104,7 +104,7 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    min-height: 100vh;
     width: 100vw;
     background: hsl(0, 10%, 90%);
 }
@@ -192,8 +192,61 @@ button {
     grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
     padding: 1rem;
-    border: 1px solid purple;
+    border: 3px solid purple;
+    min-height: 100%;
+    min-width: 100%;
 }
+
+[id^="project-card-"] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1rem;
+    padding: 1rem;
+    gap: 1rem;
+    box-shadow: 0 2px 5px hsla(0, 0%, 50%, 0.7);
+    min-width: 150px;
+    min-height: 150px;
+}
+
+.project-title {
+    text-align: center;
+}
+
+.project-description {
+    color: hsl(0, 55%, 40%);
+}
+
+.progress-bar {
+    position: relative;
+    z-index: 2;
+    align-self: start;
+    height: 10px;
+    width: 20px;
+
+    background: hsl(0, 55%, 40%);
+    border-radius: 9999px;
+
+    transition: width 300ms ease-in-out; 
+}
+
+.progress-bar.full {
+    background: green;
+}
+
+.progress-bar-bg {
+    background: hsl(0, 10%, 30%);
+    
+    position: relative;
+
+    border-radius: 9999px;
+    top: 2rem;
+    left: 0;
+    width: 90%;
+    height: 10px;
+}
+
 
 /* MODALS */
 
