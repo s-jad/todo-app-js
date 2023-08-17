@@ -1,5 +1,17 @@
+const fs = require('fs');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+
+// Before the module.exports statement
+const createDistDirectory = () => {
+    const distAssetsPath = path.resolve(__dirname, 'dist/assets');
+    if (!fs.existsSync(distAssetsPath)) {
+        fs.mkdirSync(distAssetsPath, { recursive: true });
+    }
+};
+
+createDistDirectory();
 
 module.exports = {
     mode: 'development',
@@ -9,6 +21,11 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin({
             title: "Development",
+        }),
+        new CopyWebpackPlugin({
+        patterns: [
+            { from: "src/assets", to: "assets" }
+        ],
         }),
     ],
     devtool: 'inline-source-map',
