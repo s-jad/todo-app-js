@@ -133,10 +133,45 @@ button {
 }
 
 #dashboard-header {
-    grid-column: 1 / 9;
+    grid-column: 2 / 9;
     grid-row: 1 / 2;
+    padding: 1rem;
     width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: center;
+    justify-content: space-between;
     background: red;
+}
+
+#user-name {
+   color: white; 
+    width: 100%;
+}
+
+#header-utils-flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#search-bar {
+    width: 40vw;
+    padding-left: 1.5rem;
+    background: hsl(0, 10%, 90%);
+    border-radius: 9999px;
+}
+
+#create-project-btn {
+    height: 30px;
+    width: 30px;
+    scale: 1;
+    transition: scale 200ms ease-in-out;
+}
+
+#create-project-btn:hover,
+#create-project-btn:focus-within {
+    scale: 1.2;
 }
 
 #dashboard-sidebar {

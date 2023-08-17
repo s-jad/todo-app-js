@@ -1,4 +1,4 @@
-import User from "./user";
+import { TodoApp } from "./app";
 
 export const Display = ((doc) => {
     const app = doc.createElement('div');
@@ -46,6 +46,8 @@ export const Display = ((doc) => {
         const projectGrid = renderProjectGrid();
         const sidebar = renderSidebar();
 
+        TodoApp.createNewUser(welcomeInput.value);
+
         dashboardContainer.appendChild(header);
         dashboardContainer.appendChild(sidebar);
         dashboardContainer.appendChild(projectGrid);
@@ -60,7 +62,23 @@ export const Display = ((doc) => {
         dashboardHeader.id = "dashboard-header";
         const userName = doc.createElement('h1');
         userName.innerText = username;
+        userName.id = "user-name";
 
+        const searchBar = doc.createElement('input');
+        searchBar.type = "search";
+        searchBar.id = "search-bar";
+
+        const createProjectBtn = new Image();
+        createProjectBtn.src = "./assets/add.png";
+        createProjectBtn.id = "create-project-btn";
+
+        const headerUtilsFlex = doc.createElement('div');
+        headerUtilsFlex.id = "header-utils-flex"
+        headerUtilsFlex.appendChild(searchBar);
+        headerUtilsFlex.appendChild(createProjectBtn);
+
+        dashboardHeader.appendChild(userName);
+        dashboardHeader.appendChild(headerUtilsFlex);
 
         return dashboardHeader;
     };
