@@ -125,10 +125,26 @@ export const Display = ((doc) => {
         app.appendChild(createProjectModalContainer);
     };
 
+    const renderNewProject = (project) => {
+        const projectGrid = doc.getElementById('project-grid');
+        const newProjectCard = doc.createElement('div');
+        newProjectCard.id = `project-card-${project.title}`;
+
+        newProjectCard.innerHTML = `
+            <h3 class="project-title">${project.title}</h3>
+            <p class="project-description">${project.description}</p>
+            <div class="progress-bar-bg"></div>
+            <div class="progress-bar"></div>
+        `;
+
+        projectGrid.appendChild(newProjectCard);
+    };
+
     return {
         renderApp,
         renderWelcomeScreen,
         renderProjectDashboard,
+        renderNewProject,
     };
 
 })(document);
