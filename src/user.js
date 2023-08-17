@@ -1,6 +1,6 @@
 export default class User {
-    constructor(name) {
-        this.name = name;
+    constructor(userName) {
+        this.name = userName;
         this.projects = [];
     }
 
