@@ -151,7 +151,7 @@ export const Display = ((doc) => {
         const confirmDeleteBtn = deleteProjectModalContainer.querySelector('#confirm-delete-project-btn');
         const cancelDeleteBtn = deleteProjectModalContainer.querySelector('#cancel-delete-project-btn');
         const deleteProjectTitle = deleteProjectModalContainer.querySelector('#delete-project-modal-title');
-        const projectToRemoveTitle = ev.target.parentNode.parentNode.querySelector('.project-title').innerText;
+        const projectToRemoveTitle = ev.target.parentNode.parentNode.parentNode.querySelector('.project-title').innerText;
 
         deleteProjectTitle.innerText = `Are you sure you would like to delete ${projectToRemoveTitle}`
         confirmDeleteBtn.onclick = () => UserEvents.deleteProject(projectToRemoveTitle);
@@ -171,8 +171,22 @@ export const Display = ((doc) => {
         newProjectCard.innerHTML = `
             <h3 class="project-title">${project.title}</h3>
             <p class="project-description">${project.description}</p>
-            <div class="progress-bar-bg"></div>
-            <div class="progress-bar"></div>
+            <p class="project-todos-list-title">Todos:</p>
+            <ul class="project-todos-list">
+                <div class="todo-check-container">
+                    <li class="project-todo">Example todo</li>
+                    <input type="checkbox" class="todo-check"></input>
+                </div>
+                <div class="todo-check-container">
+                    <li class="project-todo">Another longer longer todo</li>
+                    <input type="checkbox" class="todo-check"></input>
+                </div>
+            </ul>
+            <div class="project-utils">
+                <div class="progress-bar-bg">
+                    <div class="progress-bar"></div>
+                </div>
+            </div>
         `;
 
         const btnContainer = doc.createElement('div');
@@ -188,7 +202,8 @@ export const Display = ((doc) => {
         btnContainer.appendChild(deleteBtn);
         btnContainer.appendChild(actualDeleteBtn);
 
-        newProjectCard.appendChild(btnContainer);
+        const projectUtils = newProjectCard.querySelector('.project-utils');
+        projectUtils.appendChild(btnContainer);
         projectGrid.appendChild(newProjectCard);
     };
 
