@@ -254,8 +254,8 @@ textarea {
     grid-row: 2 / 7;
 
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    justify-content: space-around;
+    grid-template-columns: repeat(auto-fit, minmax(300px, max-content));
+    justify-content: center;
     gap: 1rem;
     padding: 1rem;
     border: 3px solid purple;
@@ -266,15 +266,15 @@ textarea {
 [id^="project-card-"] {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(7, 1fr);
+    grid-template-rows: repeat(5, 1fr);
     align-items: center;
     gap: 1rem;
 
     border-radius: 1rem;
     padding: 1rem;
 
-    max-height: 250px;
-    max-width: 400px;
+    height: 250px;
+    width: 300px;
 
     scale: 1;
     background: hsl(0, 10%, 80%);
@@ -284,21 +284,39 @@ textarea {
                 box-shadow 200ms ease-in-out;
 }
 
-
-[id^="project-card-"]:hover,
-[id^="project-card-"]:focus-within {
+[id^="project-card-"]:not(.expanded):hover,
+[id^="project-card-"]:not(.expanded):focus-within {
     scale: 1.02;
     background: hsl(0, 12%, 90%);
     box-shadow: 0 2px 8px hsla(0, 0%, 50%, 0.7);
 }
 
-.project-title {
+[id^="project-card-"].expanding {
+    position: absolute;
+    z-index: 10;
+}
+
+[id^="project-card-"].expanded {
+    grid-column: 2 / 9;
+    grid-row: 2 / 7;
+    min-height: 100%;
+    min-width: 100%;
+    padding: 1rem;
+    border-radius: 0;
+
+    display: grid;
+    align-items: start;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: 1fr 3fr 5fr 1fr;
+}
+
+[id^="project-card-"] > .project-title {
     grid-column: 1 / 6;
     grid-row: 1 / 2;
     text-align: center;
 }
 
-.project-description {
+[id^="project-card-"] > .project-description {
     overflow: hidden;
     text-overflow: ellipsis;
     grid-column: 1 / 6;
@@ -306,19 +324,63 @@ textarea {
     color: hsl(0, 55%, 40%);
 }
 
+/* Expanded Project Card */
+
+[id^="project-card-"].expanded > .project-title {
+    grid-column: 1 / 6;
+    grid-row: 1 / 2;
+}
+
+[id^="project-card-"].expanded > .project-description {
+    grid-column: 1 / 6;
+    grid-row: 2 / 3;
+}
+
 /* Todo List */
+
+[id^="project-card-"].expanded > .project-todos-list-container.invisible {
+    opacity: 0;
+    transition: opacity 300ms ease-in-out;
+    width: 100%;
+}
+
+
+[id^="project-card-"].expanded > .project-todos-list-container {
+    opacity: 1;
+    grid-column: 1 / 6;
+    width: 100%;
+    display: grid;
+    align-items: center;
+    grid-template-columns: repeat(5, 1fr);
+    justify-self: start;
+}
 
 .project-todos-list-title {
     grid-column: 1 / 2;
-    grid-row: 5 / 6;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.project-todos-checkbox-title {
+    grid-column: 5 / 6;
+    text-align: center;
+    margin-bottom: 1rem;
 }
 
 .project-todos-list {
     list-style: none;
     padding: 0;
     margin: 0;
-    grid-column: 2 / 6;
-    grid-row: 5 / 7;
+    grid-column: 1 / 6;
+    grid-row: 3 / 4;
+}
+
+
+
+.todo-container {
+    grid-column: 1 / 6;
+    display: grid;
+    grid-template-columns: 8fr 1fr;
 }
 
 .todo-check-container {
