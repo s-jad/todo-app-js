@@ -45,10 +45,21 @@ export const TodoApp = (() => {
         Display.renderNewProject(project);
     };
 
+    const deleteProjectFromUser = (projectTitle) => {
+        const userName = getCurrentUserName();
+        const userIndex = getCurrentUserIndex(userName);
+        const currentUser = state.users[userIndex];
+        console.log("In deleteProjectFromUser");
+        console.log(currentUser);
+        console.log(`"${projectTitle}"`);
+        currentUser.deleteProject(projectTitle);
+    };
+
     return {
         startApp,
         createNewUser,
         addProjectToUser,
+        deleteProjectFromUser,
     };
 
 })();
@@ -77,6 +88,14 @@ export const UserEvents = (() => {
         closeModal(ev.target.parentNode.parentNode);
     };
 
+    const deleteProject = (projectTitle) => {
+        const deleteProjectModalContainer = document.querySelector('#delete-project-modal-container');
+        TodoApp.deleteProjectFromUser(projectTitle);
+        Display.removeProjectFromProjectGrid(projectTitle);
+
+        closeModal(deleteProjectModalContainer);
+    };
+
     const closeModal = (modal) => {
         const parent = modal.parentNode;
         parent.removeChild(modal);
@@ -85,6 +104,7 @@ export const UserEvents = (() => {
     return {
         switchToProjectDashboard,
         createNewProject,
+        deleteProject,
         closeModal,
     };
 
