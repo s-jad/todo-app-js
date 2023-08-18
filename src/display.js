@@ -194,7 +194,11 @@ export const Display = ((doc) => {
 
         const actualDeleteBtn = doc.createElement('button');
         actualDeleteBtn.classList.add('invisible-btn');
-        actualDeleteBtn.onclick = renderDeleteProjectModal;
+
+        actualDeleteBtn.addEventListener("click", function(ev) {
+            ev.stopPropagation;
+            renderDeleteProjectModal(ev);
+        });
 
         btnContainer.appendChild(deleteBtn);
         btnContainer.appendChild(actualDeleteBtn);
@@ -207,18 +211,39 @@ export const Display = ((doc) => {
     };
 
     const removeProjectFromProjectGrid = (projectTitle) => {
-        const projectGrid = doc.getElementById('project-grid');
-
         const moddedProjectTitle = projectTitle.replaceAll(" ", "-");
         const projectCardId = `project-card-${moddedProjectTitle}`;
-        const projectToRemove = projectGrid.querySelector(`#${projectCardId}`);
+        const projectGrid = doc.getElementById('project-grid');
+        const projectToRemove = doc.querySelector(`#${projectCardId}`);
 
-        projectGrid.removeChild(projectToRemove);
+        if (projectToRemove.classList.contains("expanded")) {
+            const dashboardContainer = doc.getElementById('dashboard-container');
+            dashboardContainer.removeChild(projectToRemove);
+            const projectGrid = state.currentProjectGrid;
+            dashboardContainer.appendChild(projectGrid);
+        } else {
+            projectGrid.removeChild(projectToRemove);
+        }
     };
 
     const renderExpandedProject = (ev) => {
+        // Check if the target of the click event is the delete icon
+        // If yes, Return early without triggering the expansion
+        if (ev.target.classList.contains('invisible-btn')) {
+            return;
+        }
+
         const projectCard = ev.currentTarget;
         const projectGrid = doc.getElementById('project-grid');
+
+        // Store the current project grid and its children in state
+        const storeCurrentProjectGrid = () => {
+            state.currentProjectGrid = projectGrid.cloneNode(true);
+        };
+
+        // Call the function to store the current project grid
+        // before the projectCard is removed from it.
+        storeCurrentProjectGrid();
 
         const cardStyle = getComputedStyle(projectCard);
         const gridStyle = getComputedStyle(projectGrid);
@@ -237,8 +262,6 @@ export const Display = ((doc) => {
         // Store current card pos/dimensions and current projectGrid for return animation
         // and to restore the projectGrid after expanded card shrinks again.
         state.expandedCardPrevPosition = { currentX, currentY, currentWidth, currentHeight };
-        state.currentProjectGrid = projectGrid;
-
         // Get current dimensions and position of project-grid
         const gridRect = ev.currentTarget.parentNode.getBoundingClientRect();
         const gridX = gridRect.left;
@@ -315,6 +338,7 @@ export const Display = ((doc) => {
 
             dashboardContainer.removeChild(projectGrid);
             dashboardContainer.appendChild(projectCard);
+            projectCard.removeEventListener("click", renderExpandedProject);
         });
     };
 
