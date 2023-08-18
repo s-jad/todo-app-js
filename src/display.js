@@ -125,10 +125,37 @@ export const Display = ((doc) => {
         app.appendChild(createProjectModalContainer);
     };
 
+    const renderDeleteProjectModal = (ev) => {
+        const deleteProjectModalContainer = doc.createElement('div');
+        deleteProjectModalContainer.id = "delete-project-modal-container";
+
+        deleteProjectModalContainer.innerHTML = `
+            <div id="delete-project-modal-inner">
+                <h2 id="delete-project-modal-title"></h2>  
+                <button type="button" id="confirm-delete-project-btn">Confirm</button>
+                <button type="button" id="cancel-delete-project-btn">Cancel</button>
+            </div>
+        `;
+
+        const confirmDeleteBtn = deleteProjectModalContainer.querySelector('#confirm-delete-project-btn');
+        const cancelDeleteBtn = deleteProjectModalContainer.querySelector('#cancel-delete-project-btn');
+        const deleteProjectTitle = deleteProjectModalContainer.querySelector('#delete-project-modal-title');
+        const projectToRemoveTitle = ev.target.parentNode.querySelector('.project-title').innerText;
+
+        deleteProjectTitle.innerText = `Are you sure you would like to delete ${projectToRemoveTitle}`
+        confirmDeleteBtn.onclick = () => UserEvents.deleteProject(projectToRemoveTitle);
+        cancelDeleteBtn.onclick = () => UserEvents.closeModal(deleteProjectModalContainer);
+
+        app.appendChild(deleteProjectModalContainer);
+
+    };
+
     const renderNewProject = (project) => {
         const projectGrid = doc.getElementById('project-grid');
+
         const newProjectCard = doc.createElement('div');
-        newProjectCard.id = `project-card-${project.title}`;
+        const moddedProjectTitle = project.title.replaceAll(" ", "-");
+        newProjectCard.id = `project-card-${moddedProjectTitle}`;
 
         newProjectCard.innerHTML = `
             <h3 class="project-title">${project.title}</h3>
@@ -137,7 +164,23 @@ export const Display = ((doc) => {
             <div class="progress-bar"></div>
         `;
 
+        const deleteBtn = new Image();
+        deleteBtn.classList.add('delete-project-btn');
+        deleteBtn.src = './assets/delete.png';
+        deleteBtn.addEventListener("click", renderDeleteProjectModal);
+
+        newProjectCard.appendChild(deleteBtn);
         projectGrid.appendChild(newProjectCard);
+    };
+
+    const removeProjectFromProjectGrid = (projectTitle) => {
+        const projectGrid = doc.getElementById('project-grid');
+
+        const moddedProjectTitle = projectTitle.replaceAll(" ", "-");
+        const projectCardId = `project-card-${moddedProjectTitle}`;
+        const projectToRemove = projectGrid.querySelector(`#${projectCardId}`);
+
+        projectGrid.removeChild(projectToRemove);
     };
 
     return {
@@ -145,6 +188,8 @@ export const Display = ((doc) => {
         renderWelcomeScreen,
         renderProjectDashboard,
         renderNewProject,
+        renderDeleteProjectModal,
+        removeProjectFromProjectGrid,
     };
 
 })(document);
