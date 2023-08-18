@@ -5,21 +5,24 @@ export default class User {
     }
 
     addProject(project) {
+        // In case of accidental trailing whitespace
+        // makes it impossible to delete
+        project.title = project.title.trim();
         this.projects.push(project);
     }
 
     deleteProject(projectTitle) {
-        const projectIndex = this.projects.findIndex(project => project.name === projectTitle.name);
-
+        const projectIndex = this.projects.findIndex(project => project.title === projectTitle);
         if (projectIndex !== -1) {
             this.projects.splice(projectIndex, 1);
+            console.log(this.projects);
         } else {
             console.log(`Cant find ${projectTitle}`);
         }
     }
 
     getProject(projectTitle) {
-        const projectIndex = this.projects.findIndex(project => project.name === projectTitle.name);
+        const projectIndex = this.projects.findIndex(project => project.title === projectTitle);
 
         if (projectIndex !== -1) {
             return this.projects[projectIndex];
@@ -29,7 +32,7 @@ export default class User {
     }
 
     updateProject(projectTitle, projectPatch) {
-        const projectIndex = this.projects.findIndex(project => project.title === projectTitle.title);
+        const projectIndex = this.projects.findIndex(project => project.title === projectTitle);
 
         if (projectIndex !== -1) {
             this.projects[projectIndex] = projectPatch;
