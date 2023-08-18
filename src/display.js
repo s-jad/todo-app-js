@@ -68,16 +68,27 @@ export const Display = ((doc) => {
         searchBar.type = "search";
         searchBar.id = "search-bar";
 
+        // Allows the add.png icon to be used as 
+        // the style for the invisible button whilst
+        // still being tab selectable
+        const btnContainer = doc.createElement('div');
+        btnContainer.classList.add('btn-container');
+
         const createProjectBtn = new Image();
         createProjectBtn.src = "./assets/add.png";
         createProjectBtn.id = "create-project-btn";
 
-        createProjectBtn.addEventListener("click", renderCreateNewProjectModal);
+        const actualCreateProjectBtn = doc.createElement('button');
+        actualCreateProjectBtn.classList.add('invisible-btn');
+        actualCreateProjectBtn.onclick = renderCreateNewProjectModal;
+
+        btnContainer.appendChild(createProjectBtn);
+        btnContainer.appendChild(actualCreateProjectBtn);
 
         const headerUtilsFlex = doc.createElement('div');
         headerUtilsFlex.id = "header-utils-flex"
         headerUtilsFlex.appendChild(searchBar);
-        headerUtilsFlex.appendChild(createProjectBtn);
+        headerUtilsFlex.appendChild(btnContainer);
 
         dashboardHeader.appendChild(userName);
         dashboardHeader.appendChild(headerUtilsFlex);
@@ -140,7 +151,7 @@ export const Display = ((doc) => {
         const confirmDeleteBtn = deleteProjectModalContainer.querySelector('#confirm-delete-project-btn');
         const cancelDeleteBtn = deleteProjectModalContainer.querySelector('#cancel-delete-project-btn');
         const deleteProjectTitle = deleteProjectModalContainer.querySelector('#delete-project-modal-title');
-        const projectToRemoveTitle = ev.target.parentNode.querySelector('.project-title').innerText;
+        const projectToRemoveTitle = ev.target.parentNode.parentNode.querySelector('.project-title').innerText;
 
         deleteProjectTitle.innerText = `Are you sure you would like to delete ${projectToRemoveTitle}`
         confirmDeleteBtn.onclick = () => UserEvents.deleteProject(projectToRemoveTitle);
@@ -164,12 +175,20 @@ export const Display = ((doc) => {
             <div class="progress-bar"></div>
         `;
 
+        const btnContainer = doc.createElement('div');
+        btnContainer.classList.add('btn-container');
         const deleteBtn = new Image();
         deleteBtn.classList.add('delete-project-btn');
         deleteBtn.src = './assets/delete.png';
-        deleteBtn.addEventListener("click", renderDeleteProjectModal);
 
-        newProjectCard.appendChild(deleteBtn);
+        const actualDeleteBtn = doc.createElement('button');
+        actualDeleteBtn.classList.add('invisible-btn');
+        actualDeleteBtn.onclick = renderDeleteProjectModal;
+
+        btnContainer.appendChild(deleteBtn);
+        btnContainer.appendChild(actualDeleteBtn);
+
+        newProjectCard.appendChild(btnContainer);
         projectGrid.appendChild(newProjectCard);
     };
 
