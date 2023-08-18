@@ -15,7 +15,6 @@ export default class User {
         const projectIndex = this.projects.findIndex(project => project.title === projectTitle);
         if (projectIndex !== -1) {
             this.projects.splice(projectIndex, 1);
-            console.log(this.projects);
         } else {
             console.log(`Cant find ${projectTitle}`);
         }

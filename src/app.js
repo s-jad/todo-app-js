@@ -49,9 +49,7 @@ export const TodoApp = (() => {
         const userName = getCurrentUserName();
         const userIndex = getCurrentUserIndex(userName);
         const currentUser = state.users[userIndex];
-        console.log("In deleteProjectFromUser");
-        console.log(currentUser);
-        console.log(`"${projectTitle}"`);
+
         currentUser.deleteProject(projectTitle);
     };
 
