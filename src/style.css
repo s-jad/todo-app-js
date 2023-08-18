@@ -162,13 +162,16 @@ button {
     border-radius: 9999px;
 }
 
-#create-project-btn {
+#create-project-btn,
+.delete-project-btn {
     height: 30px;
     width: 30px;
     scale: 1;
     transition: scale 200ms ease-in-out;
 }
 
+.delete-project-btn:hover,
+.delete-project-btn:focus-within,
 #create-project-btn:hover,
 #create-project-btn:focus-within {
     scale: 1.2;
@@ -250,7 +253,8 @@ button {
 
 /* MODALS */
 
-#create-project-modal-container {
+#create-project-modal-container,
+#delete-project-modal-container {
     position: fixed;
     display: flex;
     align-items: center;
@@ -305,5 +309,31 @@ button {
 }
 
 #cancel-create-project-btn {
+    grid-column: 4 / 5;
+}
+
+#delete-project-modal-inner {
+    height: 30vh;
+    width: 50vw;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    padding: 1rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1rem;
+    background: white;
+    box-shadow: 0 2px 5px hsla(0, 0%, 50%, 0.7);
+}
+
+#delete-project-modal-title {
+    grid-column: 1 / 6;
+}
+
+#confirm-delete-project-btn {
+    grid-column: 2 / 3;
+}
+
+#cancel-delete-project-btn {
     grid-column: 4 / 5;
 }
