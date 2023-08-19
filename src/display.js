@@ -233,7 +233,12 @@ export const Display = ((doc) => {
             return;
         }
 
+        if (ev.currentTarget.classList.contains('expanded')) {
+           return;
+        }
+
         const projectCard = ev.currentTarget;
+
         const projectGrid = doc.getElementById('project-grid');
 
         // Store the current project grid and its children in state
@@ -304,7 +309,7 @@ export const Display = ((doc) => {
 
         projectCard.style.animation = `${animationName} ${animationDuration} ${animationTransition}`;
 
-        projectCard.addEventListener("animationend", function() {
+        const handleAnimationEnd = () => {
             // Stop the stylesheets from piling up
             if (styleSheet.parentNode) {
                 styleSheet.parentNode.removeChild(styleSheet);
@@ -338,8 +343,100 @@ export const Display = ((doc) => {
 
             dashboardContainer.removeChild(projectGrid);
             dashboardContainer.appendChild(projectCard);
+
+            projectCard.addEventListener("click", renderShrunkProject);
+        };
+
+        projectCard.addEventListener('animationend', handleAnimationEnd);
+
+        // Wait for the expansion to finish and remove event listeners
+        // to ensure that it doesnt try to retrigger once expanded
+        setTimeout(() => {
+            projectCard.style.animation = "";
             projectCard.removeEventListener("click", renderExpandedProject);
-        });
+            projectCard.removeEventListener('animationend', handleAnimationEnd);
+        }, 1000);
+    };
+
+    const renderShrunkProject = (ev) => {
+        // Check if the target of the click event is the delete icon
+        // If yes, Return early without triggering the shrinking
+        if (ev.target.classList.contains('invisible-btn')) {
+            return;
+        }
+
+        const projectCard = ev.currentTarget;
+
+        // Get current dimensions and position of project-card
+        const cardRect = projectCard.getBoundingClientRect();
+        const currentX = cardRect.left;
+        const currentY = cardRect.top;
+        const currentWidth = cardRect.width;
+        const currentHeight = cardRect.height;
+
+        // Get previous dimensions and position of project-card in the grid 
+        const previousX = state.expandedCardPrevPosition.currentX;
+        const previousY = state.expandedCardPrevPosition.currentY;
+        const previousWidth = state.expandedCardPrevPosition.currentWidth;
+        const previousHeight = state.expandedCardPrevPosition.currentHeight;
+        console.log(previousX, previousY, previousHeight, previousWidth); 
+        // Prepare shrinking animation
+        const animationName = `expansionAnimation_${Date.now()}`;
+        const animationDuration = "500ms";
+        const animationTransition = "cubic-bezier(.43,.22,.43,.92)";
+        const animationKeyframes = `
+            @keyframes ${animationName} {
+                0% {
+                    top: ${currentY}px;
+                    left: ${currentX}px;
+                    width: ${currentWidth}px;
+                    height: ${currentHeight}px;
+                    border-radius: 0;
+                }
+                100% {
+                    top: ${previousY}px;
+                    left: ${previousX}px;
+                    width: ${previousWidth}px;
+                    height: ${previousHeight}px;
+                    border-radius: 1rem;
+                }
+            }
+        `;
+
+        // Append animation to the stylesheet
+        const styleSheet = document.createElement("style");
+        styleSheet.innerHTML = animationKeyframes;
+        document.head.appendChild(styleSheet);
+
+        projectCard.style.animation = `${animationName} ${animationDuration} ${animationTransition}`;
+
+        const handleAnimationEnd = () => {
+            // Stop the stylesheets from piling up
+            if (styleSheet.parentNode) {
+                styleSheet.parentNode.removeChild(styleSheet);
+            }
+ 
+            const dashboardContainer = doc.getElementById('dashboard-container');
+            const projectGrid = state.currentProjectGrid;
+ 
+            const projectCardId = projectCard.id;
+
+ 
+            dashboardContainer.removeChild(projectCard);
+            dashboardContainer.appendChild(projectGrid);
+
+            const projectInGrid = projectGrid.querySelector(`#${projectCardId}`);
+            
+            projectInGrid.addEventListener('click', renderExpandedProject);
+            projectCard.classList.remove('expanded');
+         };
+
+        projectCard.addEventListener('animationend', handleAnimationEnd);
+
+        setTimeout(() => {
+           projectCard.removeEventListener('click', renderShrunkProject);
+           projectCard.removeEventListener('animationend', handleAnimationEnd);
+        }, 1000);
     };
 
     return {
