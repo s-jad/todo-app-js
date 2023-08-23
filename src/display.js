@@ -154,7 +154,6 @@ export const Display = ((doc) => {
             const todoCount = parseInt(createProjectTodoCountInput.value);
 
             if (todoCount > createProjectTodoCountInput.max) {
-                console.log("Too many todos");
                 todoInputContainer.innerHTML = '';
 
                 const warnTooManyTodos = doc.createElement('p');
@@ -192,24 +191,103 @@ export const Display = ((doc) => {
                 todoInputContainer.appendChild(todoInputBox);
             };
 
-            const leftTodoBtn = new Image();
-            leftTodoBtn.src = "./assets/chevron-left.svg";
-            leftTodoBtn.id = "left-todos-btn";
-
-            const rightTodoBtn = new Image();
-            rightTodoBtn.src = "./assets/chevron-right.svg";
-            rightTodoBtn.id = "right-todos-btn";
-
-            const leftRightTodoBtnContainer = doc.createElement('div');
-            leftRightTodoBtnContainer.id = "left-right-todo-btns-container";
-            leftRightTodoBtnContainer.appendChild(leftTodoBtn);
-            leftRightTodoBtnContainer.appendChild(rightTodoBtn);
-
-            todoInputContainer.appendChild(leftRightTodoBtnContainer);
+            if (todoCount > 0) {
+                todoInputContainer.appendChild(renderLeftRightTodoBtns());
+            }
         });
 
 
         app.appendChild(createProjectModalContainer);
+    };
+
+
+    const renderLeftRightTodoBtns = () => {
+        // Add left and right buttons for todo carousel
+        const leftBtnContainer = doc.createElement('div');
+        leftBtnContainer.classList.add('btn-container');
+
+        const leftTodoBtn = new Image();
+        leftTodoBtn.src = "./assets/chevron-left.svg";
+        leftTodoBtn.id = "left-todos-btn";
+
+        const actualLeftTodoBtn = doc.createElement('button');
+        actualLeftTodoBtn.classList.add('invisible-btn');
+        actualLeftTodoBtn.type = "button";
+        actualLeftTodoBtn.onclick = scrollTodosLeft;
+
+        leftBtnContainer.appendChild(leftTodoBtn);
+        leftBtnContainer.appendChild(actualLeftTodoBtn);
+
+        const rightBtnContainer = doc.createElement('div');
+        rightBtnContainer.classList.add('btn-container');
+
+        const rightTodoBtn = new Image();
+        rightTodoBtn.src = "./assets/chevron-right.svg";
+        rightTodoBtn.id = "right-todos-btn";
+
+        const actualRightTodoBtn = doc.createElement('button');
+        actualRightTodoBtn.classList.add('invisible-btn');
+        actualRightTodoBtn.type = "button";
+        actualRightTodoBtn.onclick = scrollTodosRight;
+
+        rightBtnContainer.appendChild(rightTodoBtn);
+        rightBtnContainer.appendChild(actualRightTodoBtn);
+
+        const leftRightTodoBtnContainer = doc.createElement('div');
+        leftRightTodoBtnContainer.id = "left-right-todo-btns-container";
+        leftRightTodoBtnContainer.appendChild(leftBtnContainer);
+        leftRightTodoBtnContainer.appendChild(rightBtnContainer);
+
+        return leftRightTodoBtnContainer;
+
+    };
+
+    const scrollTodosLeft = () => {
+        const todos = Array.from(doc.querySelectorAll('[id^="todo-input-box-"]'));
+
+        const visibleTodo = todos.find(todo => {
+            return !todo.classList.contains('hide-left') &&
+                !todo.classList.contains('hide-right');
+        });
+
+        const visibleTodoIdNum = parseInt(visibleTodo.id.match(/\d+/g));
+
+        // If there are no todos to the left
+        if (visibleTodoIdNum === 1) {
+            return;
+        }
+
+        const nextTodo = todos.find(todo => {
+            return parseInt(todo.id.match(/\d+/g)) + 1 === visibleTodoIdNum
+        });
+
+        visibleTodo.classList.add('hide-right');
+        nextTodo.classList.remove('hide-left');
+    };
+
+    const scrollTodosRight = () => {
+        const todos = Array.from(doc.querySelectorAll('[id^="todo-input-box-"]'));
+
+        const visibleTodo = todos.find(todo => {
+            return !todo.classList.contains('hide-left') &&
+                !todo.classList.contains('hide-right');
+        });
+
+        const visibleTodoIdNum = parseInt(visibleTodo.id.match(/\d+/g));
+        const maxNumTodos = parseInt(doc.querySelector('#create-project-todo-count-input').value);
+
+        // If there are no more todos to the right
+        if (visibleTodoIdNum === maxNumTodos) {
+            return;
+        }
+
+        const nextTodo = todos.find(todo => {
+            return parseInt(todo.id.match(/\d+/g)) - 1 === visibleTodoIdNum;
+        });
+
+
+        visibleTodo.classList.add('hide-left');
+        nextTodo.classList.remove('hide-right');
     };
 
     const renderDeleteProjectModal = (ev) => {
