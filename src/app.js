@@ -1,5 +1,6 @@
 import { Display } from "./display";
 import Project from "./project";
+import Todo from "./todo";
 import User from "./user";
 
 export const TodoApp = (() => {
@@ -49,7 +50,6 @@ export const TodoApp = (() => {
         const userName = getCurrentUserName();
         const userIndex = getCurrentUserIndex(userName);
         const currentUser = state.users[userIndex];
-
         currentUser.deleteProject(projectTitle);
     };
 
@@ -76,10 +76,26 @@ export const UserEvents = (() => {
         const projectDescriptionInput = document.getElementById('create-project-description-input');
         const projectDescription = projectDescriptionInput.value;
 
+        const todoBoxes = Array.from(document.querySelectorAll('[id^="todo-input-box-"]'));
+
+        let projectTodos = [];
+
+        todoBoxes.forEach(todoBox => {
+            const todo = new Todo(
+                todoBox.querySelector('[name^="new-todo-name-"]').value,
+                todoBox.querySelector('[name^="new-todo-description-"]').value,
+                todoBox.querySelector('[name^="new-todo-due-date-"]').value,
+                parseInt(todoBox.querySelector('[name^="new-todo-priority-"]').value),
+                todoBox.querySelector('[name^="new-todo-notes-"]').value,
+            );
+
+            projectTodos.push(todo);
+        });
+
         const newProject = new Project(
             projectName,
             projectDescription,
-            [],
+            projectTodos,
         );
 
         TodoApp.addProjectToUser(newProject);
