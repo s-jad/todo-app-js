@@ -447,7 +447,7 @@ export const Display = ((doc) => {
         projectCard.style.left = `${currentX + cardBorderWidth + gridBorderWidth}px`;
 
         // Prepare expansion animation
-        const animationName = `expansionAnimation_${Date.now()}`;
+        const animationName = `expansionAnimation`;
         const animationDuration = "500ms";
         const animationTransition = "cubic-bezier(.43,.22,.43,.92)";
         const animationKeyframes = `
@@ -508,7 +508,6 @@ export const Display = ((doc) => {
 
             const todosToRender = currentProject.getAllTodos();
 
-
             todosToRender.forEach((todo, index) => {
                 const todoContainer = doc.createElement('div');
                 todoContainer.classList.add('todo-container');
@@ -519,7 +518,6 @@ export const Display = ((doc) => {
                     </li>
                     <input type="checkbox" name="todo-${index}" class="todo-check"></input>
                 `;
-
                 projectTodoList.appendChild(todoContainer);
             });
 
@@ -540,7 +538,7 @@ export const Display = ((doc) => {
             projectCard.style.animation = "";
             projectCard.removeEventListener("click", renderExpandedProject);
             projectCard.removeEventListener('animationend', handleExpansionAnimationEnd);
-        }, 1000);
+        }, 600);
     };
 
     const renderShrunkProject = (ev) => {
@@ -554,6 +552,8 @@ export const Display = ((doc) => {
         }
 
         const projectCard = ev.currentTarget;
+        const dashboardContainer = doc.getElementById('dashboard-container');
+        const projectGrid = state.currentProjectGrid;
 
         // Get current dimensions and position of project-card
         const cardRect = projectCard.getBoundingClientRect();
@@ -563,13 +563,20 @@ export const Display = ((doc) => {
         const currentHeight = cardRect.height;
 
         // Get previous dimensions and position of project-card in the grid 
-        const previousX = state.expandedCardPrevPosition.currentX;
         const previousY = state.expandedCardPrevPosition.currentY;
+        const previousX = state.expandedCardPrevPosition.currentX;
         const previousWidth = state.expandedCardPrevPosition.currentWidth;
         const previousHeight = state.expandedCardPrevPosition.currentHeight;
 
+        projectCard.classList.remove('expanded');
+        projectCard.classList.add('shrinking');
+        const gridBorderWidth = 3;
+        const cardBorderWidth = 1;
+        projectCard.style.top = `${currentY + cardBorderWidth + gridBorderWidth}px`;
+        projectCard.style.left = `${currentX + cardBorderWidth + gridBorderWidth}px`;
+
         // Prepare shrinking animation
-        const animationName = `shrinkingAnimation_${Date.now()}`;
+        const animationName = "shrinkingAnimation";
         const animationDuration = "500ms";
         const animationTransition = "cubic-bezier(.43,.22,.43,.92)";
         const animationKeyframes = `
@@ -603,11 +610,6 @@ export const Display = ((doc) => {
             if (styleSheet.parentNode) {
                 styleSheet.parentNode.removeChild(styleSheet);
             }
-            const dashboardContainer = doc.getElementById('dashboard-container');
-            const projectGrid = state.currentProjectGrid;
-
-            dashboardContainer.removeChild(projectCard);
-            dashboardContainer.appendChild(projectGrid);
 
             const projectsInGrid = Array.from(projectGrid.querySelectorAll('[id^="project-card-"]'));
             const deleteBtns = Array.from(projectGrid.querySelectorAll('.invisible-btn'));
@@ -623,10 +625,18 @@ export const Display = ((doc) => {
                 proj.addEventListener('click', renderExpandedProject);
                 proj.classList.remove('expanded');
             });
+            projectCard.classList.remove('shrinking');
+            dashboardContainer.removeChild(projectCard);
+            dashboardContainer.appendChild(projectGrid);
         };
 
         projectCard.addEventListener('animationend', handleShrinkingAnimationEnd);
 
+        setTimeout(() => {
+            projectCard.style.animation = "";
+            projectCard.removeEventListener("click", renderShrunkProject);
+            projectCard.removeEventListener('animationend', handleShrinkingAnimationEnd);
+        }, 600);
     };
 
     return {

@@ -302,6 +302,11 @@ textarea {
     z-index: 10;
 }
 
+[id^="project-card-"].shrinking {
+    position: absolute;
+    z-index: 10;
+}
+
 [id^="project-card-"].expanded {
     grid-column: 2 / 9;
     grid-row: 2 / 7;
@@ -610,6 +615,4 @@ textarea {
 #cancel-delete-project-btn {
     grid-column: 4 / 5;
 }
-
-/* Todo Box on expanded card */
 
