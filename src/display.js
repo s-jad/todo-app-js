@@ -126,10 +126,16 @@ export const Display = ((doc) => {
         createProjectModalContainer.innerHTML = `
             <form action="#" id="create-project-form" method="POST">
                 <h2 id="create-project-title">Create a new Project</h2>
-                <label for="create-project-name" id="create-project-label">Name:</label>
+                <label for="create-project-name" class="create-project-label">Name:</label>
                 <input type="text" name="create-project-name" id="create-project-name-input">
-                <label for="create-project" id="create-project-label">Description:</label>
+                <label for="create-project-description" class="create-project-label">Description:</label>
                 <textarea type="text" name="create-project-description" id="create-project-description-input"></textarea>
+                <label for="create-project-todo-count" class="create-project-label">Number of todos:</label>
+                <input type="number" name="create-project-todo-count" id="create-project-todo-count-input" min="0" max="12">
+                <p id="todo-input-container-title">Todos:</p>
+                <div id="todo-input-container">
+                    <!-- Dynamic todo item inputs will be added here -->
+                </div>
                 <button type="button" id="confirm-create-project-btn">Confirm</button>
                 <button type="button" id="cancel-create-project-btn">Cancel</button>
             </form>
@@ -140,6 +146,68 @@ export const Display = ((doc) => {
 
         confirmCreateProjectBtn.onclick = UserEvents.createNewProject;
         cancelCreateProjectBtn.onclick = () => UserEvents.closeModal(createProjectModalContainer);
+
+        const createProjectTodoCountInput = createProjectModalContainer.querySelector('#create-project-todo-count-input');
+        const todoInputContainer = createProjectModalContainer.querySelector('#todo-input-container');
+
+        createProjectTodoCountInput.addEventListener('input', () => {
+            const todoCount = parseInt(createProjectTodoCountInput.value);
+
+            if (todoCount > createProjectTodoCountInput.max) {
+                console.log("Too many todos");
+                todoInputContainer.innerHTML = '';
+
+                const warnTooManyTodos = doc.createElement('p');
+                warnTooManyTodos.id = "warn-too-many-todos";
+                warnTooManyTodos.innerText = `${todoCount} is too many todos, max = 12.`
+                todoInputContainer.appendChild(warnTooManyTodos);
+                return;
+            }
+
+            todoInputContainer.innerHTML = ''; // Clear existing inputs
+
+            for (let i = 0; i < todoCount; i++) {
+
+                const todoInputBox = document.createElement('div');
+                todoInputBox.innerHTML = `
+                    <p class="todo-input-box-title">Todo ${i + 1}</p>
+                    <input type="text" name="new-todo-name-${i + 1}" class="create-project-todo-input"
+                    placeholder="Todo ${i + 1} name">
+                    <input type="text" name="new-todo-description-${i + 1}" class="create-project-todo-input"
+                    placeholder="Todo ${i + 1} description">
+                    <input type="text" name="new-todo-due-date-${i + 1}" class="create-project-todo-input"
+                    placeholder="Todo ${i + 1} due date">
+                    <input type="number" name="new-todo-priority-${i + 1}" class="create-project-todo-input"
+                    placeholder="Todo ${i + 1} priority">
+                    <textarea name="new-todo-notes-${i + 1}" class="create-project-todo-textarea"
+                    placeholder="Todo ${i + 1} notes"></textarea>
+                `;
+
+                todoInputBox.id = `todo-input-box-${i + 1}`;
+
+                if (i > 0) {
+                    todoInputBox.classList.add('hide-right');
+                }
+
+                todoInputContainer.appendChild(todoInputBox);
+            };
+
+            const leftTodoBtn = new Image();
+            leftTodoBtn.src = "./assets/chevron-left.svg";
+            leftTodoBtn.id = "left-todos-btn";
+
+            const rightTodoBtn = new Image();
+            rightTodoBtn.src = "./assets/chevron-right.svg";
+            rightTodoBtn.id = "right-todos-btn";
+
+            const leftRightTodoBtnContainer = doc.createElement('div');
+            leftRightTodoBtnContainer.id = "left-right-todo-btns-container";
+            leftRightTodoBtnContainer.appendChild(leftTodoBtn);
+            leftRightTodoBtnContainer.appendChild(rightTodoBtn);
+
+            todoInputContainer.appendChild(leftRightTodoBtnContainer);
+        });
+
 
         app.appendChild(createProjectModalContainer);
     };
@@ -186,6 +254,7 @@ export const Display = ((doc) => {
             </div>
         `;
 
+        // Delete btn + icon
         const btnContainer = doc.createElement('div');
         btnContainer.classList.add('btn-container');
         const deleteBtn = new Image();
@@ -344,17 +413,22 @@ export const Display = ((doc) => {
             const projectTodoListContainer = doc.createElement('div');
             projectTodoListContainer.classList.add('project-todos-list-container');
             projectTodoListContainer.classList.add('invisible');
+
             projectTodoListContainer.innerHTML = `
                 <p class="project-todos-list-title">Todos:</p>
                 <p class="project-todos-checkbox-title">Completed:</p>
                 <ul class="project-todos-list">
                     <div class="todo-container">
-                        <li class="project-todo" data-todo="example-todo">Example todo</li>
-                        <input type="checkbox" class="todo-check" data-todo="example-todo"></input>
+                        <li class="project-todo">
+                            <label for="todo-1">Example todo</label>
+                        </li>
+                        <input type="checkbox" name="todo-1" class="todo-check"></input>
                     </div>
                     <div class="todo-container">
-                        <li class="project-todo" data-todo="another-longer-todo">Another longer todo</li>
-                        <input type="checkbox" class="todo-check" data-todo="another-longer-todo"></input>
+                        <li class="project-todo">
+                            <label for="todo-2">Another longer todo</label>
+                        </li>
+                        <input type="checkbox" name="todo-2" class="todo-check"></input>
                     </div>
                 </ul>
             `;
