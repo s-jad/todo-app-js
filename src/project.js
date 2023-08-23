@@ -29,6 +29,10 @@ export default class Project {
         }
     }
 
+    getAllTodos() {
+        return this.todos;
+    }
+
     updateTodo(todoTitle, todoPatch) {
         const todoIndex = this.todos.findIndex(todo => todo.title === todoTitle);
 
