@@ -1,4 +1,4 @@
-import { UserEvents } from "./app";
+import { TodoApp, UserEvents } from "./app";
 
 export const Display = ((doc) => {
     const app = doc.createElement('div');
@@ -476,7 +476,7 @@ export const Display = ((doc) => {
 
         projectCard.style.animation = `${animationName} ${animationDuration} ${animationTransition}`;
 
-        const handleAnimationEnd = () => {
+        const handleExpansionAnimationEnd = () => {
             // Stop the stylesheets from piling up
             if (styleSheet.parentNode) {
                 styleSheet.parentNode.removeChild(styleSheet);
@@ -496,20 +496,33 @@ export const Display = ((doc) => {
                 <p class="project-todos-list-title">Todos:</p>
                 <p class="project-todos-checkbox-title">Completed:</p>
                 <ul class="project-todos-list">
-                    <div class="todo-container">
-                        <li class="project-todo">
-                            <label for="todo-1">Example todo</label>
-                        </li>
-                        <input type="checkbox" name="todo-1" class="todo-check"></input>
-                    </div>
-                    <div class="todo-container">
-                        <li class="project-todo">
-                            <label for="todo-2">Another longer todo</label>
-                        </li>
-                        <input type="checkbox" name="todo-2" class="todo-check"></input>
-                    </div>
+                    <!-- Dynamically add todos later --> 
                 </ul>
             `;
+
+            const projectTodoList = projectTodoListContainer.querySelector('.project-todos-list');
+            const currentUser = TodoApp.getCurrentUser();
+            const currentProjectTitle = projectCard.querySelector('.project-title').innerText.trim();
+
+            const currentProject = currentUser.getProject(currentProjectTitle);
+
+            const todosToRender = currentProject.getAllTodos();
+
+
+            todosToRender.forEach((todo, index) => {
+                const todoContainer = doc.createElement('div');
+                todoContainer.classList.add('todo-container');
+
+                todoContainer.innerHTML = `
+                    <li class="project-todo">
+                        <label for="todo-${index}">${todo.title}</label>
+                    </li>
+                    <input type="checkbox" name="todo-${index}" class="todo-check"></input>
+                `;
+
+                projectTodoList.appendChild(todoContainer);
+            });
+
             projectCard.appendChild(projectTodoListContainer);
             projectTodoListContainer.classList.remove('invisible');
 
@@ -519,14 +532,14 @@ export const Display = ((doc) => {
             projectCard.addEventListener("click", renderShrunkProject);
         };
 
-        projectCard.addEventListener('animationend', handleAnimationEnd);
+        projectCard.addEventListener('animationend', handleExpansionAnimationEnd);
 
         // Wait for the expansion to finish and remove event listeners
         // to ensure that it doesnt try to retrigger once expanded
         setTimeout(() => {
             projectCard.style.animation = "";
             projectCard.removeEventListener("click", renderExpandedProject);
-            projectCard.removeEventListener('animationend', handleAnimationEnd);
+            projectCard.removeEventListener('animationend', handleExpansionAnimationEnd);
         }, 1000);
     };
 
@@ -585,7 +598,7 @@ export const Display = ((doc) => {
 
         projectCard.style.animation = `${animationName} ${animationDuration} ${animationTransition}`;
 
-        const handleAnimationEnd = () => {
+        const handleShrinkingAnimationEnd = () => {
             // Stop the stylesheets from piling up
             if (styleSheet.parentNode) {
                 styleSheet.parentNode.removeChild(styleSheet);
@@ -612,7 +625,7 @@ export const Display = ((doc) => {
             });
         };
 
-        projectCard.addEventListener('animationend', handleAnimationEnd);
+        projectCard.addEventListener('animationend', handleShrinkingAnimationEnd);
 
     };
 
