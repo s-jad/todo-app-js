@@ -458,8 +458,8 @@ textarea {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 90vh;
-    min-width: 90vw;
+    min-height: 95vh;
+    min-width: 95vw;
     background: white;
     padding: 1rem 2rem;
 }
@@ -510,10 +510,11 @@ textarea {
     justify-content: center;
 
     margin: 2rem 0;
-    min-height: 30vh;
+    min-height: 38vh;
 }
 
 #todo-input-container-title {
+    margin-top: 2rem;
     grid-column: 1 / 4;
 }
 
@@ -536,35 +537,33 @@ textarea {
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
 
-    position: static;
     left: 0;
-    top: 0;
     opacity: 1;
 
     width: 60vw;
-    border: 1px solid black;
+    border: 1px solid hsla(0, 0%, 50%, 0.9);
     padding: 1rem;
     border-radius: 1rem;
-
-    transition: opacity 300ms ease-in-out,
-                left 300ms ease-in-out;
+    box-shadow: 0 2px 5px hsla(0, 0%, 50%, 0.7);
+    transition: opacity 250ms ease-in-out,
+                left 350ms ease-in-out;
 }
 
 [id^="todo-input-box-"].hide-right {
     position: absolute;
+    z-index: 101; 
     left: 150%;
-    top: 0;
-    width: 40vw;
-    border: 1px solid black;
+    top: -0.1rem;
+    opacity: 0;
 }
 
 
 [id^="todo-input-box-"].hide-left {
     position: absolute;
+    z-index: 101; 
+    top: -0.1rem;
     left: -150%;
-    top: 0;
-    width: 40vw;
-    border: 1px solid black;
+    opacity: 0;
 }
 
 .todo-input-box-title {
