@@ -37,6 +37,10 @@ export const TodoApp = (() => {
         }
     };
 
+    const getCurrentUser = () => {
+        return state.users[getCurrentUserIndex(getCurrentUserName())];
+    };
+
     const addProjectToUser = (project) => {
         const userName = getCurrentUserName();
         const userIndex = getCurrentUserIndex(userName);
@@ -58,6 +62,7 @@ export const TodoApp = (() => {
         createNewUser,
         addProjectToUser,
         deleteProjectFromUser,
+        getCurrentUser,
     };
 
 })();
