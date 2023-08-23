@@ -216,10 +216,32 @@ export const Display = ((doc) => {
         const projectGrid = doc.getElementById('project-grid');
         const projectToRemove = doc.querySelector(`#${projectCardId}`);
 
+        // If expanded project deleted, return to projectGrid without
+        // the deleted project-card
         if (projectToRemove.classList.contains("expanded")) {
             const dashboardContainer = doc.getElementById('dashboard-container');
             dashboardContainer.removeChild(projectToRemove);
+
             const projectGrid = state.currentProjectGrid;
+
+            const projectToRemoveInGrid = projectGrid.querySelector(`#${projectCardId}`);
+            projectGrid.removeChild(projectToRemoveInGrid);
+
+            const otherProjects = Array.from(projectGrid.querySelectorAll('[id^="project-card-"]'));
+            const deleteBtns = Array.from(projectGrid.querySelectorAll('.invisible-btn'));
+
+            deleteBtns.forEach(btn => {
+                btn.addEventListener("click", function(ev) {
+                    ev.stopPropagation;
+                    renderDeleteProjectModal(ev);
+                });
+            });
+
+            otherProjects.forEach(proj => {
+                proj.addEventListener('click', renderExpandedProject);
+                proj.classList.remove('expanded');
+            });
+
             dashboardContainer.appendChild(projectGrid);
         } else {
             projectGrid.removeChild(projectToRemove);
@@ -228,13 +250,11 @@ export const Display = ((doc) => {
 
     const renderExpandedProject = (ev) => {
         // Check if the target of the click event is the delete icon
+        // Or the project card has already been expanded
         // If yes, Return early without triggering the expansion
-        if (ev.target.classList.contains('invisible-btn')) {
+        if (ev.target.classList.contains('invisible-btn') ||
+            ev.currentTarget.classList.contains('expanded')) {
             return;
-        }
-
-        if (ev.currentTarget.classList.contains('expanded')) {
-           return;
         }
 
         const projectCard = ev.currentTarget;
@@ -360,8 +380,11 @@ export const Display = ((doc) => {
 
     const renderShrunkProject = (ev) => {
         // Check if the target of the click event is the delete icon
+        // or one of the todo checkboxes
         // If yes, Return early without triggering the shrinking
-        if (ev.target.classList.contains('invisible-btn')) {
+        if (ev.target.classList.contains('invisible-btn') ||
+            ev.target.classList.contains('todo-check')
+        ) {
             return;
         }
 
@@ -379,9 +402,9 @@ export const Display = ((doc) => {
         const previousY = state.expandedCardPrevPosition.currentY;
         const previousWidth = state.expandedCardPrevPosition.currentWidth;
         const previousHeight = state.expandedCardPrevPosition.currentHeight;
-        console.log(previousX, previousY, previousHeight, previousWidth); 
+
         // Prepare shrinking animation
-        const animationName = `expansionAnimation_${Date.now()}`;
+        const animationName = `shrinkingAnimation_${Date.now()}`;
         const animationDuration = "500ms";
         const animationTransition = "cubic-bezier(.43,.22,.43,.92)";
         const animationKeyframes = `
@@ -415,28 +438,30 @@ export const Display = ((doc) => {
             if (styleSheet.parentNode) {
                 styleSheet.parentNode.removeChild(styleSheet);
             }
- 
             const dashboardContainer = doc.getElementById('dashboard-container');
             const projectGrid = state.currentProjectGrid;
- 
-            const projectCardId = projectCard.id;
 
- 
             dashboardContainer.removeChild(projectCard);
             dashboardContainer.appendChild(projectGrid);
 
-            const projectInGrid = projectGrid.querySelector(`#${projectCardId}`);
-            
-            projectInGrid.addEventListener('click', renderExpandedProject);
-            projectCard.classList.remove('expanded');
-         };
+            const projectsInGrid = Array.from(projectGrid.querySelectorAll('[id^="project-card-"]'));
+            const deleteBtns = Array.from(projectGrid.querySelectorAll('.invisible-btn'));
+
+            deleteBtns.forEach(btn => {
+                btn.addEventListener("click", function(ev) {
+                    ev.stopPropagation;
+                    renderDeleteProjectModal(ev);
+                });
+            });
+
+            projectsInGrid.forEach(proj => {
+                proj.addEventListener('click', renderExpandedProject);
+                proj.classList.remove('expanded');
+            });
+        };
 
         projectCard.addEventListener('animationend', handleAnimationEnd);
 
-        setTimeout(() => {
-           projectCard.removeEventListener('click', renderShrunkProject);
-           projectCard.removeEventListener('animationend', handleAnimationEnd);
-        }, 1000);
     };
 
     return {
