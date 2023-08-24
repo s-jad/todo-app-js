@@ -147,9 +147,32 @@ export const Display = ((doc) => {
         confirmCreateProjectBtn.onclick = UserEvents.createNewProject;
         cancelCreateProjectBtn.onclick = () => UserEvents.closeModal(createProjectModalContainer);
 
-        const createProjectTodoCountInput = createProjectModalContainer.querySelector('#create-project-todo-count-input');
         const todoInputContainer = createProjectModalContainer.querySelector('#todo-input-container');
 
+        const createProjectNameInput = createProjectModalContainer.querySelector('#create-project-name-input');
+
+        // Check the project name is unique
+        createProjectNameInput.addEventListener('blur', () => {
+            const user = TodoApp.getCurrentUser();
+            const uniqueName = user.checkUniqueProjectName(createProjectNameInput.value);
+            console.log(uniqueName);
+
+            if (uniqueName !== -1) {
+                todoInputContainer.innerHTML = '';
+                const warnNonUniqueProjectName = doc.createElement('p');
+                warnNonUniqueProjectName.id = "warn-non-unique-project-name";
+                warnNonUniqueProjectName.innerText = `You already have a project named "${createProjectNameInput.value}", 
+                                                      please choose a unique project name`;
+                todoInputContainer.appendChild(warnNonUniqueProjectName);
+            } else {
+                todoInputContainer.innerHTML = '';
+            }
+        });
+
+        const createProjectTodoCountInput = createProjectModalContainer.querySelector('#create-project-todo-count-input');
+
+        // Check if the todo count is a valid number and not over max
+        // If so, generate inputs for that number of todos
         createProjectTodoCountInput.addEventListener('input', () => {
             const todoCount = parseInt(createProjectTodoCountInput.value);
 
@@ -159,7 +182,8 @@ export const Display = ((doc) => {
                 const warnNotANumber = doc.createElement('p');
                 warnNotANumber.id = "warn-not-a-number";
 
-                warnNotANumber.innerText = `The value you entered is not a number, please insert a number, max = 12.`;
+                warnNotANumber.innerText = `The value you have entered is not a number, 
+                                            please insert a number, max = 12.`;
                 todoInputContainer.appendChild(warnNotANumber);
                 return;
             }
@@ -207,10 +231,8 @@ export const Display = ((doc) => {
             }
         });
 
-
         app.appendChild(createProjectModalContainer);
     };
-
 
     const renderLeftRightTodoBtns = () => {
         // Add left and right buttons for todo carousel

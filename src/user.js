@@ -39,4 +39,8 @@ export default class User {
             console.log(`Cant find ${projectTitle}`);
         }
     }
+
+    checkUniqueProjectName(projectTitle) {
+        return this.projects.findIndex(project => project.title === projectTitle);
+    }
 }
