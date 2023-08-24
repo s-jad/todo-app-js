@@ -536,7 +536,7 @@ textarea {
     text-align: center;
 }
 
-[id^="todo-input-box-"] {
+[id^="todo-input-card-"] {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
@@ -553,7 +553,7 @@ textarea {
                 left 350ms ease-in-out;
 }
 
-[id^="todo-input-box-"].hide-right {
+[id^="todo-input-card-"].hide-right {
     position: absolute;
     z-index: 101; 
     left: 150%;
@@ -564,7 +564,7 @@ textarea {
 }
 
 
-[id^="todo-input-box-"].hide-left {
+[id^="todo-input-card-"].hide-left {
     position: absolute;
     z-index: 101; 
     top: -0.1rem;
@@ -572,12 +572,12 @@ textarea {
     opacity: 0;
 }
 
-.todo-input-box-title {
+.todo-input-card-title {
     grid-column: 1 / 3;
     text-align: center;
 }
 
-[id^="todo-input-box-"] > textarea {
+[id^="todo-input-card-"] > textarea {
     grid-column: 1 / 3;
 }
 

@@ -181,7 +181,6 @@ export const Display = ((doc) => {
 
                 const warnNotANumber = doc.createElement('p');
                 warnNotANumber.id = "warn-not-a-number";
-
                 warnNotANumber.innerText = `The value you have entered is not a number, 
                                             please insert a number, max = 12.`;
                 todoInputContainer.appendChild(warnNotANumber);
@@ -202,9 +201,9 @@ export const Display = ((doc) => {
 
             for (let i = 0; i < todoCount; i++) {
 
-                const todoInputBox = doc.createElement('div');
-                todoInputBox.innerHTML = `
-                    <p class="todo-input-box-title">Todo ${i + 1}</p>
+                const todoInputCard = doc.createElement('div');
+                todoInputCard.innerHTML = `
+                    <p class="todo-input-card-title">Todo ${i + 1}</p>
                     <input type="text" name="new-todo-name-${i + 1}" class="create-project-todo-input"
                     placeholder="Todo ${i + 1} name">
                     <input type="text" name="new-todo-description-${i + 1}" class="create-project-todo-input"
@@ -217,13 +216,13 @@ export const Display = ((doc) => {
                     placeholder="Todo ${i + 1} notes"></textarea>
                 `;
 
-                todoInputBox.id = `todo-input-box-${i + 1}`;
+                todoInputCard.id = `todo-input-card-${i + 1}`;
 
                 if (i > 0) {
-                    todoInputBox.classList.add('hide-right');
+                    todoInputCard.classList.add('hide-right');
                 }
 
-                todoInputContainer.appendChild(todoInputBox);
+                todoInputContainer.appendChild(todoInputCard);
             };
 
             if (todoCount > 0) {
