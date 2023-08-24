@@ -153,12 +153,23 @@ export const Display = ((doc) => {
         createProjectTodoCountInput.addEventListener('input', () => {
             const todoCount = parseInt(createProjectTodoCountInput.value);
 
+            if (isNaN(todoCount)) {
+                todoInputContainer.innerHTML = '';
+
+                const warnNotANumber = doc.createElement('p');
+                warnNotANumber.id = "warn-not-a-number";
+
+                warnNotANumber.innerText = `The value you entered is not a number, please insert a number, max = 12.`;
+                todoInputContainer.appendChild(warnNotANumber);
+                return;
+            }
+
             if (todoCount > createProjectTodoCountInput.max) {
                 todoInputContainer.innerHTML = '';
 
                 const warnTooManyTodos = doc.createElement('p');
                 warnTooManyTodos.id = "warn-too-many-todos";
-                warnTooManyTodos.innerText = `${todoCount} is too many todos, max = 12.`
+                warnTooManyTodos.innerText = `${todoCount} is too many todos, max = 12.`;
                 todoInputContainer.appendChild(warnTooManyTodos);
                 return;
             }
@@ -167,7 +178,7 @@ export const Display = ((doc) => {
 
             for (let i = 0; i < todoCount; i++) {
 
-                const todoInputBox = document.createElement('div');
+                const todoInputBox = doc.createElement('div');
                 todoInputBox.innerHTML = `
                     <p class="todo-input-box-title">Todo ${i + 1}</p>
                     <input type="text" name="new-todo-name-${i + 1}" class="create-project-todo-input"
@@ -470,9 +481,9 @@ export const Display = ((doc) => {
         `;
 
         // Append animation to the stylesheet
-        const styleSheet = document.createElement("style");
+        const styleSheet = doc.createElement("style");
         styleSheet.innerHTML = animationKeyframes;
-        document.head.appendChild(styleSheet);
+        doc.head.appendChild(styleSheet);
 
         projectCard.style.animation = `${animationName} ${animationDuration} ${animationTransition}`;
 
@@ -599,9 +610,9 @@ export const Display = ((doc) => {
         `;
 
         // Append animation to the stylesheet
-        const styleSheet = document.createElement("style");
+        const styleSheet = doc.createElement("style");
         styleSheet.innerHTML = animationKeyframes;
-        document.head.appendChild(styleSheet);
+        doc.head.appendChild(styleSheet);
 
         projectCard.style.animation = `${animationName} ${animationDuration} ${animationTransition}`;
 
