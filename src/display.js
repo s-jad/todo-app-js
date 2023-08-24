@@ -275,7 +275,7 @@ export const Display = ((doc) => {
     };
 
     const scrollTodosLeft = () => {
-        const todos = Array.from(doc.querySelectorAll('[id^="todo-input-box-"]'));
+        const todos = Array.from(doc.querySelectorAll('[id^="todo-input-card-"]'));
 
         const visibleTodo = todos.find(todo => {
             return !todo.classList.contains('hide-left') &&
@@ -298,7 +298,7 @@ export const Display = ((doc) => {
     };
 
     const scrollTodosRight = () => {
-        const todos = Array.from(doc.querySelectorAll('[id^="todo-input-box-"]'));
+        const todos = Array.from(doc.querySelectorAll('[id^="todo-input-card-"]'));
 
         const visibleTodo = todos.find(todo => {
             return !todo.classList.contains('hide-left') &&
@@ -375,7 +375,7 @@ export const Display = ((doc) => {
         actualDeleteBtn.classList.add('invisible-btn');
 
         actualDeleteBtn.addEventListener("click", function(ev) {
-            ev.stopPropagation;
+            ev.stopPropagation();
             renderDeleteProjectModal(ev);
         });
 
@@ -411,7 +411,7 @@ export const Display = ((doc) => {
 
             deleteBtns.forEach(btn => {
                 btn.addEventListener("click", function(ev) {
-                    ev.stopPropagation;
+                    ev.stopPropagation();
                     renderDeleteProjectModal(ev);
                 });
             });
@@ -545,11 +545,31 @@ export const Display = ((doc) => {
                 todoContainer.classList.add('todo-container');
 
                 todoContainer.innerHTML = `
-                    <li class="project-todo">
+                    <div class="todo-title-checkbox-container">
+                        <li class="project-todo">
                         <label for="todo-${index}">${todo.title}</label>
-                    </li>
-                    <input type="checkbox" name="todo-${index}" class="todo-check"></input>
+                        </li>
+                        <input type="checkbox" name="todo-${index}" class="todo-check"></input>
+                    </div>
                 `;
+                todoContainer.addEventListener('click', function(ev) {
+                    ev.stopPropagation();
+
+                    if (todoContainer.classList.contains("expanded")) {
+                        todoContainer.classList.remove("expanded");
+                        const expandedInfo = todoContainer.querySelector('.expanded-todo-info');
+                        todoContainer.removeChild(expandedInfo);
+                        const otherTodos = Array.from(todoContainer.parentNode.querySelectorAll(".todo-container"));
+                        otherTodos.forEach(node => {
+                            setTimeout(() => {
+                                node.classList.remove("shrink");
+                                node.style.visibility = "";
+                            }, 100);
+                        });
+                        return;
+                    }
+                    renderExpandedTodo(ev);
+                });
                 projectTodoList.appendChild(todoContainer);
             });
 
@@ -573,12 +593,54 @@ export const Display = ((doc) => {
         }, 600);
     };
 
+    const renderExpandedTodo = (ev) => {
+        if (ev.target.classList.contains('todo-check')) {
+            return;
+        }
+        const todoContainer = ev.currentTarget;
+        const projectId = doc.querySelector('[id^="project-card-"]').id;
+        const projectName = projectId.slice(projectId.lastIndexOf("-") + 1);
+        const todoName = todoContainer.querySelector('label').innerText;
+
+        const user = TodoApp.getCurrentUser();
+        const project = user.getProject(projectName);
+        const todoToExpand = project.getTodo(todoName);
+
+        const todoInfo = doc.createElement('div');
+        todoInfo.classList.add('expanded-todo-info');
+        todoInfo.innerHTML = `
+            <h4>Description:</h4>
+            <p class="expanded-todo-description">${todoToExpand.description}</p>
+            <h4>Due Date:</h4>
+            <p class="expanded-todo-due-date">${todoToExpand.dueDate}</p>
+            <h4>Priority:</h4>
+            <p class="expanded-todo-priority">${todoToExpand.priority}</p>
+            <h4>Notes:</h4>
+            <p class="expanded-todo-notes">${todoToExpand.notes}</p>
+        `;
+        todoInfo.classList.add('invisible');
+
+        todoContainer.classList.add("expanded");
+        const otherTodos = Array.from(todoContainer.parentNode.childNodes).filter(node => {
+            return node.nodeType === 1 && node !== todoContainer;
+        });
+
+        otherTodos.forEach(todo => todo.classList.add('shrink'));
+
+        setTimeout(() => {
+            otherTodos.forEach(todo => todo.style.visibility = "hidden");
+            todoContainer.appendChild(todoInfo);
+            todoInfo.classList.remove('invisible');
+        }, 300);
+    };
+
     const renderShrunkProject = (ev) => {
         // Check if the target of the click event is the delete icon
         // or one of the todo checkboxes
         // If yes, Return early without triggering the shrinking
         if (ev.target.classList.contains('invisible-btn') ||
-            ev.target.classList.contains('todo-check')
+            ev.target.classList.contains('todo-check') ||
+            ev.target.classList.contains('todo-container')
         ) {
             return;
         }
@@ -599,6 +661,9 @@ export const Display = ((doc) => {
         const previousX = state.expandedCardPrevPosition.currentX;
         const previousWidth = state.expandedCardPrevPosition.currentWidth;
         const previousHeight = state.expandedCardPrevPosition.currentHeight;
+
+        const projectTodoListContainer = projectCard.querySelector('.project-todos-list-container');
+        projectCard.removeChild(projectTodoListContainer);
 
         projectCard.classList.remove('expanded');
         projectCard.classList.add('shrinking');
@@ -648,7 +713,7 @@ export const Display = ((doc) => {
 
             deleteBtns.forEach(btn => {
                 btn.addEventListener("click", function(ev) {
-                    ev.stopPropagation;
+                    ev.stopPropagation();
                     renderDeleteProjectModal(ev);
                 });
             });
