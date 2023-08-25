@@ -10,6 +10,8 @@ export const Display = ((doc) => {
     let state = {
         currentProjectGrid: {},
         expandedCardPrevPosition: {},
+        progressBarCount: 0,
+        progressBarPercentages: [],
     };
 
     const renderApp = () => {
@@ -354,15 +356,20 @@ export const Display = ((doc) => {
         const moddedProjectTitle = project.title.replaceAll(" ", "-");
         newProjectCard.id = `project-card-${moddedProjectTitle}`;
 
+        state.progressBarPercentages[state.progressBarCount] = 0;
+        console.log("state.progressBarCount = ", state.progressBarCount);
+
         newProjectCard.innerHTML = `
             <h3 class="project-title">${project.title}</h3>
             <p class="project-description">${project.description}</p>
             <div class="project-utils">
                 <div class="progress-bar-bg">
-                    <div class="progress-bar"></div>
+                    <div id="progress-${state.progressBarCount}" class="progress-bar"></div>
                 </div>
             </div>
         `;
+
+        state.progressBarCount++;
 
         // Delete btn + icon
         const btnContainer = doc.createElement('div');
@@ -570,6 +577,11 @@ export const Display = ((doc) => {
                     }
                     renderExpandedTodo(ev);
                 });
+
+                const checkBox = todoContainer.querySelector('.todo-check');
+                checkBox.checked = todo.checked;
+                checkBox.addEventListener("click", renderProgressBar);
+
                 projectTodoList.appendChild(todoContainer);
             });
 
@@ -710,6 +722,16 @@ export const Display = ((doc) => {
 
             const projectsInGrid = Array.from(projectGrid.querySelectorAll('[id^="project-card-"]'));
             const deleteBtns = Array.from(projectGrid.querySelectorAll('.invisible-btn'));
+            const progressBars = Array.from(projectGrid.querySelectorAll('.progress-bar'));
+
+            for (let i = 0; i < progressBars.length; i++) {
+                progressBars[i].style.width = `${state.progressBarPercentages[i]}%`;
+                if (state.progressBarPercentages[i] === 100) {
+                    progressBars[i].style.background = "hsl(150, 51%, 50%)";
+                } else {
+                    progressBars[i].style.background = "hsl(0, 51%, 50%)";
+                }
+            }
 
             deleteBtns.forEach(btn => {
                 btn.addEventListener("click", function(ev) {
@@ -734,6 +756,33 @@ export const Display = ((doc) => {
             projectCard.removeEventListener("click", renderShrunkProject);
             projectCard.removeEventListener('animationend', handleShrinkingAnimationEnd);
         }, 600);
+    };
+
+    const renderProgressBar = (ev) => {
+        const projectId = doc.querySelector('[id^="project-card-"]').id;
+        const projectName = projectId.slice(projectId.lastIndexOf("-") + 1);
+        const todoIndex = ev.target.name.slice(ev.target.name.lastIndexOf("-") + 1);
+
+        const projectTodoList = doc.querySelector('.project-todos-list');
+        const checkboxes = Array.from(projectTodoList.querySelectorAll('.todo-check'));
+        const checkBoxCount = checkboxes.length;
+        const checkedCount = Array.from(checkboxes.filter(checkbox => checkbox.checked)).length;
+
+        const user = TodoApp.getCurrentUser();
+        const project = user.getProject(projectName);
+        project.todos[todoIndex].checked = ev.target.checked;
+
+        const progressBar = doc.querySelector('.progress-bar');
+        progressBar.style.width = `${(checkedCount / checkBoxCount) * 100}%`;
+
+        const progressbarIdNum = parseInt((progressBar.id).slice(progressBar.id.lastIndexOf("-") + 1));
+        state.progressBarPercentages[progressbarIdNum] = (checkedCount / checkBoxCount) * 100;
+
+        if (state.progressBarPercentages[progressbarIdNum] === 100) {
+            progressBar.style.background = "hsl(150, 51%, 50%)";
+        } else {
+            progressBar.style.background = "hsl(0, 51%, 50%)";
+        }
     };
 
     return {
