@@ -76,22 +76,24 @@ export const UserEvents = (() => {
 
     const createNewProject = (ev) => {
         const projectNameInput = document.getElementById('create-project-name-input');
+
         const projectName = projectNameInput.value;
+
 
         const projectDescriptionInput = document.getElementById('create-project-description-input');
         const projectDescription = projectDescriptionInput.value;
 
-        const todoBoxes = Array.from(document.querySelectorAll('[id^="todo-input-box-"]'));
+        const todoCards = Array.from(document.querySelectorAll('[id^="todo-input-card-"]'));
 
         let projectTodos = [];
 
-        todoBoxes.forEach(todoBox => {
+        todoCards.forEach(todoCard => {
             const todo = new Todo(
-                todoBox.querySelector('[name^="new-todo-name-"]').value,
-                todoBox.querySelector('[name^="new-todo-description-"]').value,
-                todoBox.querySelector('[name^="new-todo-due-date-"]').value,
-                parseInt(todoBox.querySelector('[name^="new-todo-priority-"]').value),
-                todoBox.querySelector('[name^="new-todo-notes-"]').value,
+                todoCard.querySelector('[name^="new-todo-name-"]').value,
+                todoCard.querySelector('[name^="new-todo-description-"]').value,
+                todoCard.querySelector('[name^="new-todo-due-date-"]').value,
+                parseInt(todoCard.querySelector('[name^="new-todo-priority-"]').value),
+                todoCard.querySelector('[name^="new-todo-notes-"]').value,
             );
 
             projectTodos.push(todo);
