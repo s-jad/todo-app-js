@@ -12,7 +12,6 @@ export const Display = ((doc) => {
         expandedCardPrevPosition: {},
         progressBarCount: 0,
         progressBarPercentages: [],
-        currentProjectNames: [],
         currentTodoNames: [],
     };
 
@@ -264,19 +263,15 @@ export const Display = ((doc) => {
                 const todoNameInput = todoInputCard.querySelector('[name^="new-todo-name-"]');
                 todoNameInput.addEventListener('input', handleModalInputChanges);
 
-                todoNameInput.addEventListener('blur', function() {
+
+                todoNameInput.addEventListener('input', function() {
+                    const currentTNI = i;
                     const todoName = todoNameInput.value;
-                    const todoNameIndex = i;
-                    if (todoNames.findIndex(existingTodoName => existingTodoName === todoName) !== -1) {
+                    const todoPresentInArr = todoNames.findIndex(existingTodoName => existingTodoName === todoName);
+                    if (todoPresentInArr !== -1) {
                         // If the warning is already present, dont append another one
                         const existingSameWarning = todoInputContainer.querySelector('#warn-non-unique-todo-name');
                         if (existingSameWarning !== null) {
-                            return
-                        }
-
-                        // If the user accidently retriggered blur with the same name as before
-                        // don't warn.
-                        if (todoName === todoNames[todoNameIndex]) {
                             return;
                         }
 
@@ -293,11 +288,13 @@ export const Display = ((doc) => {
                         if (existingWarning !== null) {
                             todoInputContainer.removeChild(existingWarning);
                         }
-
-                        todoNames.push(todoName);
+                        if (todoName !== "") {
+                            todoNames[currentTNI] = todoName;
+                            state.currentTodoNames[currentTNI] = todoName;
+                            console.log("todoNames => ", todoNames);
+                        }
                     }
                 });
-
                 todoInputContainer.appendChild(todoInputCard);
             };
 
@@ -315,30 +312,29 @@ export const Display = ((doc) => {
         const newProjectName = doc.getElementById("create-project-name-input").value;
         const uniqueProjectName = user.checkUniqueProjectName(newProjectName);
 
-        const warnings = doc.querySelectorAll('[id^="warn-"]');
         const projectTodoCount = doc.getElementById("create-project-todo-count-input");
         const confirmCreateProjectBtn = doc.getElementById("confirm-create-project-btn");
+        const todoNames = Array.from(doc.querySelectorAll('[name^="new-todo-name-"]'));
+        const todoNamesFilled = todoNames.filter(todoName => todoName.value !== "");
 
 
-        if (uniqueProjectName !== -1 ||
-            parseInt(projectTodoCount.value) > parseInt(projectTodoCount.max) ||
-            projectTodoCount.value === "" ||
-            warnings.length > 0
-        ) {
-            console.log("The button remains disabled");
-            console.log("project name taken => ", uniqueProjectName !== -1);
-            console.log("value > max => ", parseInt(projectTodoCount.value) > parseInt(projectTodoCount.max));
-            console.log("Count not a number => ", projectTodoCount.value === "");
-            console.log("warnings present => ", warnings.length > 0);
-            confirmCreateProjectBtn.disabled = true;
-            return;
-        }
+        setTimeout(() => {
+            const warnings = Array.from(doc.querySelectorAll('[id^="warn-"]'));
+            if (uniqueProjectName !== -1 ||
+                parseInt(projectTodoCount.value) > parseInt(projectTodoCount.max) ||
+                projectTodoCount.value === "" ||
+                todoNames.length !== todoNamesFilled.length ||
+                todoNamesFilled.length === 0 ||
+                warnings.length > 0
+            ) {
+                confirmCreateProjectBtn.disabled = true;
+                return;
+            }
 
-        console.log("Button enabled");
-        confirmCreateProjectBtn.disabled = false;
+            confirmCreateProjectBtn.disabled = false;
+        }, 300);
 
     }
-
 
     const renderLeftRightTodoBtns = () => {
         // Add left and right buttons for todo carousel
