@@ -147,6 +147,7 @@ export const Display = ((doc) => {
         const cancelCreateProjectBtn = createProjectModalContainer.querySelector('#cancel-create-project-btn');
 
         confirmCreateProjectBtn.onclick = UserEvents.createNewProject;
+        confirmCreateProjectBtn.disabled = true;
         cancelCreateProjectBtn.onclick = () => UserEvents.closeModal(createProjectModalContainer);
 
         const todoInputContainer = createProjectModalContainer.querySelector('#todo-input-container');
@@ -157,7 +158,6 @@ export const Display = ((doc) => {
         createProjectNameInput.addEventListener('blur', () => {
             const user = TodoApp.getCurrentUser();
             const uniqueName = user.checkUniqueProjectName(createProjectNameInput.value);
-            console.log(uniqueName);
 
             if (uniqueName !== -1) {
                 todoInputContainer.innerHTML = '';
@@ -173,10 +173,14 @@ export const Display = ((doc) => {
 
         const createProjectTodoCountInput = createProjectModalContainer.querySelector('#create-project-todo-count-input');
 
+        // Stores chosen todo names to check uniqueness and count names
+        const todoNames = [];
+        let todoCount = 0;
+
         // Check if the todo count is a valid number and not over max
         // If so, generate inputs for that number of todos
         createProjectTodoCountInput.addEventListener('input', () => {
-            const todoCount = parseInt(createProjectTodoCountInput.value);
+            todoCount = parseInt(createProjectTodoCountInput.value);
 
             if (isNaN(todoCount)) {
                 todoInputContainer.innerHTML = '';
@@ -201,6 +205,7 @@ export const Display = ((doc) => {
 
             todoInputContainer.innerHTML = ''; // Clear existing inputs
 
+
             for (let i = 0; i < todoCount; i++) {
 
                 const todoInputCard = doc.createElement('div');
@@ -224,6 +229,28 @@ export const Display = ((doc) => {
                     todoInputCard.classList.add('hide-right');
                 }
 
+                const todoNameInput = todoInputCard.querySelector('[name^="new-todo-name-"]');
+
+                todoNameInput.addEventListener('blur', function() {
+                    const todoName = todoNameInput.value;
+                    if (todoNames.findIndex(existingTodoName => existingTodoName === todoName) !== -1) {
+                        const warnNonUniqueTodoName = doc.createElement('p');
+                        warnNonUniqueTodoName.id = "warn-non-unique-todo-name";
+                        warnNonUniqueTodoName.innerText = `A todo named "${todoName}" already exists in this project,
+                                                            please choose a unique name for each todo in a project.`;
+                        todoInputContainer.appendChild(warnNonUniqueTodoName);
+                        return;
+                    } else {
+                        // Remove existing warning if present
+                        const existingWarning = todoInputContainer.querySelector('#warn-non-unique-todo-name');
+                        if (existingWarning !== null) {
+                            todoInputContainer.removeChild(existingWarning);
+                        }
+
+                        todoNames.push(todoName);
+                    }
+                });
+
                 todoInputContainer.appendChild(todoInputCard);
             };
 
@@ -231,6 +258,32 @@ export const Display = ((doc) => {
                 todoInputContainer.appendChild(renderLeftRightTodoBtns());
             }
         });
+
+        // Create a new instance of MutationObserver
+        // Use it to observe if the user is receiving
+        // any warnings about inputs or hasnt filled the necessary fields
+        // disable confirmCreateProjectBtn if true
+        const observer = new MutationObserver(function(mutationsList) {
+            for (const mutation of mutationsList) {
+                if (mutation.type === 'childList') {
+                    if (todoInputContainer.querySelector('[id^="warn-"]') ||
+                        todoNames.length < todoCount ||
+                        createProjectTodoCountInput.value === "" ||
+                        createProjectNameInput.value === ""
+                    ) {
+                        confirmCreateProjectBtn.disabled = true;
+                    } else {
+                        confirmCreateProjectBtn.disabled = false;
+                    }
+                }
+            }
+        });
+
+        // Configuration options for the observer
+        const warningObserverConfig = { childList: true };
+
+        // Start observing the parent element with the specified configuration
+        observer.observe(todoInputContainer, warningObserverConfig);
 
         app.appendChild(createProjectModalContainer);
     };
