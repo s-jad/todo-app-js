@@ -117,6 +117,7 @@ input {
 
 textarea {
     min-width: 100%;
+    padding-left: 1.5rem;
     border-radius: 1rem;
 }
 
@@ -556,13 +557,27 @@ textarea {
 
 #confirm-create-project-btn {
     grid-column: 2 / 3;
-    box-shadow: inset 0 0 5px hsl(150, 51%, 50%);
+    box-shadow: inset 0 0 5px hsl(150, 90%, 70%);
 }
 
 #confirm-create-project-btn:disabled {
     grid-column: 2 / 3;
-    box-shadow: inset 0 0 5px hsl(0, 51%, 50%);
+    box-shadow: inset 0 0 5px hsl(0, 90%, 70%);
     background: hsla(0, 0%, 50%, 0.7);
+}
+
+.required {
+    color: hsl(0, 90%, 70%);
+}
+
+[name^="new-todo-name-"] {
+    position: relative;
+}
+
+[name^="new-todo-name-"]::after {
+    position: absolute;
+    content: "HELLO!";
+    color: hsl(0, 90%, 70%);
 }
 
 

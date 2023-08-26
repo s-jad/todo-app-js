@@ -128,11 +128,11 @@ export const Display = ((doc) => {
         createProjectModalContainer.innerHTML = `
             <form action="#" id="create-project-form" method="POST">
                 <h2 id="create-project-title">Create a new Project</h2>
-                <label for="create-project-name" class="create-project-label">Name:</label>
+                <label for="create-project-name" class="create-project-label"><span class="required">*</span> Name: </label>
                 <input type="text" name="create-project-name" id="create-project-name-input">
                 <label for="create-project-description" class="create-project-label">Description:</label>
                 <textarea type="text" name="create-project-description" id="create-project-description-input"></textarea>
-                <label for="create-project-todo-count" class="create-project-label">Number of todos:</label>
+                <label for="create-project-todo-count" class="create-project-label"><span class="required">*</span> Number of todos:</label>
                 <input type="number" name="create-project-todo-count" id="create-project-todo-count-input" min="0" max="12">
                 <p id="todo-input-container-title">Todos:</p>
                 <div id="todo-input-container">
@@ -233,11 +233,26 @@ export const Display = ((doc) => {
 
                 todoNameInput.addEventListener('blur', function() {
                     const todoName = todoNameInput.value;
+                    const todoNameIndex = i;
                     if (todoNames.findIndex(existingTodoName => existingTodoName === todoName) !== -1) {
+                        // If the warning is already present, dont append another one
+                        const existingWarning = todoInputContainer.querySelector('#warn-non-unique-todo-name');
+                        if (existingWarning !== null) {
+                            return
+                        }
+
+                        // If the user accidently retriggered blur with the same name as before
+                        // don't warn.
+                        if (todoName === todoNames[todoNameIndex]) {
+                            return;
+                        }
+
                         const warnNonUniqueTodoName = doc.createElement('p');
                         warnNonUniqueTodoName.id = "warn-non-unique-todo-name";
                         warnNonUniqueTodoName.innerText = `A todo named "${todoName}" already exists in this project,
                                                             please choose a unique name for each todo in a project.`;
+
+
                         todoInputContainer.appendChild(warnNonUniqueTodoName);
                         return;
                     } else {
@@ -279,10 +294,7 @@ export const Display = ((doc) => {
             }
         });
 
-        // Configuration options for the observer
         const warningObserverConfig = { childList: true };
-
-        // Start observing the parent element with the specified configuration
         observer.observe(todoInputContainer, warningObserverConfig);
 
         app.appendChild(createProjectModalContainer);
