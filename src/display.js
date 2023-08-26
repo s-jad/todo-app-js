@@ -12,6 +12,8 @@ export const Display = ((doc) => {
         expandedCardPrevPosition: {},
         progressBarCount: 0,
         progressBarPercentages: [],
+        currentProjectNames: [],
+        currentTodoNames: [],
     };
 
     const renderApp = () => {
@@ -35,6 +37,17 @@ export const Display = ((doc) => {
         welcomeConfirmBtn.type = "button";
         welcomeConfirmBtn.innerText = "Confirm";
         welcomeConfirmBtn.onclick = UserEvents.switchToProjectDashboard;
+        welcomeConfirmBtn.disabled = true;
+
+        welcomeInput.addEventListener("input", function(ev) {
+            if (ev.target.value === "") {
+                welcomeConfirmBtn.disabled = true;
+            } else {
+                welcomeConfirmBtn.disabled = false;
+                welcomeConfirmBtn.style.boxShadow = "inset 0 0 5px hsl(150, 90%, 70%)";
+                welcomeConfirmBtn.style.scale = "1.2";
+            }
+        })
 
         welcomeFlex.appendChild(welcomeTitle);
         welcomeFlex.appendChild(welcomeInput);
@@ -128,19 +141,20 @@ export const Display = ((doc) => {
         createProjectModalContainer.innerHTML = `
             <form action="#" id="create-project-form" method="POST">
                 <h2 id="create-project-title">Create a new Project</h2>
-                <label for="create-project-name" class="create-project-label"><span class="required">*</span> Name: </label>
-                <input type="text" name="create-project-name" id="create-project-name-input">
+                <label for="create-project-name" class="create-project-label"><span class="warn-hl">*</span> Name: </label>
+                <input type="text" value="" name="create-project-name" id="create-project-name-input" class="required">
                 <label for="create-project-description" class="create-project-label">Description:</label>
-                <textarea type="text" name="create-project-description" id="create-project-description-input"></textarea>
-                <label for="create-project-todo-count" class="create-project-label"><span class="required">*</span> Number of todos:</label>
-                <input type="number" name="create-project-todo-count" id="create-project-todo-count-input" min="0" max="12">
+                <textarea type="text" value="" name="create-project-description" id="create-project-description-input"></textarea>
+                <label for="create-project-todo-count" class="create-project-label"><span class="warn-hl">*</span> Number of todos:</label>
+                <input type="number" value="" name="create-project-todo-count" 
+                id="create-project-todo-count-input" min="0" max="12" class="required">
                 <p id="todo-input-container-title">Todos:</p>
                 <div id="todo-input-container">
                     <!-- Dynamic todo item inputs will be added here -->
                 </div>
                 <button type="button" id="confirm-create-project-btn">Confirm</button>
                 <button type="button" id="cancel-create-project-btn">Cancel</button>
-            </form>
+            </input>
         `;
 
         const confirmCreateProjectBtn = createProjectModalContainer.querySelector('#confirm-create-project-btn');
@@ -153,6 +167,7 @@ export const Display = ((doc) => {
         const todoInputContainer = createProjectModalContainer.querySelector('#todo-input-container');
 
         const createProjectNameInput = createProjectModalContainer.querySelector('#create-project-name-input');
+        createProjectNameInput.addEventListener('input', handleModalInputChanges);
 
         // Check the project name is unique
         createProjectNameInput.addEventListener('blur', () => {
@@ -160,19 +175,28 @@ export const Display = ((doc) => {
             const uniqueName = user.checkUniqueProjectName(createProjectNameInput.value);
 
             if (uniqueName !== -1) {
-                todoInputContainer.innerHTML = '';
+                const existingWarning = todoInputContainer.querySelector('[id^="warn-"]');
+
+                if (existingWarning !== null) {
+                    todoInputContainer.removeChild(existingWarning);
+                }
+
                 const warnNonUniqueProjectName = doc.createElement('p');
                 warnNonUniqueProjectName.id = "warn-non-unique-project-name";
                 warnNonUniqueProjectName.innerText = `You already have a project named "${createProjectNameInput.value}", 
                                                       please choose a unique project name`;
                 todoInputContainer.appendChild(warnNonUniqueProjectName);
             } else {
-                todoInputContainer.innerHTML = '';
+                const existingWarning = todoInputContainer.querySelector('[id^="warn-"]');
+
+                if (existingWarning !== null) {
+                    todoInputContainer.removeChild(existingWarning);
+                }
             }
         });
 
         const createProjectTodoCountInput = createProjectModalContainer.querySelector('#create-project-todo-count-input');
-
+        createProjectTodoCountInput.addEventListener('input', handleModalInputChanges);
         // Stores chosen todo names to check uniqueness and count names
         const todoNames = [];
         let todoCount = 0;
@@ -183,7 +207,11 @@ export const Display = ((doc) => {
             todoCount = parseInt(createProjectTodoCountInput.value);
 
             if (isNaN(todoCount)) {
-                todoInputContainer.innerHTML = '';
+                const existingWarning = todoInputContainer.querySelector('[id^="warn-"]');
+
+                if (existingWarning !== null) {
+                    todoInputContainer.removeChild(existingWarning);
+                }
 
                 const warnNotANumber = doc.createElement('p');
                 warnNotANumber.id = "warn-not-a-number";
@@ -194,7 +222,11 @@ export const Display = ((doc) => {
             }
 
             if (todoCount > createProjectTodoCountInput.max) {
-                todoInputContainer.innerHTML = '';
+                const existingWarning = todoInputContainer.querySelector('[id^="warn-"]');
+
+                if (existingWarning !== null) {
+                    todoInputContainer.removeChild(existingWarning);
+                }
 
                 const warnTooManyTodos = doc.createElement('p');
                 warnTooManyTodos.id = "warn-too-many-todos";
@@ -205,13 +237,12 @@ export const Display = ((doc) => {
 
             todoInputContainer.innerHTML = ''; // Clear existing inputs
 
-
             for (let i = 0; i < todoCount; i++) {
 
                 const todoInputCard = doc.createElement('div');
                 todoInputCard.innerHTML = `
                     <p class="todo-input-card-title">Todo ${i + 1}</p>
-                    <input type="text" name="new-todo-name-${i + 1}" class="create-project-todo-input"
+                    <input type="text" name="new-todo-name-${i + 1}" class="create-project-todo-input required"
                     placeholder="Todo ${i + 1} name">
                     <input type="text" name="new-todo-description-${i + 1}" class="create-project-todo-input"
                     placeholder="Todo ${i + 1} description">
@@ -229,15 +260,17 @@ export const Display = ((doc) => {
                     todoInputCard.classList.add('hide-right');
                 }
 
+
                 const todoNameInput = todoInputCard.querySelector('[name^="new-todo-name-"]');
+                todoNameInput.addEventListener('input', handleModalInputChanges);
 
                 todoNameInput.addEventListener('blur', function() {
                     const todoName = todoNameInput.value;
                     const todoNameIndex = i;
                     if (todoNames.findIndex(existingTodoName => existingTodoName === todoName) !== -1) {
                         // If the warning is already present, dont append another one
-                        const existingWarning = todoInputContainer.querySelector('#warn-non-unique-todo-name');
-                        if (existingWarning !== null) {
+                        const existingSameWarning = todoInputContainer.querySelector('#warn-non-unique-todo-name');
+                        if (existingSameWarning !== null) {
                             return
                         }
 
@@ -251,7 +284,6 @@ export const Display = ((doc) => {
                         warnNonUniqueTodoName.id = "warn-non-unique-todo-name";
                         warnNonUniqueTodoName.innerText = `A todo named "${todoName}" already exists in this project,
                                                             please choose a unique name for each todo in a project.`;
-
 
                         todoInputContainer.appendChild(warnNonUniqueTodoName);
                         return;
@@ -274,31 +306,39 @@ export const Display = ((doc) => {
             }
         });
 
-        // Create a new instance of MutationObserver
-        // Use it to observe if the user is receiving
-        // any warnings about inputs or hasnt filled the necessary fields
-        // disable confirmCreateProjectBtn if true
-        const observer = new MutationObserver(function(mutationsList) {
-            for (const mutation of mutationsList) {
-                if (mutation.type === 'childList') {
-                    if (todoInputContainer.querySelector('[id^="warn-"]') ||
-                        todoNames.length < todoCount ||
-                        createProjectTodoCountInput.value === "" ||
-                        createProjectNameInput.value === ""
-                    ) {
-                        confirmCreateProjectBtn.disabled = true;
-                    } else {
-                        confirmCreateProjectBtn.disabled = false;
-                    }
-                }
-            }
-        });
-
-        const warningObserverConfig = { childList: true };
-        observer.observe(todoInputContainer, warningObserverConfig);
-
         app.appendChild(createProjectModalContainer);
+
     };
+
+    const handleModalInputChanges = () => {
+        const user = TodoApp.getCurrentUser();
+        const newProjectName = doc.getElementById("create-project-name-input").value;
+        const uniqueProjectName = user.checkUniqueProjectName(newProjectName);
+
+        const warnings = doc.querySelectorAll('[id^="warn-"]');
+        const projectTodoCount = doc.getElementById("create-project-todo-count-input");
+        const confirmCreateProjectBtn = doc.getElementById("confirm-create-project-btn");
+
+
+        if (uniqueProjectName !== -1 ||
+            parseInt(projectTodoCount.value) > parseInt(projectTodoCount.max) ||
+            projectTodoCount.value === "" ||
+            warnings.length > 0
+        ) {
+            console.log("The button remains disabled");
+            console.log("project name taken => ", uniqueProjectName !== -1);
+            console.log("value > max => ", parseInt(projectTodoCount.value) > parseInt(projectTodoCount.max));
+            console.log("Count not a number => ", projectTodoCount.value === "");
+            console.log("warnings present => ", warnings.length > 0);
+            confirmCreateProjectBtn.disabled = true;
+            return;
+        }
+
+        console.log("Button enabled");
+        confirmCreateProjectBtn.disabled = false;
+
+    }
+
 
     const renderLeftRightTodoBtns = () => {
         // Add left and right buttons for todo carousel
