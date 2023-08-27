@@ -135,7 +135,7 @@ export const Display = ((doc) => {
     const scrollProjects = (ev) => {
         const allProjects = Array.from(doc.querySelectorAll('[id^="project-card-"]'));
         const focussedProject = allProjects.find(proj => proj === document.activeElement);
-
+        console.log(ev.target);
         if (allProjects.length === 0) {
             return;
         }
@@ -146,7 +146,8 @@ export const Display = ((doc) => {
         } else if (ev.key === ">") {
             ev.preventDefault();
             scrollProjectsRight(focussedProject, allProjects);
-        } else if (ev.key === "Enter") {
+        } else if (ev.key === "Enter" && !ev.target.classList.contains("invisible-btn")) {
+            // Only if not currently focussed on button that could use the Enter key
             ev.preventDefault();
             renderExpandedProject(ev);
         }
@@ -218,7 +219,7 @@ export const Display = ((doc) => {
         const confirmCreateProjectBtn = createProjectModalContainer.querySelector('#confirm-create-project-btn');
         const cancelCreateProjectBtn = createProjectModalContainer.querySelector('#cancel-create-project-btn');
 
-        confirmCreateProjectBtn.onclick = function(ev) {
+        confirmCreateProjectBtn.onclick = (ev) => {
             createProjectModalContainer.removeEventListener("keypress", scrollTodosKeyPress);
             window.addEventListener("keypress", scrollProjects);
             UserEvents.createNewProject(ev);
@@ -494,6 +495,8 @@ export const Display = ((doc) => {
 
         // If there are no more todos to the right
         if (visibleTodoIdNum === maxNumTodos) {
+            const confirmCreateProjectBtn = doc.getElementById('confirm-create-project-btn');
+            confirmCreateProjectBtn.focus();
             return;
         }
 
@@ -588,7 +591,14 @@ export const Display = ((doc) => {
     const renderExpandedProjectKeyEnter = (ev) => {
         if (ev.key === "Enter") {
             ev.stopImmediatePropagation();
-            renderExpandedProject(ev);
+            if (ev.target.classList.contains("expanded") ||
+                !ev.target.id.includes("project-card-")
+
+            ) {
+                return;
+            } else {
+                renderExpandedProject(ev);
+            }
         }
     }
 
@@ -633,13 +643,15 @@ export const Display = ((doc) => {
 
     const renderExpandedProject = (ev) => {
         ev.target.removeEventListener("keypress", renderExpandedProjectKeyEnter);
-        console.log("ev.target => ", ev.target);
+        if (Array.from(ev.target.classList).includes("expanded")) {
+            renderShrunkProject(ev);
+            return;
+        }
 
         let projectCard;
         let gridRect;
 
         if (ev instanceof MouseEvent) {
-            console.log("Mouse event registered => ", ev);
             // Check if the target of the click event is the delete icon
             // Or the project card has already been expanded
             // If yes, Return early without triggering the expansion
@@ -651,7 +663,7 @@ export const Display = ((doc) => {
             gridRect = ev.currentTarget.parentNode.getBoundingClientRect();
 
         } else {
-            console.log("KeyBoard event registered => ", ev);
+            // If keypress event, use target instead of currentTarget
             projectCard = ev.target;
             gridRect = ev.target.parentNode.getBoundingClientRect();
         }
@@ -668,7 +680,6 @@ export const Display = ((doc) => {
         // Call the function to store the current project grid
         // before the projectCard is removed from it.
         storeCurrentProjectGrid();
-
 
         // Get borders widths of card and grid.
         const gridBorderWidth = parseFloat(gridStyle.borderTopWidth);
@@ -736,6 +747,7 @@ export const Display = ((doc) => {
 
             projectCard.classList.remove('expanding');
             projectCard.classList.add('expanded');
+            projectCard.tabindex = "1";
 
             const projectDescription = projectCard.querySelector('.project-description');
 
@@ -769,7 +781,7 @@ export const Display = ((doc) => {
                         <label for="todo-${index}">${todo.title}</label>
                         </li>
                         <div class="checkbox-container">
-                            <input type="checkbox" name="todo-${index}" class="todo-check"></input>
+                            <input type="checkbox" name="todo-${index}" class="todo-check" tabindex="${index + 2}"></input>
                             <div class="todo-check-image-left unchecked"></div>
                             <div class="todo-check-image-right unchecked"></div>
                         </div>
@@ -893,7 +905,14 @@ export const Display = ((doc) => {
             return;
         }
 
-        const projectCard = ev.currentTarget;
+        let projectCard;
+
+        if (ev instanceof MouseEvent) {
+            projectCard = ev.currentTarget;
+        } else {
+            projectCard = ev.target;
+        }
+
         const dashboardContainer = doc.getElementById('dashboard-container');
         const projectGrid = state.currentProjectGrid;
 
