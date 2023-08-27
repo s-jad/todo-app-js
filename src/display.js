@@ -104,7 +104,10 @@ export const Display = ((doc) => {
 
         const actualCreateProjectBtn = doc.createElement('button');
         actualCreateProjectBtn.classList.add('invisible-btn');
-        actualCreateProjectBtn.onclick = renderCreateNewProjectModal;
+        actualCreateProjectBtn.onclick = () => {
+            window.removeEventListener("keypress", scrollProjects);
+            renderCreateNewProjectModal();
+        };
 
         btnContainer.appendChild(createProjectBtn);
         btnContainer.appendChild(actualCreateProjectBtn);
@@ -124,7 +127,61 @@ export const Display = ((doc) => {
         const projectGrid = doc.createElement('div');
         projectGrid.id = "project-grid";
 
+
+        window.addEventListener("keypress", scrollProjects);
         return projectGrid;
+    };
+
+    const scrollProjects = (ev) => {
+        const allProjects = Array.from(doc.querySelectorAll('[id^="project-card-"]'));
+        const focussedProject = allProjects.find(proj => proj === document.activeElement);
+
+        if (allProjects.length === 0) {
+            return;
+        }
+
+        if (ev.key === "<") {
+            ev.preventDefault();
+            scrollProjectsLeft(focussedProject, allProjects);
+        } else if (ev.key === ">") {
+            ev.preventDefault();
+            scrollProjectsRight(focussedProject, allProjects);
+        } else if (ev.key === "Enter") {
+            ev.preventDefault();
+            renderExpandedProject(ev);
+        }
+    };
+
+    const scrollProjectsLeft = (focussedProject, allProjects) => {
+        if (focussedProject === undefined) {
+            allProjects[0].focus();
+            return;
+        }
+
+        const focussedProjectIndex = allProjects.indexOf(focussedProject);
+        const nextProject = allProjects[(focussedProjectIndex + 1) % allProjects.length];
+
+        nextProject.focus()
+    };
+
+
+    const scrollProjectsRight = (focussedProject, allProjects) => {
+        if (focussedProject === undefined) {
+            allProjects[0].focus();
+            return;
+        }
+
+
+        const focussedProjectIndex = allProjects.indexOf(focussedProject);
+        let nextProject;
+
+        if (focussedProjectIndex === 0) {
+            nextProject = allProjects[allProjects.length - 1];
+        } else {
+            nextProject = allProjects[(focussedProjectIndex - 1) % allProjects.length];
+        }
+
+        nextProject.focus()
     };
 
     const renderSidebar = () => {
@@ -161,9 +218,18 @@ export const Display = ((doc) => {
         const confirmCreateProjectBtn = createProjectModalContainer.querySelector('#confirm-create-project-btn');
         const cancelCreateProjectBtn = createProjectModalContainer.querySelector('#cancel-create-project-btn');
 
-        confirmCreateProjectBtn.onclick = UserEvents.createNewProject;
+        confirmCreateProjectBtn.onclick = function(ev) {
+            createProjectModalContainer.removeEventListener("keypress", scrollTodosKeyPress);
+            window.addEventListener("keypress", scrollProjects);
+            UserEvents.createNewProject(ev);
+        }
+
         confirmCreateProjectBtn.disabled = true;
-        cancelCreateProjectBtn.onclick = () => UserEvents.closeModal(createProjectModalContainer);
+        cancelCreateProjectBtn.onclick = () => {
+            createProjectModalContainer.removeEventListener("keypress", scrollTodosKeyPress);
+            window.addEventListener("keypress", scrollProjects);
+            UserEvents.closeModal(createProjectModalContainer);
+        };
 
         const todoInputContainer = createProjectModalContainer.querySelector('#todo-input-container');
 
@@ -293,7 +359,6 @@ export const Display = ((doc) => {
                         if (todoName !== "") {
                             todoNames[currentTNI] = todoName;
                             state.currentTodoNames[currentTNI] = todoName;
-                            console.log("todoNames => ", todoNames);
                         }
                     }
                 });
@@ -304,6 +369,18 @@ export const Display = ((doc) => {
                 todoInputContainer.appendChild(renderLeftRightTodoBtns());
             }
         });
+
+        const scrollTodosKeyPress = (ev) => {
+            if (ev.key === ">") {
+                ev.preventDefault();
+                scrollTodosLeft();
+            } else if (ev.key === "<") {
+                ev.preventDefault();
+                scrollTodosRight();
+            }
+        }
+        window.removeEventListener("keypress", scrollProjects);
+        createProjectModalContainer.addEventListener("keypress", scrollTodosKeyPress);
 
         app.appendChild(createProjectModalContainer);
 
@@ -400,6 +477,8 @@ export const Display = ((doc) => {
 
         visibleTodo.classList.add('hide-right');
         nextTodo.classList.remove('hide-left');
+        const todoNameInput = nextTodo.querySelector('input[name^="new-todo-name-"]');
+        todoNameInput.focus();
     };
 
     const scrollTodosRight = () => {
@@ -425,6 +504,8 @@ export const Display = ((doc) => {
 
         visibleTodo.classList.add('hide-left');
         nextTodo.classList.remove('hide-right');
+        const todoNameInput = nextTodo.querySelector('input[name^="new-todo-name-"]');
+        todoNameInput.focus();
     };
 
     const renderDeleteProjectModal = (ev) => {
@@ -462,7 +543,6 @@ export const Display = ((doc) => {
         newProjectCard.id = `project-card-${moddedProjectTitle}`;
 
         state.progressBarPercentages[state.progressBarCount] = 0;
-        console.log("state.progressBarCount = ", state.progressBarCount);
 
         newProjectCard.innerHTML = `
             <h3 class="project-title">${project.title}</h3>
@@ -498,8 +578,19 @@ export const Display = ((doc) => {
         projectUtils.appendChild(btnContainer);
 
         newProjectCard.addEventListener('click', renderExpandedProject);
+        newProjectCard.addEventListener('keypress', renderExpandedProjectKeyEnter);
+
+        const user = TodoApp.getCurrentUser();
+        newProjectCard.tabIndex = user.getAllProjects().length;
         projectGrid.appendChild(newProjectCard);
     };
+
+    const renderExpandedProjectKeyEnter = (ev) => {
+        if (ev.key === "Enter") {
+            ev.stopImmediatePropagation();
+            renderExpandedProject(ev);
+        }
+    }
 
     const removeProjectFromProjectGrid = (projectTitle) => {
         const moddedProjectTitle = projectTitle.replaceAll(" ", "-");
@@ -530,6 +621,7 @@ export const Display = ((doc) => {
 
             otherProjects.forEach(proj => {
                 proj.addEventListener('click', renderExpandedProject);
+                proj.addEventListener("keypress", renderExpandedProjectKeyEnter);
                 proj.classList.remove('expanded');
             });
 
@@ -540,17 +632,33 @@ export const Display = ((doc) => {
     };
 
     const renderExpandedProject = (ev) => {
-        // Check if the target of the click event is the delete icon
-        // Or the project card has already been expanded
-        // If yes, Return early without triggering the expansion
-        if (ev.target.classList.contains('invisible-btn') ||
-            ev.currentTarget.classList.contains('expanded')) {
-            return;
+        ev.target.removeEventListener("keypress", renderExpandedProjectKeyEnter);
+        console.log("ev.target => ", ev.target);
+
+        let projectCard;
+        let gridRect;
+
+        if (ev instanceof MouseEvent) {
+            console.log("Mouse event registered => ", ev);
+            // Check if the target of the click event is the delete icon
+            // Or the project card has already been expanded
+            // If yes, Return early without triggering the expansion
+            if (ev.target.classList.contains('invisible-btn') ||
+                ev.currentTarget.classList.contains('expanded')) {
+                return;
+            }
+            projectCard = ev.currentTarget;
+            gridRect = ev.currentTarget.parentNode.getBoundingClientRect();
+
+        } else {
+            console.log("KeyBoard event registered => ", ev);
+            projectCard = ev.target;
+            gridRect = ev.target.parentNode.getBoundingClientRect();
         }
 
-        const projectCard = ev.currentTarget;
-
         const projectGrid = doc.getElementById('project-grid');
+        const cardStyle = getComputedStyle(projectCard);
+        const gridStyle = getComputedStyle(projectGrid);
 
         // Store the current project grid and its children in state
         const storeCurrentProjectGrid = () => {
@@ -561,15 +669,13 @@ export const Display = ((doc) => {
         // before the projectCard is removed from it.
         storeCurrentProjectGrid();
 
-        const cardStyle = getComputedStyle(projectCard);
-        const gridStyle = getComputedStyle(projectGrid);
 
         // Get borders widths of card and grid.
         const gridBorderWidth = parseFloat(gridStyle.borderTopWidth);
         const cardBorderWidth = parseFloat(cardStyle.borderTopWidth);
 
         // Get current dimensions and position of project-card
-        const cardRect = ev.currentTarget.getBoundingClientRect();
+        const cardRect = projectCard.getBoundingClientRect();
         const currentX = cardRect.left;
         const currentY = cardRect.top;
         const currentWidth = cardRect.width;
@@ -578,8 +684,7 @@ export const Display = ((doc) => {
         // Store current card pos/dimensions and current projectGrid for return animation
         // and to restore the projectGrid after expanded card shrinks again.
         state.expandedCardPrevPosition = { currentX, currentY, currentWidth, currentHeight };
-        // Get current dimensions and position of project-grid
-        const gridRect = ev.currentTarget.parentNode.getBoundingClientRect();
+
         const gridX = gridRect.left;
         const gridY = gridRect.top;
         const gridWidth = parseFloat(gridStyle.width);
@@ -708,9 +813,7 @@ export const Display = ((doc) => {
 
                 checkBox.addEventListener("click", handleCheckBox);
                 checkBox.addEventListener("keydown", function(ev) {
-                    console.log("Registered keydown event");
                     if (ev.key === "Enter") {
-                        console.log("Registered key === Enter event");
                         ev.preventDefault();
                         handleCheckBox(ev);
                     }
@@ -721,7 +824,6 @@ export const Display = ((doc) => {
 
             projectCard.appendChild(projectTodoListContainer);
             projectTodoListContainer.classList.remove('invisible');
-
             dashboardContainer.removeChild(projectGrid);
             dashboardContainer.appendChild(projectCard);
 
@@ -813,7 +915,7 @@ export const Display = ((doc) => {
 
         projectCard.classList.remove('expanded');
         projectCard.classList.add('shrinking');
-        const gridBorderWidth = 3;
+        const gridBorderWidth = 0;
         const cardBorderWidth = 1;
         projectCard.style.top = `${currentY + cardBorderWidth + gridBorderWidth}px`;
         projectCard.style.left = `${currentX + cardBorderWidth + gridBorderWidth}px`;
@@ -877,6 +979,7 @@ export const Display = ((doc) => {
 
             projectsInGrid.forEach(proj => {
                 proj.addEventListener('click', renderExpandedProject);
+                proj.addEventListener('keypress', renderExpandedProjectKeyEnter);
                 proj.classList.remove('expanded');
             });
             projectCard.classList.remove('shrinking');
