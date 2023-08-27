@@ -444,7 +444,9 @@ export const Display = ((doc) => {
         const deleteProjectTitle = deleteProjectModalContainer.querySelector('#delete-project-modal-title');
         const projectToRemoveTitle = ev.target.parentNode.parentNode.parentNode.querySelector('.project-title').innerText;
 
-        deleteProjectTitle.innerText = `Are you sure you would like to delete ${projectToRemoveTitle}`
+        deleteProjectTitle.innerText = `Are you sure you 
+                                        would like to delete
+                                        "${projectToRemoveTitle}"`;
         confirmDeleteBtn.onclick = () => UserEvents.deleteProject(projectToRemoveTitle);
         cancelDeleteBtn.onclick = () => UserEvents.closeModal(deleteProjectModalContainer);
 
@@ -673,6 +675,9 @@ export const Display = ((doc) => {
                     ev.stopPropagation();
 
                     if (todoContainer.classList.contains("expanded")) {
+                        if (ev.target.classList.contains("todo-check")) {
+                            return;
+                        }
                         todoContainer.classList.remove("expanded");
                         const expandedInfo = todoContainer.querySelector('.expanded-todo-info');
                         todoContainer.removeChild(expandedInfo);
@@ -854,11 +859,12 @@ export const Display = ((doc) => {
             const progressBars = Array.from(projectGrid.querySelectorAll('.progress-bar'));
 
             for (let i = 0; i < progressBars.length; i++) {
-                progressBars[i].style.width = `${state.progressBarPercentages[i]}%`;
-                if (state.progressBarPercentages[i] === 100) {
-                    progressBars[i].style.background = "hsl(150, 51%, 50%)";
+                const progressBarIdNum = parseInt(progressBars[i].id.slice(progressBars[i].id.lastIndexOf("-") + 1));
+                progressBars[i].style.width = `${state.progressBarPercentages[progressBarIdNum]}%`;
+                if (state.progressBarPercentages[progressBarIdNum] === 100) {
+                    progressBars[i].style.background = "hsl(150, 90%, 70%)";
                 } else {
-                    progressBars[i].style.background = "hsl(0, 51%, 50%)";
+                    progressBars[i].style.background = "hsl(0, 90%, 70%)";
                 }
             }
 
