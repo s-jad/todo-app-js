@@ -25,7 +25,8 @@ export const Display = ((doc) => {
 
         const welcomeTitle = doc.createElement('h2');
         welcomeTitle.id = "welcome-title";
-        welcomeTitle.textContent = "Welcome, please enter a username";
+        welcomeTitle.textContent = `Welcome,
+                                    please enter a username`;
 
         const welcomeInput = doc.createElement('input');
         welcomeInput.id = "welcome-input";
@@ -99,6 +100,7 @@ export const Display = ((doc) => {
         const createProjectBtn = new Image();
         createProjectBtn.src = "./assets/add.png";
         createProjectBtn.id = "create-project-btn";
+        createProjectBtn.style.filter = "invert(90%)";
 
         const actualCreateProjectBtn = doc.createElement('button');
         actualCreateProjectBtn.classList.add('invisible-btn');
@@ -628,6 +630,8 @@ export const Display = ((doc) => {
             projectCard.classList.remove('expanding');
             projectCard.classList.add('expanded');
 
+            const projectDescription = projectCard.querySelector('.project-description');
+
             const projectTodoListContainer = doc.createElement('div');
             projectTodoListContainer.classList.add('project-todos-list-container');
             projectTodoListContainer.classList.add('invisible');
@@ -657,7 +661,12 @@ export const Display = ((doc) => {
                         <li class="project-todo">
                         <label for="todo-${index}">${todo.title}</label>
                         </li>
-                        <input type="checkbox" name="todo-${index}" class="todo-check"></input>
+                        <div class="checkbox-container">
+                            <input type="checkbox" name="todo-${index}" class="todo-check"></input>
+                            <div class="todo-check-image-left unchecked"></div>
+                            <div class="todo-check-image-right unchecked"></div>
+                        </div>
+                        
                     </div>
                 `;
                 todoContainer.addEventListener('click', function(ev) {
@@ -680,8 +689,27 @@ export const Display = ((doc) => {
                 });
 
                 const checkBox = todoContainer.querySelector('.todo-check');
+                const checkBoxContainer = todoContainer.querySelector('.checkbox-container');
+
                 checkBox.checked = todo.checked;
-                checkBox.addEventListener("click", renderProgressBar);
+
+                if (checkBox.checked) {
+                    checkBoxContainer.style.border = "2px solid hsl(150, 90%, 70%)";
+                    checkBoxContainer.style.boxShadow = "inset 0 0 5px hsla(150, 90%, 90%, 0.7)";
+                } else {
+                    checkBoxContainer.style.border = "2px solid hsl(0, 90%, 70%)";
+                    checkBoxContainer.style.boxShadow = "inset 0 0 5px hsla(0, 90%, 90%, 0.7)";
+                }
+
+                checkBox.addEventListener("click", handleCheckBox);
+                checkBox.addEventListener("keydown", function(ev) {
+                    console.log("Registered keydown event");
+                    if (ev.key === "Enter") {
+                        console.log("Registered key === Enter event");
+                        ev.preventDefault();
+                        handleCheckBox(ev);
+                    }
+                });
 
                 projectTodoList.appendChild(todoContainer);
             });
@@ -859,19 +887,42 @@ export const Display = ((doc) => {
         }, 600);
     };
 
-    const renderProgressBar = (ev) => {
+    const handleCheckBox = (ev) => {
         const projectId = doc.querySelector('[id^="project-card-"]').id;
         const projectName = projectId.slice(projectId.lastIndexOf("-") + 1);
         const todoIndex = ev.target.name.slice(ev.target.name.lastIndexOf("-") + 1);
 
         const projectTodoList = doc.querySelector('.project-todos-list');
         const checkboxes = Array.from(projectTodoList.querySelectorAll('.todo-check'));
-        const checkBoxCount = checkboxes.length;
-        const checkedCount = Array.from(checkboxes.filter(checkbox => checkbox.checked)).length;
+
+        const checkBoxContainer = ev.target.parentNode;
 
         const user = TodoApp.getCurrentUser();
         const project = user.getProject(projectName);
+
+        if (ev.key === "Enter") {
+            if (ev.target.checked) {
+                ev.target.checked = false;
+                checkBoxContainer.style.border = "2px solid hsl(0, 90%, 70%)";
+                checkBoxContainer.style.boxShadow = "inset 0 0 5px hsla(0, 90%, 90%, 0.7)";
+            } else {
+                ev.target.checked = true;
+                checkBoxContainer.style.border = "2px solid hsl(150, 90%, 70%)";
+                checkBoxContainer.style.boxShadow = "inset 0 0 5px hsla(150, 90%, 90%, 0.7)"
+            }
+        } else {
+            if (ev.target.checked) {
+                checkBoxContainer.style.border = "2px solid hsl(150, 90%, 70%)";
+                checkBoxContainer.style.boxShadow = "inset 0 0 5px hsla(150, 90%, 90%, 0.7)"
+            } else {
+                checkBoxContainer.style.border = "2px solid hsl(0, 90%, 70%)";
+                checkBoxContainer.style.boxShadow = "inset 0 0 5px hsla(0, 90%, 90%, 0.7)";
+            }
+        }
+
         project.todos[todoIndex].checked = ev.target.checked;
+        const checkBoxCount = checkboxes.length;
+        const checkedCount = Array.from(checkboxes.filter(checkbox => checkbox.checked)).length;
 
         const progressBar = doc.querySelector('.progress-bar');
         progressBar.style.width = `${(checkedCount / checkBoxCount) * 100}%`;
@@ -880,9 +931,11 @@ export const Display = ((doc) => {
         state.progressBarPercentages[progressbarIdNum] = (checkedCount / checkBoxCount) * 100;
 
         if (state.progressBarPercentages[progressbarIdNum] === 100) {
-            progressBar.style.background = "hsl(150, 51%, 50%)";
+            progressBar.style.background = "hsl(150, 90%, 70%)";
+            progressBar.style.boxShadow = "0 0 4px hsla(150, 90%, 90%, 0.7)";
         } else {
-            progressBar.style.background = "hsl(0, 51%, 50%)";
+            progressBar.style.background = "hsl(0, 90%, 70%)";
+            progressBar.style.boxShadow = "0 0 4px hsla(0, 90%, 90%, 0.7)";
         }
     };
 
