@@ -44,14 +44,14 @@ export const Display = ((doc) => {
                 welcomeConfirmBtn.disabled = true;
             } else {
                 welcomeConfirmBtn.disabled = false;
-                welcomeConfirmBtn.style.boxShadow = "inset 0 0 5px hsl(150, 90%, 70%)";
-                welcomeConfirmBtn.style.scale = "1.2";
+                welcomeConfirmBtn.classList.add("activated");
             }
         })
 
         welcomeFlex.appendChild(welcomeTitle);
         welcomeFlex.appendChild(welcomeInput);
         welcomeFlex.appendChild(welcomeConfirmBtn);
+        welcomeFlex.addEventListener("shown.bs.welcomeFlex", setFocusToFirstInput(welcomeInput));
 
         return welcomeFlex;
     };
@@ -60,6 +60,12 @@ export const Display = ((doc) => {
         const welcomeFlex = doc.getElementById("welcome-flex");
         app.removeChild(welcomeFlex);
     };
+
+    const setFocusToFirstInput = (firstInput) => {
+        setTimeout(() => {
+            firstInput.focus();
+        }, 100);
+    }
 
     const renderProjectDashboard = () => {
         const welcomeInput = doc.getElementById("welcome-input");
@@ -76,7 +82,6 @@ export const Display = ((doc) => {
         app.appendChild(dashboardContainer);
 
         removeWelcomeScreen();
-
     };
 
     const renderHeader = (username) => {
@@ -97,10 +102,12 @@ export const Display = ((doc) => {
         const btnContainer = doc.createElement('div');
         btnContainer.classList.add('btn-container');
 
-        const createProjectBtn = new Image();
-        createProjectBtn.src = "./assets/add.png";
+        const createProjectBtn = doc.createElement('div');
         createProjectBtn.id = "create-project-btn";
-        createProjectBtn.style.filter = "invert(90%)";
+        createProjectBtn.innerHTML = `
+            <div class="create-project-btn-vertical"></div>
+            <div class="create-project-btn-horizontal"></div>
+        `;
 
         const actualCreateProjectBtn = doc.createElement('button');
         actualCreateProjectBtn.classList.add('invisible-btn');
@@ -124,18 +131,20 @@ export const Display = ((doc) => {
     };
 
     const renderProjectGrid = () => {
+        const projectGridOuter = doc.createElement('div');
         const projectGrid = doc.createElement('div');
+        projectGridOuter.id = "project-grid-outer";
         projectGrid.id = "project-grid";
 
+        projectGridOuter.appendChild(projectGrid);
 
         window.addEventListener("keypress", scrollProjects);
-        return projectGrid;
+        return projectGridOuter;
     };
 
     const scrollProjects = (ev) => {
         const allProjects = Array.from(doc.querySelectorAll('[id^="project-card-"]'));
         const focussedProject = allProjects.find(proj => proj === document.activeElement);
-        console.log(ev.target);
         if (allProjects.length === 0) {
             return;
         }
@@ -237,6 +246,7 @@ export const Display = ((doc) => {
         const createProjectNameInput = createProjectModalContainer.querySelector('#create-project-name-input');
         createProjectNameInput.addEventListener('input', handleModalInputChanges);
 
+        createProjectModalContainer.addEventListener("shown.bs.createProjectModalContainer", setFocusToFirstInput(createProjectNameInput));
         // Check the project name is unique
         createProjectNameInput.addEventListener('blur', () => {
             const user = TodoApp.getCurrentUser();
@@ -412,6 +422,7 @@ export const Display = ((doc) => {
             }
 
             confirmCreateProjectBtn.disabled = false;
+            confirmCreateProjectBtn.classList.add("activated");
         }, 300);
 
     }
@@ -669,6 +680,7 @@ export const Display = ((doc) => {
         }
 
         const projectGrid = doc.getElementById('project-grid');
+        const projectGridOuter = projectGrid.parentNode;
         const cardStyle = getComputedStyle(projectCard);
         const gridStyle = getComputedStyle(projectGrid);
 
@@ -752,8 +764,11 @@ export const Display = ((doc) => {
             const projectDescription = projectCard.querySelector('.project-description');
 
             const projectTodoListContainer = doc.createElement('div');
+            const projectTodoListContainerOuter = doc.createElement('div');
+            projectTodoListContainerOuter.classList.add('project-todos-list-container-outer');
             projectTodoListContainer.classList.add('project-todos-list-container');
             projectTodoListContainer.classList.add('invisible');
+            projectTodoListContainerOuter.appendChild(projectTodoListContainer);
 
             projectTodoListContainer.innerHTML = `
                 <p class="project-todos-list-title">Todos:</p>
@@ -834,9 +849,9 @@ export const Display = ((doc) => {
                 projectTodoList.appendChild(todoContainer);
             });
 
-            projectCard.appendChild(projectTodoListContainer);
+            projectCard.appendChild(projectTodoListContainerOuter);
             projectTodoListContainer.classList.remove('invisible');
-            dashboardContainer.removeChild(projectGrid);
+            dashboardContainer.removeChild(projectGridOuter);
             dashboardContainer.appendChild(projectCard);
 
             projectCard.addEventListener("click", renderShrunkProject);
@@ -915,6 +930,8 @@ export const Display = ((doc) => {
 
         const dashboardContainer = doc.getElementById('dashboard-container');
         const projectGrid = state.currentProjectGrid;
+        const projectGridOuter = doc.createElement('div');
+        projectGridOuter.id = "project-grid-outer";
 
         // Get current dimensions and position of project-card
         const cardRect = projectCard.getBoundingClientRect();
@@ -929,8 +946,8 @@ export const Display = ((doc) => {
         const previousWidth = state.expandedCardPrevPosition.currentWidth;
         const previousHeight = state.expandedCardPrevPosition.currentHeight;
 
-        const projectTodoListContainer = projectCard.querySelector('.project-todos-list-container');
-        projectCard.removeChild(projectTodoListContainer);
+        const projectTodoListContainerOuter = projectCard.querySelector('.project-todos-list-container-outer');
+        projectCard.removeChild(projectTodoListContainerOuter);
 
         projectCard.classList.remove('expanded');
         projectCard.classList.add('shrinking');
@@ -969,6 +986,9 @@ export const Display = ((doc) => {
 
         projectCard.style.animation = `${animationName} ${animationDuration} ${animationTransition}`;
 
+        projectGridOuter.appendChild(projectGrid);
+        dashboardContainer.appendChild(projectGridOuter);
+
         const handleShrinkingAnimationEnd = () => {
             // Stop the stylesheets from piling up
             if (styleSheet.parentNode) {
@@ -1003,7 +1023,6 @@ export const Display = ((doc) => {
             });
             projectCard.classList.remove('shrinking');
             dashboardContainer.removeChild(projectCard);
-            dashboardContainer.appendChild(projectGrid);
         };
 
         projectCard.addEventListener('animationend', handleShrinkingAnimationEnd);
