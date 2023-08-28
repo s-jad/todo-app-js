@@ -749,6 +749,9 @@ textarea:focus-within {
 .todo-container:last-of-type {
     border-radius: 0 0 1rem 1rem;
 }
+.todo-container:last-of-type:first-of-type {
+    border-radius: 1rem;
+}
 
 .checkbox-container input[type="checkbox"] {
     position: relative;
