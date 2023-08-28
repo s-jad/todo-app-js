@@ -544,7 +544,7 @@ export const Display = ((doc) => {
         const confirmDeleteBtn = deleteProjectModalContainer.querySelector('#confirm-delete-project-btn');
         const cancelDeleteBtn = deleteProjectModalContainer.querySelector('#cancel-delete-project-btn');
         const deleteProjectTitle = deleteProjectModalContainer.querySelector('#delete-project-modal-title');
-        const projectToRemoveTitle = ev.target.parentNode.parentNode.parentNode.querySelector('.project-title').innerText;
+        const projectToRemoveTitle = ev.target.parentNode.parentNode.parentNode.parentNode.querySelector('.project-title').innerText;
 
         deleteProjectTitle.innerText = `Are you sure you 
                                         would like to delete
@@ -580,22 +580,21 @@ export const Display = ((doc) => {
         // Delete btn + icon
         const btnContainer = doc.createElement('div');
         btnContainer.classList.add('btn-container');
-        btnContainer.classList.add('small-btn');
-        const deleteBtn = new Image();
-        deleteBtn.classList.add('delete-project-btn');
-        deleteBtn.src = './assets/delete.png';
+        btnContainer.classList.add('big-btn');
+
+        const deleteBtn = renderDeleteBtn();
 
         const actualDeleteBtn = doc.createElement('button');
         actualDeleteBtn.classList.add('invisible-btn');
-        actualDeleteBtn.classList.add('small-btn');
+        actualDeleteBtn.classList.add('big-btn');
 
         actualDeleteBtn.addEventListener("click", function(ev) {
             ev.stopPropagation();
             renderDeleteProjectModal(ev);
         });
 
+        deleteBtn.appendChild(actualDeleteBtn);
         btnContainer.appendChild(deleteBtn);
-        btnContainer.appendChild(actualDeleteBtn);
 
         const projectUtils = newProjectCard.querySelector('.project-utils');
         projectUtils.appendChild(btnContainer);
@@ -621,6 +620,40 @@ export const Display = ((doc) => {
             }
         }
     }
+
+    const renderDeleteBtn = () => {
+        const deleteBtnContainer = doc.createElement('div');
+        deleteBtnContainer.classList.add('delete-btn-container');
+        deleteBtnContainer.classList.add('big-btn');
+
+        const binBody = doc.createElement('div');
+        binBody.classList.add('bin-body');
+        const binLidBottom = doc.createElement('div');
+        binLidBottom.classList.add('bin-lid-bottom');
+        const binLidTop = doc.createElement('div');
+        binLidTop.classList.add('bin-lid-top');
+        const binLidBottomBlackout = doc.createElement('div');
+        binLidBottomBlackout.classList.add('bin-lid-bottom-blackout');
+        const binLidTopBlackout = doc.createElement('div');
+        binLidTopBlackout.classList.add('bin-lid-top-blackout');
+        const binBodyLineOne = doc.createElement('div');
+        binBodyLineOne.classList.add('bin-body-line-one');
+        const binBodyLineTwo = doc.createElement('div');
+        binBodyLineTwo.classList.add('bin-body-line-two');
+        const binBodyLineThree = doc.createElement('div');
+        binBodyLineThree.classList.add('bin-body-line-three');
+
+        deleteBtnContainer.appendChild(binBody);
+        deleteBtnContainer.appendChild(binLidBottom);
+        deleteBtnContainer.appendChild(binLidTop);
+        deleteBtnContainer.appendChild(binLidBottomBlackout);
+        deleteBtnContainer.appendChild(binLidTopBlackout);
+        deleteBtnContainer.appendChild(binBodyLineOne);
+        deleteBtnContainer.appendChild(binBodyLineTwo);
+        deleteBtnContainer.appendChild(binBodyLineThree);
+
+        return deleteBtnContainer;
+    };
 
     const removeProjectFromProjectGrid = (projectTitle) => {
         const moddedProjectTitle = projectTitle.replaceAll(" ", "-");
