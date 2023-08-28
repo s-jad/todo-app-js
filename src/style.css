@@ -192,7 +192,6 @@ input {
     padding-left: 1.5rem;
 }
 
-
 input:focus-within {
     box-shadow: 0 0 10px var(--contrast-yellow-faded), 
             inset 0 0 16px var(--contrast-yellow-faded),
@@ -278,10 +277,11 @@ textarea:focus-within {
     grid-column: 1 / 9;
     grid-row: 1 / 2;
     padding: 0 4rem;
+    min-height: 80px;
     width: 100vw;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     color: var(--base-white);
     background: var(--base-black);
 }
@@ -294,29 +294,163 @@ textarea:focus-within {
 }
 
 #header-utils-flex {
+    height: 100%;
     display: flex;
     gap: 2rem;
     align-items: center;
     justify-content: space-between;
 }
 
-#search-bar {
-    width: 40vw;
+/* SEARCH BAR */
+
+#search-bar-container {
+    position: relative;
 }
 
-/* INVISIBLE BUTTONS WITH IMAGES */
+#search-image-glass {
+    position: absolute;
+    top: 40%;
+    left: 40%;
+    transform: translateX(-50%) translateY(-50%);
 
-.btn-container {
-    height: 30px;
-    width: 30px;
-    position: relative;
+    border: 3px solid transparent;
+    box-shadow: inset 0 0 1px var(--base-white),
+                inset 0 0 5px var(--contrast-yellow),
+                inset 0 0 10px var(--contrast-yellow-faded),
+                0 0 1px var(--base-white),
+                0 0 5px var(--contrast-yellow),
+                0 0 10px var(--contrast-yellow-faded);
+    height: 25px;
+    width: 25px;
+    border-radius: 12.5px;
+    opacity: 1;
+    transition: scale 200ms ease-in-out,
+                top 200ms ease-in-out,
+                left 200ms ease-in-out,
+                border 200ms ease-in-out;
+    scale: 1;
+    z-index: 3;
+}
+
+#search-image-handle {
+    position: absolute;
+    top: 67%;
+    left: 50%;
+    transform: rotate(45deg) translateY(-50%);
+
+    height: 3px;
+    width: 13px;
+    border-radius: 9999px;
+    box-shadow: inset 0 0 1px var(--base-white),
+                inset 0 0 5px var(--contrast-yellow),
+                inset 0 0 10px var(--contrast-yellow-faded),
+                0 0 1px var(--base-white),
+                0 0 3px var(--contrast-yellow),
+                0 0 6px var(--contrast-yellow-faded);
+    background: var(--base-black);
+    transition: scale 200ms ease-in-out,
+                box-shadow 200ms ease-in-out,
+                top 200ms ease-in-out,
+                left 200ms ease-in-out,
+                rotate 200ms ease-in-out;
+    scale: 1;
+    z-index: 2;
+}
+
+#search-image-glass.minify {
+    height: 25px;
+    width: 25px;
+    top: 10%;
+    left: -4%;
+    box-shadow: inset 0 0 1px var(--base-white),
+                inset 0 0 3px var(--contrast-yellow),
+                inset 0 0 6px var(--contrast-yellow-faded),
+                0 0 1px var(--base-white),
+                0 0 3px var(--contrast-yellow),
+                0 0 6px var(--contrast-yellow-faded);
+    border: 2px solid var(--contrast-yellow-glow);
+
     scale: 1;
     transition: scale 200ms ease-in-out;
+
 }
 
-.btn-container:hover,
-.btn-container:focus-within {
+#search-image-handle.minify {
+    transform: rotate(0deg); 
+    width: 12px;
+    top: 7%;
+    left: -5.5%;
+
+}
+
+#toggle-search-bar:hover ~ #search-image-handle.minify,
+#toggle-search-bar:focus-within ~ #search-image-handle.minify,
+#toggle-search-bar:hover ~ #search-image-glass.minify,
+#toggle-search-bar:focus-within ~ #search-image-glass.minify {
     scale: 1.2;
+}
+#toggle-search-bar {
+    z-index: 10;
+}
+
+#toggle-search-bar.activate {
+    top: -25%;
+    left: -11%;
+    height: 50px;
+    width: 50px;
+}
+
+#search-bar {
+    border-radius: 25px;
+    border: 2px solid var(--contrast-yellow);
+    width: 50px;
+    height: 50px;
+    scale: 1;
+    color: transparent;
+    transition: box-shadow 200ms ease-in-out,
+                color 200ms ease-in-out,
+                width 200ms ease-in-out,
+                scale 200ms ease-in-out;
+
+}
+
+#search-bar.active {
+    border-radius: 9999px;
+    color: var(--base-white);
+    width: 40vw;
+    height: 30px;
+}
+
+#search-bar-container:hover > #search-bar:not(.active), 
+#search-bar-container:focus-within > #search-bar:not(.active) {
+    scale: 1.1;
+    box-shadow: inset 0 0 1px var(--base-white),
+                inset 0 0 5px var(--contrast-yellow),
+                inset 0 0 10px var(--contrast-yellow-faded),
+                0 0 1px var(--base-white),
+                0 0 3px var(--contrast-yellow),
+                0 0 6px var(--contrast-yellow-faded);
+}
+
+#search-bar-container:hover > #search-image-glass,
+#search-bar-container:focus-within > #search-image-glass {
+    border: 2px solid var(--contrast-yellow-glow);
+}
+
+#search-bar-container:hover > #search-image-handle,
+#search-bar-container:focus-within > #search-image-handle {
+    box-shadow: inset 0 0 1px var(--base-white),
+                inset 0 0 5px var(--contrast-yellow),
+                inset 0 0 10px var(--contrast-yellow-faded),
+                0 0 1px var(--base-white),
+                0 0 5px var(--contrast-yellow),
+                0 0 10px var(--contrast-yellow-faded);
+}
+
+/* INVISIBLE BUTTONS CREATE PROJECT */
+
+.btn-container {
+    position: relative;
 }
 
 .delete-project-btn,
@@ -329,58 +463,98 @@ textarea:focus-within {
     transition: scale 200ms ease-in-out;
 }
 
-#create-project-btn {
+.btn-container > #create-project-btn {
     position: relative;
-    height: 30px;
-    width: 30px;
-    border-radius: 15px;
+    height: 50px;
+    width: 50px;
+    border-radius: 25px;
     background: none;
     border: 2px solid var(--contrast-green);
+    box-shadow: inset 0 0 1px var(--base-white),
+                inset 0 0 5px var(--contrast-green),
+                inset 0 0 10px var(--contrast-green-faded);
+    transition: scale 200ms ease-in-out,
+                box-shadow 200ms ease-in-out;
+    scale: 1;
+}
+
+.btn-container:hover > #create-project-btn,
+.btn-container:focus-within > #create-project-btn {
     box-shadow: 0 0 1px var(--base-white),
                 0 0 5px var(--contrast-green),
                 0 0 10px var(--contrast-green-faded),
                 inset 0 0 1px var(--base-white),
                 inset 0 0 5px var(--contrast-green),
                 inset 0 0 10px var(--contrast-green-faded);
-    scale: 1;
+    scale: 1.1;
 }
 
-#create-project-btn > .create-project-btn-horizontal,
-#create-project-btn > .create-project-btn-vertical {
+.btn-container > .create-project-btn-horizontal,
+.btn-container > .create-project-btn-vertical {
     position: absolute;
-    width: 18px;
-    height: 4px;
+    width: 25px;
+    height: 3px;
     border-radius: 9999px;
-    background: var(--contrast-green-glow);
-    box-shadow: inset 0 0 1px var(--base-white),
-                inset 0 0 5px var(--contrast-green),
-                inset 0 0 10px var(--contrast-green-faded);
-    scale: 1;
-    transition: box-shadow 200ms ease-in-out,
-                scale 200ms ease-in-out;
+    box-shadow: 0 0 1px var(--base-white),
+                0 0 4px var(--contrast-green),
+                0 0 8px var(--contrast-green-faded);
+    transition: box-shadow 200ms ease-in-out;
 }
 
-#create-project-btn > .create-project-btn-horizontal {
+.btn-container > .create-project-btn-horizontal-blackout,
+.btn-container > .create-project-btn-vertical-blackout {
+    position: absolute;
+    background: var(--base-black);
+    width: 20px;
+    height: 3px;
+    border-radius: 9999px;
+    top: 50%;
+    left: 50%;
+    z-index: 3;
+    transition: background 200ms ease-in-out;
+}
+
+
+.btn-container:hover > .create-project-btn-horizontal-blackout,
+.btn-container:hover > .create-project-btn-vertical-blackout, 
+.btn-container:focus-within > .create-project-btn-horizontal-blackout,
+.btn-container:focus-within > .create-project-btn-vertical-blackout {
+    background : var(--contrast-green-glow);
+}
+.btn-container > .create-project-btn-horizontal-blackout {
+    transform: translateX(-50%) translateY(-50%);
+}
+
+.btn-container > .create-project-btn-vertical-blackout {
+    transform: translateX(-50%) translateY(-50%) rotate(90deg);
+    transform-origin: 50% 50%;
+}
+
+.btn-container > .create-project-btn-horizontal {
     top: 50%;
     left: 50%;
     transform: translateX(-50%) translateY(-50%);
 }
 
-#create-project-btn > .create-project-btn-vertical {
+.btn-container > .create-project-btn-vertical {
     top: 50%;
     left: 50%;
     transform: translateX(-50%) translateY(-50%) rotate(90deg);
     transform-origin: 50% 50%;
 }
 
-#create-project-btn:hover > .create-project-btn-vertical,
-#create-project-btn:hover > .create-project-btn-horizontal,
-#create-project-btn:focus-within > .create-project-btn-vertical,
-#create-project-btn:focus-within > .create-project-btn-horizontal {
-    scale: 1.2;
-    box-shadow: inset 0 0 2px var(--base-white),
-                inset 0 0 8px var(--contrast-green),
-                inset 0 0 16px var(--contrast-green-glow);
+.btn-container:hover > .create-project-btn-vertical,
+.btn-container:hover > .create-project-btn-horizontal,
+.btn-container:focus-within > .create-project-btn-vertical,
+.btn-container:focus-within > .create-project-btn-horizontal {
+
+    box-shadow: inset 0 0 1px var(--base-white),
+                inset 0 0 4px var(--contrast-green),           
+                inset 0 0 8px var(--contrast-green-faded), 
+                0 0 2px var(--base-white),
+                0 0 5px var(--contrast-green),
+                0 0 10px var(--contrast-green-faded);
+
 }
 
 .invisible-btn {
@@ -389,15 +563,22 @@ textarea:focus-within {
     content: "";
     top: 0;
     left: 0;
-    z-index: 1;
-    height: 30px;
-    width: 30px;
-
+    z-index: 2;
     background: transparent;
     border: none;
     color: transparent;
     outline: none;
     box-shadow: none;
+}
+
+.small-btn {
+    height: 30px;
+    width: 30px;
+}
+
+.big-btn {
+    height: 50px;
+    width: 50px;
 }
 
 .invisible-btn:hover,
@@ -408,8 +589,6 @@ textarea:focus-within {
 
 .delete-project-btn:hover,
 .delete-project-btn:focus-within,
-#create-project-btn:hover,
-#create-project-btn:focus-within,
 #left-todos-btn:hover,
 #left-todos-btn:focus-within,
 #right-todos-btn:hover,
@@ -843,7 +1022,7 @@ textarea:focus-within {
 }
 
 .todo-container.expanded {
-    height: 42vh;
+    height: 50vh;
     align-items: start;
     padding-top: 1rem;
     border-radius: 1rem;

@@ -1,4 +1,5 @@
 import { TodoApp, UserEvents } from "./app";
+import { SearchBar } from "./searchbar";
 
 export const Display = ((doc) => {
     const app = doc.createElement('div');
@@ -92,25 +93,27 @@ export const Display = ((doc) => {
         userName.innerText = username;
         userName.id = "user-name";
 
-        const searchBar = doc.createElement('input');
-        searchBar.type = "search";
-        searchBar.id = "search-bar";
+        const searchBar = SearchBar.generateSearchBar();
 
         // Allows the add.png icon to be used as 
         // the style for the invisible button whilst
         // still being tab selectable
         const btnContainer = doc.createElement('div');
         btnContainer.classList.add('btn-container');
+        btnContainer.classList.add('big-btn');
 
         const createProjectBtn = doc.createElement('div');
         createProjectBtn.id = "create-project-btn";
-        createProjectBtn.innerHTML = `
+        btnContainer.innerHTML = `
             <div class="create-project-btn-vertical"></div>
+            <div class="create-project-btn-vertical-blackout"></div>
             <div class="create-project-btn-horizontal"></div>
+            <div class="create-project-btn-horizontal-blackout"></div>
         `;
 
         const actualCreateProjectBtn = doc.createElement('button');
         actualCreateProjectBtn.classList.add('invisible-btn');
+        actualCreateProjectBtn.classList.add('big-btn');
         actualCreateProjectBtn.onclick = () => {
             window.removeEventListener("keypress", scrollProjects);
             renderCreateNewProjectModal();
@@ -431,6 +434,7 @@ export const Display = ((doc) => {
         // Add left and right buttons for todo carousel
         const leftBtnContainer = doc.createElement('div');
         leftBtnContainer.classList.add('btn-container');
+        leftBtnContainer.classList.add('big-btn');
 
         const leftTodoBtn = new Image();
         leftTodoBtn.src = "./assets/chevron-left.svg";
@@ -438,6 +442,7 @@ export const Display = ((doc) => {
 
         const actualLeftTodoBtn = doc.createElement('button');
         actualLeftTodoBtn.classList.add('invisible-btn');
+        actualLeftTodoBtn.classList.add('big-btn');
         actualLeftTodoBtn.type = "button";
         actualLeftTodoBtn.onclick = scrollTodosLeft;
 
@@ -446,6 +451,7 @@ export const Display = ((doc) => {
 
         const rightBtnContainer = doc.createElement('div');
         rightBtnContainer.classList.add('btn-container');
+        rightBtnContainer.classList.add('big-btn');
 
         const rightTodoBtn = new Image();
         rightTodoBtn.src = "./assets/chevron-right.svg";
@@ -453,6 +459,7 @@ export const Display = ((doc) => {
 
         const actualRightTodoBtn = doc.createElement('button');
         actualRightTodoBtn.classList.add('invisible-btn');
+        actualLeftTodoBtn.classList.add('big-btn');
         actualRightTodoBtn.type = "button";
         actualRightTodoBtn.onclick = scrollTodosRight;
 
@@ -573,12 +580,14 @@ export const Display = ((doc) => {
         // Delete btn + icon
         const btnContainer = doc.createElement('div');
         btnContainer.classList.add('btn-container');
+        btnContainer.classList.add('small-btn');
         const deleteBtn = new Image();
         deleteBtn.classList.add('delete-project-btn');
         deleteBtn.src = './assets/delete.png';
 
         const actualDeleteBtn = doc.createElement('button');
         actualDeleteBtn.classList.add('invisible-btn');
+        actualDeleteBtn.classList.add('small-btn');
 
         actualDeleteBtn.addEventListener("click", function(ev) {
             ev.stopPropagation();
@@ -1093,6 +1102,7 @@ export const Display = ((doc) => {
         renderNewProject,
         renderDeleteProjectModal,
         removeProjectFromProjectGrid,
+        setFocusToFirstInput,
     };
 
 })(document);
