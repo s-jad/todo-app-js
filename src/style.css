@@ -89,13 +89,20 @@ select {
     --police-blue: hsl(205, 48%, 27%);
     --deep-aquamarine: hsl(163, 32%, 37%); 
     --dark-sea-green:  	hsl(142, 36%, 59%);
+
+    --contrast-green: hsl(150, 95%, 78%);
+    --contrast-green-faded: hsl(150, 95%, 78%, 0.1);
+    --contrast-green-glow: hsl(150, 90%, 70%, 0.5);
+
     --contrast-yellow: hsl(60, 95%, 78%);
     --contrast-orange: hsl(30, 95%, 78%);
     --contrast-red: hsl(0, 95%, 83%);
     --contrast-yellow-faded: hsla(60, 90%, 78%, 0.1);
     --contrast-orange-faded: hsla(30, 90%, 78%, 0.1);
     --contrast-red-faded: hsla(0, 90%, 83%, 0.1);
-    --contrast-red-glow: hsla(0, 90%, 75%, 0.2)
+    --contrast-yellow-glow: hsla(60, 90%, 70%, 0.5);
+    --contrast-orange-glow: hsla(30, 90%, 70%, 0.5);
+    --contrast-red-glow: hsla(0, 90%, 75%, 0.5);
 
     --shadow-blue: hsla(204, 40%, 10%, 1);
     --shadow-blue-07: hsla(204, 40%, 10%, 0.7);
@@ -107,8 +114,6 @@ body {
     font-size: clamp(16px, 1.8rem, 20px);
     color: var(--base-white);
     background: var(--base-black);
-    height: 100%;
-    width: 100%;
 }
 
 h1 {
@@ -120,35 +125,114 @@ h2 {
 }
 
 button {
-    background: var(--base-black);
+    background: var(--shadow-blue);
     color: var(--base-white);
     border-radius: 1rem;
     padding: 0.5rem 1rem;
     scale: 1;
-    box-shadow: 0 2px 5px var(--shadow-blue-07);
-    transition: scale 200ms ease-in-out,
+    opacity: 1;
+    border: none;
+    outline: none;
+    box-shadow: inset 0 0 1px var(--base-white),
+                0 0 5px var(--base-black),
+                inset 0 0 5px var(--contrast-yellow),
+                inset 0 0 10px var(--contrast-yellow-faded);
+    transition: opacity 200ms ease-in-out,
+                scale 200ms ease-in-out,
                 box-shadow 200ms ease-in-out;
+}
+
+button:disabled,
+button:disabled:hover,
+button:disabled:focus-within {
+    box-shadow: inset 0 0 1px var(--base-white),
+                0 0 5px var(--base-black),
+                inset 0 0 5px var(--contrast-red),
+                inset 0 0 10px var(--contrast-red-faded);
+    scale: 1;
+    opacity: 0.7;
 }
 
 button:hover,
 button:focus-within {
+    scale: 1.2;
+    box-shadow: inset 0 0 2px var(--base-white),
+                0 0 5px var(--base-black),
+                inset 0 0 8px var(--contrast-yellow),
+                inset 0 0 16px var(--contrast-yellow-faded);
+}
+
+button.activated {
     scale: 1.1;
-    box-shadow: 0 2px 8px var(--shadow-blue);
+    box-shadow: inset 0 0 2px var(--base-white),
+                0 0 5px var(--base-black),
+                inset 0 0 6px var(--contrast-green),
+                inset 0 0 12px var(--contrast-green-faded);
+}
+
+button.activated:hover,
+button.activated:focus-within {
+    scale: 1.2;
+    box-shadow: inset 0 0 2px var(--base-white),
+                0 0 5px var(--base-black),
+                inset 0 0 8px var(--contrast-green),
+                inset 0 0 16px var(--contrast-green-faded);
 }
 
 input {
-    padding-left: 1.5rem;
+    background: var(--shadow-blue-07);
+    color: var(--base-white);
     border-radius: 1rem;
-    background: var(--base-white);
-    box-shadow: inset 0 0 2px var(--contrast-yellow),
-                inset 0 0 10px var(--contrast-yellow-faded);
+    min-height: 50px;
+    outline: none;
+    border: none;
+    box-shadow: inset 0 0 10px var(--contrast-yellow-faded),
+            inset 0 0 5px var(--contrast-yellow),
+            inset 0 0 1px var(--base-white);
+    padding-left: 1.5rem;
+}
+
+
+input:focus-within {
+    box-shadow: 0 0 10px var(--contrast-yellow-faded), 
+            inset 0 0 16px var(--contrast-yellow-faded),
+            inset 0 0 8px var(--contrast-yellow),
+            inset 0 0 2px var(--base-white);
+}
+
+input.required {
+    box-shadow: inset 0 0 10px var(--contrast-red-faded),
+            inset 0 0 5px var(--contrast-red),
+            inset 0 0 1px var(--base-white);
+}
+
+
+input.required:focus-within {
+    box-shadow: 0 0 10px var(--contrast-red-faded), 
+            inset 0 0 16px var(--contrast-red-faded),
+            inset 0 0 8px var(--contrast-red),
+            inset 0 0 2px var(--base-white);
 }
 
 textarea {
+    background: var(--shadow-blue-07);
+    color: var(--base-white);
+    border-radius: 1rem;
     min-width: 100%;
     padding-left: 1.5rem;
-    background: var(--base-white);
-    border-radius: 1rem;
+    min-height: 50px;
+    outline: none;
+    border: none;
+    box-shadow: inset 0 0 10px var(--contrast-yellow-faded),
+            inset 0 0 5px var(--contrast-yellow),
+            inset 0 0 1px var(--base-white);
+}
+
+textarea:focus-within {
+    box-shadow: 0 0 10px var(--contrast-yellow-faded), 
+            inset 0 0 16px var(--contrast-yellow-faded),
+            inset 0 0 8px var(--contrast-yellow),
+            inset 0 0 2px var(--base-white);
 }
 
 #app-container {
@@ -156,7 +240,6 @@ textarea {
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    width: 100vw;
     background: var(--base-black);
 }
 
@@ -183,19 +266,19 @@ textarea {
 }
 
 #dashboard-container {
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     min-height: 100vh;
     display: grid;
-    grid-template-columns: 20px, repeat(7, 1fr);
-    grid-template-rows: repeat(6, 1fr);
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: 1fr 9fr;
 }
 
 #dashboard-header {
-    grid-column: 2 / 9;
+    grid-column: 1 / 9;
     grid-row: 1 / 2;
-    padding: 1rem;
-    width: 100%;
+    padding: 0 4rem;
+    width: 100vw;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -204,10 +287,7 @@ textarea {
 }
 
 #user-name {
-    background-image: linear-gradient(97deg, var(--base-white), var(--contrast-orange-faded)), 
-                      linear-gradient(0deg, var(--base-white), var(--contrast-red-faded));
-    background-clip: text;
-    color: transparent;
+    color: var(--base-white);
     font-size: clamp(24px, 3rem, 32px);
     font-weight: 900;
     width: 100%;
@@ -222,8 +302,6 @@ textarea {
 
 #search-bar {
     width: 40vw;
-    background-image: linear-gradient(0deg, var(--base-white) 10%, var(--contrast-orange-faded)),
-                    linear-gradient(195deg, var(--base-white) 10%, var(--contrast-yellow-faded));
 }
 
 /* INVISIBLE BUTTONS WITH IMAGES */
@@ -241,7 +319,6 @@ textarea {
     scale: 1.2;
 }
 
-#create-project-btn,
 .delete-project-btn,
 #right-todos-btn,
 #left-todos-btn {
@@ -250,6 +327,60 @@ textarea {
     scale: 1;
     filter: invert(90%);
     transition: scale 200ms ease-in-out;
+}
+
+#create-project-btn {
+    position: relative;
+    height: 30px;
+    width: 30px;
+    border-radius: 15px;
+    background: none;
+    border: 2px solid var(--contrast-green);
+    box-shadow: 0 0 1px var(--base-white),
+                0 0 5px var(--contrast-green),
+                0 0 10px var(--contrast-green-faded),
+                inset 0 0 1px var(--base-white),
+                inset 0 0 5px var(--contrast-green),
+                inset 0 0 10px var(--contrast-green-faded);
+    scale: 1;
+}
+
+#create-project-btn > .create-project-btn-horizontal,
+#create-project-btn > .create-project-btn-vertical {
+    position: absolute;
+    width: 18px;
+    height: 4px;
+    border-radius: 9999px;
+    background: var(--contrast-green-glow);
+    box-shadow: inset 0 0 1px var(--base-white),
+                inset 0 0 5px var(--contrast-green),
+                inset 0 0 10px var(--contrast-green-faded);
+    scale: 1;
+    transition: box-shadow 200ms ease-in-out,
+                scale 200ms ease-in-out;
+}
+
+#create-project-btn > .create-project-btn-horizontal {
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+}
+
+#create-project-btn > .create-project-btn-vertical {
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%) rotate(90deg);
+    transform-origin: 50% 50%;
+}
+
+#create-project-btn:hover > .create-project-btn-vertical,
+#create-project-btn:hover > .create-project-btn-horizontal,
+#create-project-btn:focus-within > .create-project-btn-vertical,
+#create-project-btn:focus-within > .create-project-btn-horizontal {
+    scale: 1.2;
+    box-shadow: inset 0 0 2px var(--base-white),
+                inset 0 0 8px var(--contrast-green),
+                inset 0 0 16px var(--contrast-green-glow);
 }
 
 .invisible-btn {
@@ -294,27 +425,36 @@ textarea {
     grid-row: 1 / 7;
     z-index: 3;
     left: 0;
+    width: 0%;
     height: 100%;
     background-image: var(--base-black);
 }
 
 /* PROJECT GRID */
 
-#project-grid {
-    grid-column: 2 / 9;
+#project-grid-outer {
+    grid-column: 1 / 9;
     grid-row: 2 / 7;
 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 0 3px var(--contrast-yellow),
+                inset 0 0 9px var(--contrast-yellow-faded);
+    padding: 0.7rem;
+}
+
+#project-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, max-content));
     justify-content: center;
     gap: 1rem;
-    border-radius: 1rem;
-    padding: 1rem;
-    min-height: 100%;
-    min-width: 100%;
-    box-shadow: inset 0 0 3px var(--contrast-yellow),
-                inset 0 0 6px var(--contrast-yellow-faded);
+    padding: 0.3rem;
+    height: 88vh;
+    width: 98vw;
+    overflow: scroll;
 }
+
 
 [id^="project-card-"] {
     display: grid;
@@ -331,17 +471,27 @@ textarea {
 
     scale: 1;
     background: var(--shadow-blue);
-    box-shadow: inset 0 0 5px var(--contrast-yellow-faded);
-    transition: scale 200ms ease-in-out,
+    box-shadow: inset 0 0 5px var(--contrast-orange-faded),
+                inset 0 0 2px var(--contrast-orange);
+
+    opacity: 1;
+    transition: opacity 200ms ease-in-out,
+                scale 200ms ease-in-out,
                 background 200ms ease-in-out,
                 box-shadow 200ms ease-in-out;
+}
+
+
+[id^="project-card-"].invisible {
+    opacity: 0;
 }
 
 [id^="project-card-"]:not(.expanded):hover,
 [id^="project-card-"]:not(.expanded):focus-within {
     scale: 1.02;
     background: var(--shadow-blue);
-    box-shadow: inset 0 0 10px var(--contrast-yellow);
+    box-shadow: inset 0 0 2px var(--base-white),
+                inset 0 0 10px var(--contrast-orange);
 }
 
 [id^="project-card-"].expanding {
@@ -355,7 +505,7 @@ textarea {
 }
 
 [id^="project-card-"].expanded {
-    grid-column: 2 / 9;
+    grid-column: 1 / 9;
     grid-row: 2 / 7;
     min-height: 100%;
     min-width: 100%;
@@ -372,7 +522,8 @@ textarea {
     grid-column: 1 / 6;
     grid-row: 1 / 2;
     padding-left: 2.5rem;
-    text-shadow: 0 0 2px var(--contrast-orange);
+    text-shadow: inset 0 0 2px var(--contrast-orange),
+                  0 0 2px var(--base-black);
 }
 
 [id^="project-card-"] > .project-description {
@@ -400,45 +551,110 @@ textarea {
 
 /* Todo List */
 
-[id^="project-card-"].expanded > .project-todos-list-container.invisible {
+[id^="project-card-"].expanded .project-todos-list-container.invisible {
     opacity: 0;
-    width: 100%;
 }
 
 
-[id^="project-card-"].expanded > .project-todos-list-container {
-    opacity: 1;
-    grid-column: 1 / 6;
-    grid-row: 3 / 4;
-    width: 100%;
-    height: 100%;
+[id^="project-card-"].expanded .project-todos-list-container {
     display: grid;
     grid-template-rows: 35px;
     grid-auto-rows: 1fr;
     justify-self: start;
-    box-shadow: inset 0 0 3px var(--contrast-orange),
-                inset 0 0 10px var(--contrast-orange-faded);
+
+    width: 100%;
+    height: 100%;
     border-radius: 1rem;
-    padding: 2rem;
+    padding: 1.3rem;
     opacity: 1;
     overflow: scroll;
 
+    opacity: 1;
     transition: opacity 300ms ease-in-out;
-    
 }
+
+[id^="project-card-"].expanded .project-todos-list-container-outer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    grid-column: 1 / 6;
+    grid-row: 3 / 4;
+    width: 100%;
+    height: 65vh;
+    padding: 0.7rem;
+    box-shadow: inset 0 0 1px var(--base-white),
+                inset 0 0 3px var(--contrast-orange),
+                inset 0 0 10px var(--contrast-orange-faded);
+}
+
+/* SCROLLBAR STYLING */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: none;
+}
+
+#project-grid::-webkit-scrollbar-thumb {
+  background: none;
+  border-radius: 9999px;
+  box-shadow: inset 0 0 1px white,
+            inset 0 0 5px var(--contrast-yellow),
+            inset 0 0 8px var(--contrast-yellow-glow);
+}
+
+
+#project-grid:hover::-webkit-scrollbar-thumb,
+#project-grid:focus-within::-webkit-scrollbar-thumb {
+  background: none;
+  border-radius: 9999px;
+  box-shadow: inset 0 0 1px white,
+            inset 0 0 8px var(--contrast-yellow),
+            inset 0 0 12px var(--contrast-yellow-glow);
+}
+
+::-webkit-scrollbar-corner {
+    background: none;
+    height: 0px;
+}
+
+/* Handle */
+.project-todos-list-container:hover::-webkit-scrollbar-thumb,
+.project-todos-list-container:focus-within::-webkit-scrollbar-thumb {
+  background: none;
+  scale: 1;
+  border-radius: 9999px;
+  box-shadow: inset 0 0 1px white,
+            inset 0 0 5px var(--contrast-orange),
+            inset 0 0 8px var(--contrast-orange-glow);
+}
+
+/* Handle on hover */
+.project-todos-list-container:hover::-webkit-scrollbar-thumb:hover,
+.project-todos-list-container:focus-within::-webkit-scrollbar-thumb:hover {
+  scale: 1.3;
+  box-shadow: inset 0 0 1px white,
+            inset 0 0 8px var(--contrast-orange),
+            inset 0 0 12px var(--contrast-orange-glow);
+} 
+
 
 .project-todos-list-title {
     grid-column: 1 / 2;
     text-align: center;
     margin-bottom: 1rem;
-    text-shadow: 0 0 2px var(--contrast-orange);
+    text-shadow: inset 0 0 2px var(--contrast-orange),
+                0 0 2px var(--base-black);
 }
 
 .project-todos-checkbox-title {
     grid-column: 5 / 6;
     text-align: center;
     margin-bottom: 1rem;
-    text-shadow: 0 0 2px var(--contrast-orange);
+    text-shadow: inset 0 0 2px var(--contrast-orange),
+                0 0 2px var(--base-black);
 }
 
 .project-todos-list {
@@ -462,7 +678,8 @@ textarea {
     height: 10px;
     width: 0;
     border-radius: 9999px;
-    box-shadow: inset 0 0 2px white,
+    box-shadow: 0 0 5px hsla(0, 90%, 75%, 0.3),
+                inset 0 0 2px white,
                 inset 0 0 5px var(--contrast-red),
                 inset 0 0 20px var(--contrast-yellow-faded);
     transition: width 300ms ease-in-out,
@@ -471,7 +688,8 @@ textarea {
 
 .progress-bar.full {
     background: var(--dark-sea-green);
-    box-shadow: inset 0 0 2px white,
+    box-shadow: 0 0 5px hsla(150, 90%, 75%, 0.3),
+                inset 0 0 2px white,
                 inset 0 0 5px var(--base-white),
                 inset 0 0 20px var(--contrast-yellow-faded);
 }
@@ -516,7 +734,7 @@ textarea {
     grid-template-columns: repeat(5, 1fr);
     align-items: center;
     justify-content: space-between;
-    border: 1px solid var(--contrast-orange-faded);
+    border: 1px solid var(--contrast-orange-glow);
     padding: 0 1rem;
     height: 4rem;
 
@@ -569,13 +787,14 @@ textarea {
     content: "";
     top: 50%;
     left: 50%;
-    transform: translateX(-50%) translateY(-50%) rotate(45deg);
+    transform: translateX(-50%) translateY(-50%) rotate(45deg) rotateZ(0deg);
     height: 3px;
     width: 22px;
     border: 2px solid var(--contrast-red);
     box-shadow: 0 0 4px var(--contrast-red-glow);
 
-    transition: left 200ms ease-in-out,
+    transition: transform 200ms ease-in-out,
+                left 200ms ease-in-out,
                 width 200ms ease-in-out,
                 border 200ms ease-in-out,
                 box-shadow 200ms ease-in-out;
@@ -586,17 +805,16 @@ textarea {
     content: "";
     top: 50%;
     left: 50%;
-    transform: translateX(-50%) translateY(-50%) rotate(-45deg);
+    transform: translateX(-50%) translateY(-50%) rotate(-45deg) rotateZ(0deg);
     height: 3px;
     width: 22px;
     border: 2px solid var(--contrast-red);
     box-shadow: 0 0 4px var(--contrast-red-faded);
 
-    transition: translateX 200ms ease-in-out,
-                translateY 200ms ease-in-out,
-                top 200ms ease-in-out,
+    transition: transform 200ms ease-in-out,
+                top 100ms ease-in-out,
                 left 200ms ease-in-out,
-                width 200ms ease-in-out,
+                width 100ms ease-in-out,
                 border 200ms ease-in-out,
                 box-shadow 200ms ease-in-out;
 }
@@ -604,7 +822,7 @@ textarea {
 .todo-check:checked ~ .todo-check-image-left {
     top: 50%;
     left: 58%;
-    transform: translateX(-50%) translateY(-50%) rotate(-45deg);
+    transform: translateX(-50%) translateY(-50%) rotate(-45deg) rotateZ(180deg);
     height: 3px;
     width: 18px;
     border: 2px solid hsl(150, 90%, 70%);
@@ -614,7 +832,7 @@ textarea {
 .todo-check:checked ~ .todo-check-image-right {
     top: 50%;
     left: 10%;
-    transform: rotate(45deg);
+    transform: rotate(45deg) rotateZ(180deg);
     height: 3px;
     width: 6px;
     border: 2px solid hsl(150, 90%, 70%);
@@ -622,7 +840,7 @@ textarea {
 }
 
 .todo-container.expanded {
-    height: 45vh;
+    height: 42vh;
     align-items: start;
     padding-top: 1rem;
     border-radius: 1rem;
@@ -667,15 +885,14 @@ textarea {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 95vh;
-    min-width: 95vw;
+    min-height: 98vh;
+    min-width: 99.5vw;
     background: var(--base-black);
     padding: 1rem 2rem;
 }
 
-#create-project-form > input,
-#create-project-form > textarea {
-    background: var(--base-white);
+#create-project-form input[type="number"] {
+    appearance: none;
 }
 
 #create-project-title {
@@ -708,16 +925,6 @@ textarea {
 
 #confirm-create-project-btn {
     grid-column: 2 / 3;
-    box-shadow: inset 0 0 5px hsl(150, 90%, 70%),
-                0 0 5px var(--pastel-blue);
-    scale: 1.2;
-}
-
-#confirm-create-project-btn:disabled {
-    scale: 1;
-    grid-column: 2 / 3;
-    box-shadow: inset 0 0 5px hsl(0, 90%, 70%);
-    background: var(--shadow-blue);
 }
 
 .warn-hl {
@@ -734,16 +941,7 @@ textarea {
     color: hsl(0, 90%, 70%);
 }
 
-button {
-    box-shadow: none;
-}
 
-button:disabled,
-button:disabled:hover,
-button:disabled:focus-within {
-    box-shadow: inset 0 0 5px hsl(0, 90%, 70%);
-    scale: 1;
-}
 
 #cancel-create-project-btn {
     grid-column: 4 / 5;
@@ -846,12 +1044,15 @@ button:disabled:focus-within {
     align-items: center;
     justify-content: center;
     border-radius: 1rem;
-    background: white;
-    box-shadow: 0 2px 5px hsla(0, 0%, 50%, 0.7);
+    background: var(--base-black);
+    box-shadow: inset 0 2px 5px var(--contrast-red-glow),
+                inset 0 0 2px var(--base-white),
+                inset 0 0 10px var(--contrast-red-faded);
 }
 
 #delete-project-modal-title {
     grid-column: 1 / 6;
+    text-align: center;
 }
 
 #confirm-delete-project-btn {
