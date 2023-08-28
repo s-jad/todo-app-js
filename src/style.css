@@ -362,10 +362,7 @@ textarea:focus-within {
     width: 25px;
     top: 10%;
     left: -4%;
-    box-shadow: inset 0 0 1px var(--base-white),
-                inset 0 0 3px var(--contrast-yellow),
-                inset 0 0 6px var(--contrast-yellow-faded),
-                0 0 1px var(--base-white),
+    box-shadow: 0 0 1px var(--base-white),
                 0 0 3px var(--contrast-yellow),
                 0 0 6px var(--contrast-yellow-faded);
     border: 2px solid var(--contrast-yellow-glow);
@@ -389,6 +386,7 @@ textarea:focus-within {
 #toggle-search-bar:focus-within ~ #search-image-glass.minify {
     scale: 1.2;
 }
+
 #toggle-search-bar {
     z-index: 10;
 }
@@ -447,13 +445,16 @@ textarea:focus-within {
                 0 0 10px var(--contrast-yellow-faded);
 }
 
+#search-bar::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+}
+
 /* INVISIBLE BUTTONS CREATE PROJECT */
 
 .btn-container {
     position: relative;
 }
 
-.delete-project-btn,
 #right-todos-btn,
 #left-todos-btn {
     height: 30px;
@@ -587,8 +588,6 @@ textarea:focus-within {
     scale: 1;
 }
 
-.delete-project-btn:hover,
-.delete-project-btn:focus-within,
 #left-todos-btn:hover,
 #left-todos-btn:focus-within,
 #right-todos-btn:hover,
@@ -596,6 +595,142 @@ textarea:focus-within {
     scale: 1.2;
 }
 
+/* DELETE PROJECT BUTTON */
+
+.delete-btn-container {
+    position: relative;
+    opacity: 0.7;
+}
+
+.bin-body,
+.bin-lid-top,
+.bin-lid-bottom,
+.bin-lid-top-blackout,
+.bin-lid-bottom-blackout,
+.bin-body-line-one,
+.bin-body-line-two,
+.bin-body-line-three {
+    position: absolute;
+}
+
+.bin-body,
+.bin-lid-bottom,
+.bin-lid-top {
+    background: transparent;
+    border: 2px solid var(--contrast-yellow);
+    box-shadow: 0 0 1px var(--base-white),
+                0 0 3px var(--contrast-yellow),
+                0 0 5px var(--contrast-yellow-faded);
+}
+
+.bin-body-line-one,
+.bin-body-line-two,
+.bin-body-line-three {
+    background: var(--contrast-yellow);
+    height: 2px;
+    width: 18px;
+    box-shadow: 0 0 2px var(--contrast-yellow),
+                0 0 5px var(--contrast-yellow-faded);
+}
+
+.bin-body {
+    top: 30%;
+    left: 30%;
+    height: 26px;
+    width: 24px;
+    transform: perspective(3rem) rotateX(-15deg);
+    border-radius: 2px;
+    border-top: 0px solid var(--contrast-yellow);
+}
+
+.bin-body-line-one {
+    top: 48%;
+    left: 23%;
+    transform: rotate(85deg);
+}
+
+.bin-body-line-two {
+    top: 48%;
+    left: 35%;
+    transform: rotate(90deg);
+}
+
+.bin-body-line-three {
+    top: 48%;
+    left: 47%;
+    transform: rotate(95deg);
+}
+
+.bin-lid-bottom {
+    top: 15%;
+    left: 22%;
+    width: 32px;
+    height: 6px;
+    border-radius: 9999px;
+}
+
+.bin-lid-top {
+    top: 5%;
+    left: 33%;
+    width: 21px;
+    height: 6px;
+    border-radius: 9999px;
+}
+
+.bin-lid-bottom-blackout {
+    background: var(--shadow-blue);
+    border-radius: 9999px;
+    opacity: 0.5;
+    height: 3px;
+    width: 28px;
+    top: 18%;
+    left: 25%;
+    z-index: 2;
+}
+
+.bin-lid-top-blackout {
+    background: var(--shadow-blue);
+    opacity: 0.5;
+    border-radius: 9999px;
+
+    width: 18px;
+    height: 3px;
+    top: 8%;
+    left: 35%;
+    z-index: 2;
+}
+
+.bin-lid-top,
+.bin-lid-top-blackout,
+.bin-lid-bottom,
+.bin-lid-bottom-blackout {
+    transform: rotate(0deg);
+    transform-origin: 100% 50%;
+    transition: rotate 200ms ease-in-out;
+}
+
+.delete-btn-container:hover > .bin-lid-top,
+.delete-btn-container:focus-within > .bin-lid-top,
+.delete-btn-container:hover > .bin-lid-top-blackout,
+.delete-btn-container:focus-within > .bin-lid-top-blackout,
+.delete-btn-container:focus-within > .bin-lid-bottom,
+.delete-btn-container:hover > .bin-lid-bottom,
+.delete-btn-container:focus-within > .bin-lid-bottom-blackout,
+.delete-btn-container:hover > .bin-lid-bottom-blackout {
+    transform: rotate(30deg);
+} 
+
+
+.delete-btn-container:hover > .bin-lid-top,
+.delete-btn-container:focus-within > .bin-lid-top {
+    top: 2%;
+    left: 37%;
+}
+.delete-btn-container:hover > .bin-lid-top-blackout,
+.delete-btn-container:focus-within > .bin-lid-top-blackout {
+    top: 1%;
+    left: 39%;
+}
 /* DASHBOARD SIDEBAR */
 
 #dashboard-sidebar {
@@ -888,7 +1023,7 @@ textarea:focus-within {
     grid-column: 1 / 6;
     grid-row: 7 / 8;
     display: flex;
-    gap: 0.5rem;
+    gap: 1.5rem;
     width: 100%;
     padding: 0 1rem 0 2rem;
     align-items: center;
