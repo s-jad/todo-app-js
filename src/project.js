@@ -30,6 +30,7 @@ export default class Project {
     }
 
     getAllTodos() {
+        console.log("getting all todos");
         return this.todos;
     }
 
@@ -41,6 +42,15 @@ export default class Project {
         } else {
             console.log(`Can't find ${todoTitle}`);
         }
+    }
+
+    registerCheckState(todoTitle, checkedBool) {
+        const todoIndex = this.todos.findIndex(todo => todo.title === todoTitle);
+        this.todos[todoIndex] = checkedBool;
+    }
+
+    checkUniqueTodoName(todoTitle) {
+        return this.todos.findIndex(todo => todo.title === todoTitle);
     }
 }
 

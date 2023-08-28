@@ -30,6 +30,10 @@ export default class User {
         }
     }
 
+    getAllProjects() {
+        return Array.from(this.projects);
+    }
+
     updateProject(projectTitle, projectPatch) {
         const projectIndex = this.projects.findIndex(project => project.title === projectTitle);
 
