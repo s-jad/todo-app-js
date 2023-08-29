@@ -14,6 +14,7 @@ export const Display = ((doc) => {
         progressBarCount: 0,
         progressBarPercentages: [],
         currentTodoNames: [],
+        currentUserNameColorIndex: 0,
     };
 
     const renderApp = () => {
@@ -92,6 +93,37 @@ export const Display = ((doc) => {
         const userName = doc.createElement('h1');
         userName.innerText = username;
         userName.id = "user-name";
+        userName.classList.add('yellow');
+
+        const userNameMask = doc.createElement('h1');
+        userNameMask.id = "user-name-mask";
+        const userNameContainer = doc.createElement('div');
+        userNameContainer.id = "user-name-container";
+        userNameContainer.appendChild(userName);
+        userNameContainer.appendChild(userNameMask);
+
+        userNameContainer.addEventListener("click", function() {
+            state.currentUserNameColorIndex = (state.currentUserNameColorIndex + 1) % 4;
+
+            switch (state.currentUserNameColorIndex) {
+                case 0:
+                    userName.classList.add("yellow");
+                    userName.classList.remove("green");
+                    break;
+                case 1:
+                    userName.classList.add("orange");
+                    userName.classList.remove("yellow");
+                    break;
+                case 2:
+                    userName.classList.add("red");
+                    userName.classList.remove("orange");
+                    break;
+                case 3:
+                    userName.classList.add("green");
+                    userName.classList.remove("red");
+                    break;
+            }
+        });
 
         const searchBar = SearchBar.generateSearchBar();
 
@@ -100,7 +132,7 @@ export const Display = ((doc) => {
         // still being tab selectable
         const btnContainer = doc.createElement('div');
         btnContainer.classList.add('btn-container');
-        btnContainer.classList.add('big-btn');
+        btnContainer.classList.add('header-btn');
 
         const createProjectBtn = doc.createElement('div');
         createProjectBtn.id = "create-project-btn";
@@ -113,7 +145,7 @@ export const Display = ((doc) => {
 
         const actualCreateProjectBtn = doc.createElement('button');
         actualCreateProjectBtn.classList.add('invisible-btn');
-        actualCreateProjectBtn.classList.add('big-btn');
+        actualCreateProjectBtn.classList.add('header-btn');
         actualCreateProjectBtn.onclick = () => {
             window.removeEventListener("keypress", scrollProjects);
             renderCreateNewProjectModal();
@@ -127,7 +159,7 @@ export const Display = ((doc) => {
         headerUtilsFlex.appendChild(searchBar);
         headerUtilsFlex.appendChild(btnContainer);
 
-        dashboardHeader.appendChild(userName);
+        dashboardHeader.appendChild(userNameContainer);
         dashboardHeader.appendChild(headerUtilsFlex);
 
         return dashboardHeader;
@@ -544,12 +576,27 @@ export const Display = ((doc) => {
         const confirmDeleteBtn = deleteProjectModalContainer.querySelector('#confirm-delete-project-btn');
         const cancelDeleteBtn = deleteProjectModalContainer.querySelector('#cancel-delete-project-btn');
         const deleteProjectTitle = deleteProjectModalContainer.querySelector('#delete-project-modal-title');
-        const projectToRemoveTitle = ev.target.parentNode.parentNode.parentNode.parentNode.querySelector('.project-title').innerText;
+        const projectToRemove = ev.target.parentNode.parentNode.parentNode.parentNode;
+        const projectToRemoveTitle = projectToRemove.querySelector('.project-title').innerText;
 
         deleteProjectTitle.innerText = `Are you sure you 
                                         would like to delete
                                         "${projectToRemoveTitle}"`;
-        confirmDeleteBtn.onclick = () => UserEvents.deleteProject(projectToRemoveTitle);
+        confirmDeleteBtn.onclick = () => {
+            UserEvents.deleteProject(projectToRemoveTitle);
+
+            if (projectToRemove.classList.contains('expanded')) {
+                const dashboardContainer = doc.getElementById('dashboard-container');
+                const projectGridOuter = doc.createElement('div');
+                projectGridOuter.id = "project-grid-outer";
+
+                const projectGrid = state.currentProjectGrid;
+
+                projectGridOuter.appendChild(projectGrid)
+                dashboardContainer.appendChild(projectGridOuter);
+            }
+        };
+
         cancelDeleteBtn.onclick = () => UserEvents.closeModal(deleteProjectModalContainer);
 
         app.appendChild(deleteProjectModalContainer);
