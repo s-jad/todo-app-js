@@ -17,6 +17,10 @@ export const Display = ((doc) => {
         currentUserNameColorIndex: 0,
     };
 
+    const getCurrentProjectGrid = () => {
+        return state.currentProjectGrid;
+    }
+
     const renderApp = () => {
         return app;
     };
@@ -651,7 +655,10 @@ export const Display = ((doc) => {
 
         const user = TodoApp.getCurrentUser();
         newProjectCard.tabIndex = user.getAllProjects().length;
+
+
         projectGrid.appendChild(newProjectCard);
+        state.currentProjectGrid = projectGrid;
     };
 
     const renderExpandedProjectKeyEnter = (ev) => {
@@ -738,6 +745,7 @@ export const Display = ((doc) => {
             dashboardContainer.appendChild(projectGrid);
         } else {
             projectGrid.removeChild(projectToRemove);
+            state.currentProjectGrid = projectGrid;
         }
     };
 
@@ -1183,6 +1191,7 @@ export const Display = ((doc) => {
         renderDeleteProjectModal,
         removeProjectFromProjectGrid,
         setFocusToFirstInput,
+        getCurrentProjectGrid,
     };
 
 })(document);

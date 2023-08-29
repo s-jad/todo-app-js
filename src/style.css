@@ -814,7 +814,7 @@ textarea:focus-within {
 .bin-lid-bottom-blackout {
     transform: rotate(0deg);
     transform-origin: 100% 50%;
-    transition: rotate 200ms ease-in-out;
+    transition: transform 60ms ease-in-out;
 }
 
 .delete-btn-container:hover > .bin-lid-top,
@@ -905,7 +905,7 @@ textarea:focus-within {
 }
 
 
-[id^="project-card-"].invisible {
+[id^="project-card-"].search-invisible {
     opacity: 0;
 }
 
