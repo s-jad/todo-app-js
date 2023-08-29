@@ -110,6 +110,22 @@ select {
     --shadow-green: hsla(142, 40%, 10%, 0.7);
 }
 
+@font-face {
+  font-family: 'Kanit';
+  src: url('./assets/fonts/Kanit-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+
+@font-face {
+  font-family: 'Kanit';
+  src: url('./assets/fonts/Kanit-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+
 body {
     font-size: clamp(16px, 1.8rem, 20px);
     color: var(--base-white);
@@ -117,11 +133,13 @@ body {
 }
 
 h1 {
-    font-size: clamp(24px, 2.8rem, 30px);
+    font-size: clamp(28px, 3.4rem, 36px);
+    font-family: Kanit-Regular system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 h2 {
-    font-size: clamp(22px, 2.4rem, 28px);
+    font-size: clamp(24px, 2.8rem, 32px);
+    font-family: Kanit-Regular system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 button {
@@ -140,6 +158,8 @@ button {
     transition: opacity 200ms ease-in-out,
                 scale 200ms ease-in-out,
                 box-shadow 200ms ease-in-out;
+
+    font-family: Kanit-Regular system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 button:disabled,
@@ -281,16 +301,99 @@ textarea:focus-within {
     width: 100vw;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     color: var(--base-white);
     background: var(--base-black);
 }
+#user-name-container {
+    position: relative;
+}
+
 
 #user-name {
-    color: var(--base-white);
-    font-size: clamp(24px, 3rem, 32px);
-    font-weight: 900;
+    width: fit-content;
+    font-size: 32px;
+    padding: 0 3rem;
+    letter-spacing: 6px;
+    border-radius: 9999px;
+    transition: text-shadow 500ms ease-in-out,
+                border 250ms ease-in-out,
+                box-shadow 300ms ease-in-out,
+                color 300ms ease-in-out;
+}
+
+#user-name.green {
+    border: 2px solid var(--contrast-green);
+    color: var(--contrast-green-glow);
+
+    text-shadow: 0 0 1px var(--base-white),
+                0 0 3px var(--contrast-green);
+
+    box-shadow: inset 0 0 1px var(--base-white),
+            inset 0 0 6px var(--contrast-green),
+            inset 0 0 12px var(--contrast-yellow-faded),
+            0 0 1px var(--base-white),
+            0 0 6px var(--contrast-green),
+            0 0 12px var(--contrast-yellow-faded);
+
+}
+#user-name.orange {
+    border: 2px solid var(--contrast-orange);
+    color: var(--contrast-orange-glow);
+
+    text-shadow: 0 0 1px var(--base-white),
+                0 0 3px var(--contrast-orange);
+
+    box-shadow: inset 0 0 1px var(--base-white),
+            inset 0 0 6px var(--contrast-orange),
+            inset 0 0 12px var(--contrast-yellow-faded),
+            0 0 1px var(--base-white),
+            0 0 6px var(--contrast-orange),
+            0 0 12px var(--contrast-yellow-faded);
+
+}
+#user-name.red {
+    border: 2px solid var(--contrast-red);
+    color: var(--contrast-red-glow);
+
+    text-shadow: 0 0 1px var(--base-white),
+                0 0 3px var(--contrast-red);
+
+    box-shadow: inset 0 0 1px var(--base-white),
+            inset 0 0 6px var(--contrast-red),
+            inset 0 0 12px var(--contrast-orange-faded),
+            0 0 1px var(--base-white),
+            0 0 6px var(--contrast-red),
+            0 0 12px var(--contrast-orange-faded);
+
+}
+#user-name.yellow {
+    border: 2px solid var(--contrast-yellow);
+    color: var(--contrast-yellow-glow);
+
+    text-shadow: 0 0 1px var(--base-white),
+                0 0 3px var(--contrast-yellow);
+
+    box-shadow: inset 0 0 1px var(--base-white),
+            inset 0 0 6px var(--contrast-yellow),
+            inset 0 0 12px var(--contrast-red-faded),
+            0 0 1px var(--base-white),
+            0 0 6px var(--contrast-yellow),
+            0 0 12px var(--contrast-red-faded);
+
+}
+
+#user-name-mask {
+    position: absolute;
+    width: fit-content;
+    border: 3px solid var(--base-black);
+    opacity: 0.9;
+    border-radius: 9999px;
+    height: 56px;
     width: 100%;
+    padding: 4px 3rem;
+    top: -2px;
+    left: 0;
 }
 
 #header-utils-flex {
@@ -361,7 +464,7 @@ textarea:focus-within {
     height: 25px;
     width: 25px;
     top: 10%;
-    left: -4%;
+    left: -20px;
     box-shadow: 0 0 1px var(--base-white),
                 0 0 3px var(--contrast-yellow),
                 0 0 6px var(--contrast-yellow-faded);
@@ -376,7 +479,7 @@ textarea:focus-within {
     transform: rotate(0deg); 
     width: 12px;
     top: 7%;
-    left: -5.5%;
+    left: -25px;
 
 }
 
@@ -394,15 +497,15 @@ textarea:focus-within {
 #toggle-search-bar.activate {
     top: -25%;
     left: -11%;
-    height: 50px;
-    width: 50px;
+    height: 55px;
+    width: 55px;
 }
 
 #search-bar {
-    border-radius: 25px;
+    border-radius: 27.5px;
     border: 2px solid var(--contrast-yellow);
-    width: 50px;
-    height: 50px;
+    width: 55px;
+    height: 55px;
     scale: 1;
     color: transparent;
     transition: box-shadow 200ms ease-in-out,
@@ -466,9 +569,9 @@ textarea:focus-within {
 
 .btn-container > #create-project-btn {
     position: relative;
-    height: 50px;
-    width: 50px;
-    border-radius: 25px;
+    height: 55px;
+    width: 55px;
+    border-radius: 27.5px;
     background: none;
     border: 2px solid var(--contrast-green);
     box-shadow: inset 0 0 1px var(--base-white),
@@ -582,6 +685,11 @@ textarea:focus-within {
     width: 50px;
 }
 
+.header-btn {
+    height: 55px;
+    width: 55px;
+}
+
 .invisible-btn:hover,
 .invisible-btn:focus-within {
     box-shadow: none;
@@ -599,7 +707,7 @@ textarea:focus-within {
 
 .delete-btn-container {
     position: relative;
-    opacity: 0.7;
+    opacity: 0.9;
 }
 
 .bin-body,
@@ -788,6 +896,7 @@ textarea:focus-within {
     box-shadow: inset 0 0 5px var(--contrast-orange-faded),
                 inset 0 0 2px var(--contrast-orange);
 
+    will-change: transform;
     opacity: 1;
     transition: opacity 200ms ease-in-out,
                 scale 200ms ease-in-out,
