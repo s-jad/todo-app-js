@@ -83,10 +83,8 @@ export const SearchBar = ((doc) => {
                 return;
             } else {
                 projects.forEach(proj => {
-                    if (proj.classList.contains("search-invisible")) {
-                        proj.classList.remove("search-invisible");
-                        proj.style.display = "grid";
-                    }
+                    proj.classList.remove("search-invisible");
+                    proj.style.display = "grid";
                 })
             }
             return projects;
@@ -181,7 +179,7 @@ export const SearchBar = ((doc) => {
             });
 
             if (!match && displayed) {
-                const projectGrid = doc.getElementById('project-grid');
+                const projectGrid = Display.getCurrentProjectGrid();
                 const projectToRemove = projectGrid.querySelector(`#project-card-${projTitle}`);
                 projectToRemove.classList.add("search-invisible");
                 setTimeout(() => {
@@ -189,7 +187,7 @@ export const SearchBar = ((doc) => {
                 }, 110);
             } else if (match && !displayed) {
                 setTimeout(() => {
-                    const projectGrid = doc.getElementById('project-grid');
+                    const projectGrid = Display.getCurrentProjectGrid();
                     const projectToAdd = projectGrid.querySelector(`#project-card-${projTitle}`);
                     projectToAdd.style.display = "grid";
                     projectToAdd.classList.remove("search-invisible");
