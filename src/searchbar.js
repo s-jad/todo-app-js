@@ -3,8 +3,12 @@ import { Display } from "./display";
 import User from "./user";
 
 export const SearchBar = ((doc) => {
-    const generateSearchBar = () => {
+    let state = {
+        expandedMatchingProject: false,
+        currentlyExpandedProject: {},
+    };
 
+    const generateSearchBar = () => {
         const searchBarContainer = doc.createElement('div');
         searchBarContainer.id = "search-bar-container"
 
@@ -50,17 +54,9 @@ export const SearchBar = ((doc) => {
         return searchBarContainer;
     };
 
-    const searchProjects = () => {
-        console.log("Searching projects");
-    };
-
-    const searchTodos = () => {
-        console.log("Searching todos");
-    };
-
     const findMatches = (wordToMatch, arrayToSearch) => {
-        const projectGrid = doc.getElementById('project-grid');
-        const projects = Array.from(projectGrid.querySelectorAll('[id^="project-card-"]'));
+        const projectGrid = Display.getCurrentProjectGrid();
+        const projects = Array.from(projectGrid.children);
 
         if (wordToMatch === "") {
             return projects;
@@ -75,7 +71,6 @@ export const SearchBar = ((doc) => {
                 return projectTitle.match(regex);
             });
         } else if (arrayToSearch = "todos") {
-
             const currentUser = TodoApp.getCurrentUser();
             let matches;
 
@@ -103,13 +98,38 @@ export const SearchBar = ((doc) => {
 
         const projectGrid = document.getElementById('project-grid');
 
+        // If only one project title matches, auto-expand that project
+        if (matches.length === 1) {
+            const singleMatch = new CustomEvent('searchGrow', {
+                target: matches[0],
+            });
+
+            matches[0].dispatchEvent(singleMatch);
+            state.expandedMatchingProject = true;
+            state.currentlyExpandedProject = matches[0];
+        }
+
+        // If a project is auto-expanded but not the only match, shrink it
+        if (matches.length > 1 && state.expandedMatchingProject === true) {
+            const currentExpanded = state.currentlyExpandedProject;
+            console.log("currentExpanded => ", currentExpanded);
+            const notSingleMatch = new CustomEvent('searchShrink', {
+                target: currentExpanded,
+            });
+
+            console.log("Dispatching event notSingleMatch on element ", currentExpanded);
+            currentExpanded.dispatchEvent(notSingleMatch);
+            state.expandedMatchingProject = false;
+
+            console.log("displayMatches::notSingleMatch => ", notSingleMatch);
+            console.log("state.expandedMatchingProject => ", state.expandedMatchingProject);
+        }
+
         const totalProjectGrid = Display.getCurrentProjectGrid().cloneNode(true);
-        console.log("Total project grid => ", totalProjectGrid);
         const allProjects = Array.from(totalProjectGrid.querySelectorAll('[id^="project-card-"]'));
 
-        console.log("All projects => ", allProjects);
         const currentProjects = document.querySelectorAll('[id^="project-card-"]');
-        console.log("currentProjects => ", currentProjects);
+
         let currentlyDisplayedProjects = [];
         currentProjects.forEach(proj => {
             if (proj.classList.contains("search-invisible")) {
@@ -140,11 +160,11 @@ export const SearchBar = ((doc) => {
             })
             ) {
                 console.log("Isnt a match and is currently displayed => ", proj);
-                const projectToRemove = projectGrid.querySelector(`#project-card-${projTitle}`);
+                const projectToRemove = totalProjectGrid.querySelector(`#project-card-${projTitle}`);
                 projectToRemove.classList.add("search-invisible");
                 setTimeout(() => {
                     projectToRemove.style.display = "none";
-                }, 210);
+                }, 110);
             } else if (match && !currentlyDisplayedProjects.some((project) => {
                 const title = project.querySelector('.project-title').innerText.trim();
 
@@ -154,18 +174,16 @@ export const SearchBar = ((doc) => {
                 }
             })) {
                 console.log("Is a match and not currently displayed => ", proj);
-                const projectToAdd = projectGrid.querySelector(`#project-card-${projTitle}`);
-                projectToAdd.classList.remove("search-invisible");
+                const projectToAdd = totalProjectGrid.querySelector(`#project-card-${projTitle}`);
+                projectToAdd.style.display = "grid";
                 setTimeout(() => {
-                    projectToAdd.style.display = "grid";
-                }, 210);
+                    projectToAdd.classList.remove("search-invisible");
+                }, 110);
             }
         });
     }
 
     return {
-        searchTodos,
-        searchProjects,
         generateSearchBar,
     };
 

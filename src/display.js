@@ -653,6 +653,14 @@ export const Display = ((doc) => {
         newProjectCard.addEventListener('click', renderExpandedProject);
         newProjectCard.addEventListener('keypress', renderExpandedProjectKeyEnter);
 
+        newProjectCard.addEventListener('searchGrow', function(ev) {
+            renderExpandedProject(ev);
+        });
+
+        newProjectCard.addEventListener('searchShrink', function(ev) {
+            renderShrunkProject(ev);
+        });
+
         const user = TodoApp.getCurrentUser();
         newProjectCard.tabIndex = user.getAllProjects().length;
 
@@ -750,6 +758,7 @@ export const Display = ((doc) => {
     };
 
     const renderExpandedProject = (ev) => {
+        console.log("Rendering expanded project ", ev.target);
         ev.target.removeEventListener("keypress", renderExpandedProjectKeyEnter);
         if (Array.from(ev.target.classList).includes("expanded")) {
             renderShrunkProject(ev);
@@ -961,6 +970,7 @@ export const Display = ((doc) => {
         setTimeout(() => {
             projectCard.style.animation = "";
             projectCard.removeEventListener("click", renderExpandedProject);
+            projectCard.removeEventListener("keypress", renderExpandedProjectKeyEnter);
             projectCard.removeEventListener('animationend', handleExpansionAnimationEnd);
         }, 600);
     };
@@ -1007,6 +1017,7 @@ export const Display = ((doc) => {
     };
 
     const renderShrunkProject = (ev) => {
+        console.log("Rendering shrunk project ", ev.target);
         // Check if the target of the click event is the delete icon
         // or one of the todo checkboxes
         // If yes, Return early without triggering the shrinking
@@ -1116,6 +1127,14 @@ export const Display = ((doc) => {
             projectsInGrid.forEach(proj => {
                 proj.addEventListener('click', renderExpandedProject);
                 proj.addEventListener('keypress', renderExpandedProjectKeyEnter);
+                proj.addEventListener('searchGrow', function(ev) {
+                    renderExpandedProject(ev);
+                });
+
+                proj.addEventListener('searchShrink', function(ev) {
+                    renderShrunkProject(ev);
+                });
+
                 proj.classList.remove('expanded');
             });
             projectCard.classList.remove('shrinking');
@@ -1192,6 +1211,8 @@ export const Display = ((doc) => {
         removeProjectFromProjectGrid,
         setFocusToFirstInput,
         getCurrentProjectGrid,
+        renderExpandedProject,
+        renderShrunkProject,
     };
 
 })(document);
