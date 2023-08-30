@@ -667,7 +667,7 @@ textarea:focus-within {
     content: "";
     top: 0;
     left: 0;
-    z-index: 2;
+    z-index: 10;
     background: transparent;
     border: none;
     color: transparent;
@@ -898,12 +898,11 @@ textarea:focus-within {
 
     will-change: transform;
     opacity: 1;
-    transition: opacity 200ms ease-in-out,
+    transition: opacity 100ms ease-in-out,
                 scale 200ms ease-in-out,
                 background 200ms ease-in-out,
                 box-shadow 200ms ease-in-out;
 }
-
 
 [id^="project-card-"].search-invisible {
     opacity: 0;
