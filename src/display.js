@@ -1134,7 +1134,7 @@ export const Display = ((doc) => {
                 proj.addEventListener('searchShrink', function(ev) {
                     renderShrunkProject(ev);
                 });
-
+                proj.classList.remove('search-invisible');
                 proj.classList.remove('expanded');
             });
             projectCard.classList.remove('shrinking');
