@@ -81,6 +81,13 @@ export const SearchBar = ((doc) => {
         if (wordToMatch === "") {
             if (projects.length === 0) {
                 return;
+            } else {
+                projects.forEach(proj => {
+                    if (proj.classList.contains("search-invisible")) {
+                        proj.classList.remove("search-invisible");
+                        proj.style.display = "grid";
+                    }
+                })
             }
             return projects;
         }
@@ -94,6 +101,7 @@ export const SearchBar = ((doc) => {
 
     const displayProjectMatches = (wordToMatch) => {
         const projects = Array.from(doc.querySelectorAll('[id^="project-card-"]'));
+        // If there are no projects, dont do anything
         if (projects.length === 0) {
             return;
         }
@@ -119,6 +127,7 @@ export const SearchBar = ((doc) => {
             }
         }
 
+        // If there are no matches, but project is expanded, make invisible
         if (matches.length === 0 && state.expandedMatchingProject === true) {
             const currentExpanded = state.currentlyExpandedProject;
             currentExpanded.classList.add("search-invisible");
