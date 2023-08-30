@@ -79,14 +79,10 @@ export const SearchBar = ((doc) => {
         }
 
         if (wordToMatch === "") {
-            if (projects.length === 0) {
-                return;
-            } else {
-                projects.forEach(proj => {
-                    proj.classList.remove("search-invisible");
-                    proj.style.display = "grid";
-                })
-            }
+            projects.forEach(proj => {
+                proj.classList.remove("search-invisible");
+                proj.style.display = "grid";
+            })
             return projects;
         }
 
