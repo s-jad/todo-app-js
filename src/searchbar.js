@@ -59,6 +59,9 @@ export const SearchBar = ((doc) => {
         const projects = Array.from(projectGrid.children);
 
         if (wordToMatch === "") {
+            if (projects.length === 0) {
+                return;
+            }
             return projects;
         }
 
@@ -110,7 +113,7 @@ export const SearchBar = ((doc) => {
         }
 
         // If a project is auto-expanded but not the only match, shrink it
-        if (matches.length > 1 && state.expandedMatchingProject === true) {
+        if (matches.length !== 1 && state.expandedMatchingProject === true) {
             const currentExpanded = state.currentlyExpandedProject;
             console.log("currentExpanded => ", currentExpanded);
             const notSingleMatch = new CustomEvent('searchShrink', {
@@ -160,8 +163,9 @@ export const SearchBar = ((doc) => {
             })
             ) {
                 console.log("Isnt a match and is currently displayed => ", proj);
-                const projectToRemove = totalProjectGrid.querySelector(`#project-card-${projTitle}`);
+                const projectToRemove = projectGrid.querySelector(`#project-card-${projTitle}`);
                 projectToRemove.classList.add("search-invisible");
+                console.log("projectToRemove => ", projectToRemove);
                 setTimeout(() => {
                     projectToRemove.style.display = "none";
                 }, 110);
@@ -174,7 +178,7 @@ export const SearchBar = ((doc) => {
                 }
             })) {
                 console.log("Is a match and not currently displayed => ", proj);
-                const projectToAdd = totalProjectGrid.querySelector(`#project-card-${projTitle}`);
+                const projectToAdd = projectGrid.querySelector(`#project-card-${projTitle}`);
                 projectToAdd.style.display = "grid";
                 setTimeout(() => {
                     projectToAdd.classList.remove("search-invisible");
