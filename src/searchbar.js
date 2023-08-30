@@ -93,8 +93,12 @@ export const SearchBar = ((doc) => {
     };
 
     const displayProjectMatches = (wordToMatch) => {
+        const projects = Array.from(doc.querySelectorAll('[id^="project-card-"]'));
+        if (projects.length === 0) {
+            return;
+        }
+
         const matches = findProjectMatches(wordToMatch);
-        console.log("matches.length => ", matches.length);
         // If only one project title matches, auto-expand that project
         if (matches.length === 1) {
             const matchTitle = matches[0].id.slice(matches[0].id.lastIndexOf("-") + 1);
