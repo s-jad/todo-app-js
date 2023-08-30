@@ -472,9 +472,30 @@ export const Display = ((doc) => {
         leftBtnContainer.classList.add('btn-container');
         leftBtnContainer.classList.add('big-btn');
 
-        const leftTodoBtn = new Image();
-        leftTodoBtn.src = "./assets/chevron-left.svg";
-        leftTodoBtn.id = "left-todos-btn";
+        const leftTodoBtnTop = doc.createElement('div');
+        leftTodoBtnTop.classList.add("left-todos-btn-top");
+        const leftTodoBtnBottom = doc.createElement('div');
+        leftTodoBtnBottom.classList.add("left-todos-btn-bottom");
+
+        const leftTodoBtnTopTwo = doc.createElement('div');
+        const leftTodoBtnBottomTwo = doc.createElement('div');
+        leftTodoBtnTopTwo.classList.add("left-todos-btn-top");
+        leftTodoBtnBottomTwo.classList.add("left-todos-btn-bottom");
+
+        const leftTodoBtnTwoContainer = doc.createElement('div');
+        leftTodoBtnTwoContainer.classList.add('left-todo-container-two');
+        leftTodoBtnTwoContainer.appendChild(leftTodoBtnTopTwo);
+        leftTodoBtnTwoContainer.appendChild(leftTodoBtnBottomTwo);
+
+        const leftTodoBtnTopThree = doc.createElement('div');
+        const leftTodoBtnBottomThree = doc.createElement('div');
+        leftTodoBtnTopThree.classList.add("left-todos-btn-top");
+        leftTodoBtnBottomThree.classList.add("left-todos-btn-bottom");
+
+        const leftTodoBtnThreeContainer = doc.createElement('div');
+        leftTodoBtnThreeContainer.classList.add('left-todo-container-three');
+        leftTodoBtnThreeContainer.appendChild(leftTodoBtnTopThree);
+        leftTodoBtnThreeContainer.appendChild(leftTodoBtnBottomThree);
 
         const actualLeftTodoBtn = doc.createElement('button');
         actualLeftTodoBtn.classList.add('invisible-btn');
@@ -482,24 +503,51 @@ export const Display = ((doc) => {
         actualLeftTodoBtn.type = "button";
         actualLeftTodoBtn.onclick = scrollTodosLeft;
 
-        leftBtnContainer.appendChild(leftTodoBtn);
+        leftBtnContainer.appendChild(leftTodoBtnTop);
+        leftBtnContainer.appendChild(leftTodoBtnBottom);
+        leftBtnContainer.appendChild(leftTodoBtnTwoContainer);
+        leftBtnContainer.appendChild(leftTodoBtnThreeContainer);
         leftBtnContainer.appendChild(actualLeftTodoBtn);
 
         const rightBtnContainer = doc.createElement('div');
         rightBtnContainer.classList.add('btn-container');
         rightBtnContainer.classList.add('big-btn');
 
-        const rightTodoBtn = new Image();
-        rightTodoBtn.src = "./assets/chevron-right.svg";
-        rightTodoBtn.id = "right-todos-btn";
+        const rightTodoBtnTop = doc.createElement('div');
+        const rightTodoBtnBottom = doc.createElement('div');
+        rightTodoBtnTop.classList.add("right-todos-btn-top");
+        rightTodoBtnBottom.classList.add("right-todos-btn-bottom");
+
+        const rightTodoBtnTopTwo = doc.createElement('div');
+        const rightTodoBtnBottomTwo = doc.createElement('div');
+        rightTodoBtnTopTwo.classList.add("right-todos-btn-top");
+        rightTodoBtnBottomTwo.classList.add("right-todos-btn-bottom");
+
+        const rightTodoBtnTwoContainer = doc.createElement('div');
+        rightTodoBtnTwoContainer.classList.add('right-todo-container-two');
+        rightTodoBtnTwoContainer.appendChild(rightTodoBtnTopTwo);
+        rightTodoBtnTwoContainer.appendChild(rightTodoBtnBottomTwo);
+
+        const rightTodoBtnTopThree = doc.createElement('div');
+        const rightTodoBtnBottomThree = doc.createElement('div');
+        rightTodoBtnTopThree.classList.add("right-todos-btn-top");
+        rightTodoBtnBottomThree.classList.add("right-todos-btn-bottom");
+
+        const rightTodoBtnThreeContainer = doc.createElement('div');
+        rightTodoBtnThreeContainer.classList.add('right-todo-container-three');
+        rightTodoBtnThreeContainer.appendChild(rightTodoBtnTopThree);
+        rightTodoBtnThreeContainer.appendChild(rightTodoBtnBottomThree);
 
         const actualRightTodoBtn = doc.createElement('button');
         actualRightTodoBtn.classList.add('invisible-btn');
-        actualLeftTodoBtn.classList.add('big-btn');
+        actualRightTodoBtn.classList.add('big-btn');
         actualRightTodoBtn.type = "button";
         actualRightTodoBtn.onclick = scrollTodosRight;
 
-        rightBtnContainer.appendChild(rightTodoBtn);
+        rightBtnContainer.appendChild(rightTodoBtnTop);
+        rightBtnContainer.appendChild(rightTodoBtnBottom);
+        rightBtnContainer.appendChild(rightTodoBtnTwoContainer);
+        rightBtnContainer.appendChild(rightTodoBtnThreeContainer);
         rightBtnContainer.appendChild(actualRightTodoBtn);
 
         const leftRightTodoBtnContainer = doc.createElement('div');
@@ -826,7 +874,7 @@ export const Display = ((doc) => {
 
         // Prepare expansion animation
         const animationName = `expansionAnimation`;
-        const animationDuration = "500ms";
+        const animationDuration = "300ms";
         const animationTransition = "cubic-bezier(.43,.22,.43,.92)";
         const animationKeyframes = `
             @keyframes ${animationName} {
@@ -991,13 +1039,13 @@ export const Display = ((doc) => {
         const todoInfo = doc.createElement('div');
         todoInfo.classList.add('expanded-todo-info');
         todoInfo.innerHTML = `
-            <h4>Description:</h4>
+            <h4>Description</h4>
             <p class="expanded-todo-description">${todoToExpand.description}</p>
-            <h4>Due Date:</h4>
+            <h4>Due Date</h4>
             <p class="expanded-todo-due-date">${todoToExpand.dueDate}</p>
-            <h4>Priority:</h4>
+            <h4>Priority</h4>
             <p class="expanded-todo-priority">${todoToExpand.priority}</p>
-            <h4>Notes:</h4>
+            <h4>Notes</h4>
             <p class="expanded-todo-notes">${todoToExpand.notes}</p>
         `;
         todoInfo.classList.add('invisible');
@@ -1018,6 +1066,10 @@ export const Display = ((doc) => {
 
     const renderShrunkProject = (ev) => {
         console.log("Rendering shrunk project ", ev.target);
+        if (!ev.target.classList.contains('expanded')) {
+            return;
+        }
+
         // Check if the target of the click event is the delete icon
         // or one of the todo checkboxes
         // If yes, Return early without triggering the shrinking
@@ -1066,7 +1118,7 @@ export const Display = ((doc) => {
 
         // Prepare shrinking animation
         const animationName = "shrinkingAnimation";
-        const animationDuration = "500ms";
+        const animationDuration = "300ms";
         const animationTransition = "cubic-bezier(.43,.22,.43,.92)";
         const animationKeyframes = `
             @keyframes ${animationName} {
