@@ -6,7 +6,9 @@ export const SearchBar = ((doc) => {
     let state = {
         expandedMatchingProject: false,
         currentlyExpandedProject: {},
-        searchBarToggle: "projects",
+        expandedMatchingTodo: false,
+        currentlyExpandedTodo: {},
+        searchBarToggle: "todos",
     };
 
     const generateSearchBar = () => {
@@ -196,16 +198,32 @@ export const SearchBar = ((doc) => {
         const projectGrid = Display.getCurrentProjectGrid();
         const projects = Array.from(projectGrid.children);
 
+        if (wordToMatch === "" && state.expandedMatchingProject) {
+            const currentExpanded = state.currentlyExpandedProject;
+            const currentCard = doc.querySelector(`#${currentExpanded.id}`);
+
+            if (currentCard.classList.contains("search-invisible")) {
+                currentCard.classList.remove("search-invisible");
+            };
+            const notSingleMatch = new CustomEvent('searchShrink', {
+                target: currentCard,
+            });
+
+            currentCard.dispatchEvent(notSingleMatch);
+            state.expandedMatchingProject = false;
+        }
+
         if (wordToMatch === "") {
-            if (projects.length === 0) {
-                return;
-            }
+            projects.forEach(proj => {
+                proj.classList.remove("search-invisible");
+                proj.style.display = "grid";
+            })
             return projects;
         }
 
         const currentUser = TodoApp.getCurrentUser();
         let projMatches = [];
-        let todoTitleMatches = [];
+        let todoMatches = [];
 
         for (let i = 0; i < projects.length; i++) {
             const currentProjectTitle = projects[i].querySelector('.project-title').innerText.trim();
@@ -218,38 +236,44 @@ export const SearchBar = ((doc) => {
                     if (!projMatches.includes(projects[i])) {
                         projMatches.push(projects[i]);
                     }
-                    todoTitleMatches.push(todo.title);
+                    todoMatches.push(todo.title);
                 }
             });
         };
-        return { projMatches, todoTitleMatches };
+        return { projMatches, todoMatches };
     };
 
     const displayTodoMatches = (wordToMatch) => {
-        const { projectMatches, todoTitleMatches } = findTodoMatches(wordToMatch);
+        const matches = findTodoMatches(wordToMatch);
+        const projectMatches = matches.projMatches;
+        const todoMatches = matches.todoMatches;
 
-        const projectGrid = doc.getElementById('project-grid');
+        if (projectMatches === undefined) {
+            return;
+        }
 
-        // If only one project title matches, auto-expand that project
-        if (projectMatches.length === 1) {
-            const singleMatch = new CustomEvent('searchGrow', {
-                target: projectMatches[0],
-            });
-
-            projectMatches[0].dispatchEvent(singleMatch);
-            state.expandedMatchingProject = true;
-            state.currentlyExpandedProject = projectMatches[0];
+        // If there are no matches, but project is expanded, make invisible
+        if (projectMatches.length === 0 && state.expandedMatchingProject === true) {
+            const currentExpanded = state.currentlyExpandedProject;
+            currentExpanded.classList.add("search-invisible");
+            return;
         }
 
         // If a project is auto-expanded but not the only match, shrink it
-        if (projectMatches.length !== 1 && state.expandedMatchingProject === true) {
+        if (projectMatches.length > 1 && state.expandedMatchingProject === true) {
             const currentExpanded = state.currentlyExpandedProject;
-            const notSingleMatch = new CustomEvent('searchShrink', {
-                target: currentExpanded,
-            });
+            if (currentExpanded.classList.contains("search-invisible")) {
+                currentExpanded.classList.remove("search-invisible");
+            };
 
-            currentExpanded.dispatchEvent(notSingleMatch);
-            state.expandedMatchingProject = false;
+            if (currentExpanded.classList.contains("expanded")) {
+                const notSingleMatch = new CustomEvent('searchShrink', {
+                    target: currentExpanded,
+                });
+
+                currentExpanded.dispatchEvent(notSingleMatch);
+                state.expandedMatchingProject = false;
+            }
         }
 
         const totalProjectGrid = Display.getCurrentProjectGrid().cloneNode(true);
@@ -265,6 +289,90 @@ export const SearchBar = ((doc) => {
             currentlyDisplayedProjects.push(proj);
         });
 
+        if (projectMatches.length === 1) {
+            const matchTitle = projectMatches[0].id.slice(projectMatches[0].id.lastIndexOf("-") + 1);
+            const projectMatch = doc.querySelector(`[id="project-card-${matchTitle}"]`)
+
+            // If only one project matches, its expanded but invisible
+            if (projectMatch.classList.contains("search-invisible")) {
+                projectMatch.classList.remove("search-invisible");
+                return;
+            } else {
+                const singleMatch = new CustomEvent('searchGrow', {
+                    target: projectMatches[0],
+                });
+
+                projectMatches[0].dispatchEvent(singleMatch);
+                state.expandedMatchingProject = true;
+                state.currentlyExpandedProject = projectMatches[0];
+            }
+
+            if (todoMatches.length > 1 && state.expandedMatchingTodo) {
+                const expandedProject = doc.querySelector('.expanded');
+                const projectTodos = Array.from(expandedProject.querySelectorAll('.todo-container'));
+
+                projectTodos.forEach(todo => {
+                    if (todo.classList.contains("expanded")) {
+                        todo.classList.remove("expanded");
+                        const expandedInfo = todo.querySelector('.expanded-todo-info');
+                        todo.removeChild(expandedInfo);
+                        state.expandedMatchingTodo = false;
+                    } else {
+                        setTimeout(() => {
+                            todo.classList.remove("shrink");
+                            todo.style.visibility = "";
+                        }, 100);
+                    }
+                });
+            }
+
+            // If only a single todo matches
+            if (todoMatches.length === 1) {
+                if (todoMatches[0] === state.currentlyExpandedTodo) {
+                    return;
+                }
+                let expandedProject = doc.querySelector('.expanded');
+                if (expandedProject === null) {
+                    // Wait for the project to expand and expand it.
+                    setTimeout(() => {
+                        expandedProject = doc.querySelector('.expanded');
+                        const projectTodos = Array.from(expandedProject.querySelectorAll('.todo-container'));
+                        const todoToExpand = projectTodos.find(todo => {
+                            const label = todo.querySelector('label').innerText;
+                            return label === todoMatches[0];
+                        });
+
+                        console.log("todoToExpand => ", todoToExpand);
+
+                        const singleTodoMatch = new CustomEvent('searchTodoGrow', {
+                            target: todoToExpand,
+                        });
+
+                        todoToExpand.dispatchEvent(singleTodoMatch);
+                        state.expandedMatchingTodo = true;
+                        state.currentlyExpandedTodo = todoToExpand;
+                    }, 400);
+                } else {
+                    const projectTodos = Array.from(expandedProject.querySelectorAll('.todo-container'));
+                    const todoToExpand = projectTodos.find(todo => {
+                        const label = todo.querySelector('label').innerText;
+                        return label === todoMatches[0];
+                    });
+
+                    console.log("todoToExpand => ", todoToExpand);
+
+                    const singleTodoMatch = new CustomEvent('searchTodoGrow', {
+                        target: todoToExpand,
+                    });
+
+                    todoToExpand.dispatchEvent(singleTodoMatch);
+                    state.expandedMatchingTodo = true;
+                    state.currentlyExpandedTodo = todoToExpand;
+                }
+            }
+        }
+
+
         allProjects.forEach((proj) => {
             const projTitle = proj.querySelector('.project-title').innerText.trim();
 
@@ -272,6 +380,7 @@ export const SearchBar = ((doc) => {
                 const matchTitle = match.querySelector('.project-title').innerText.trim();
                 return matchTitle === projTitle;
             });
+
             const displayed = currentlyDisplayedProjects.some((project) => {
                 const title = project.querySelector('.project-title').innerText.trim();
                 if (title === projTitle) {
@@ -280,29 +389,22 @@ export const SearchBar = ((doc) => {
             });
 
             if (!match && displayed) {
+                const projectGrid = Display.getCurrentProjectGrid();
                 const projectToRemove = projectGrid.querySelector(`#project-card-${projTitle}`);
                 projectToRemove.classList.add("search-invisible");
                 setTimeout(() => {
                     projectToRemove.style.display = "none";
                 }, 110);
             } else if (match && !displayed) {
-                const projectToAdd = projectGrid.querySelector(`#project-card-${projTitle}`);
-                projectToAdd.style.display = "grid";
                 setTimeout(() => {
+                    const projectGrid = Display.getCurrentProjectGrid();
+                    const projectToAdd = projectGrid.querySelector(`#project-card-${projTitle}`);
+                    projectToAdd.style.display = "grid";
                     projectToAdd.classList.remove("search-invisible");
                 }, 110);
             }
         });
 
-        if (todoTitleMatches.length === 1) {
-            const singleTodoMatch = new CustomEvent('searchTodoGrow', {
-                target: todoTitleMatches[0],
-            });
-
-            todoTitleMatches[0].dispatchEvent(singleTodoMatch);
-            state.expandedMatchingTodo = true;
-            state.currentlyExpandedTodo = todoTitleMatches[0];
-        }
     }
 
     return {
