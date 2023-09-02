@@ -196,6 +196,16 @@ export const SearchBar = ((doc) => {
 
     const findTodoMatches = (wordToMatch) => {
         const projectGrid = Display.getCurrentProjectGrid();
+
+        const isEmpty = (obj) => {
+            return Object.keys(obj).length === 0;
+        };
+
+        if (isEmpty(projectGrid)) {
+            console.log("Project grid is empty");
+            return;
+        }
+
         const projects = Array.from(projectGrid.children);
 
         if (wordToMatch === "" && state.expandedMatchingProject) {
@@ -245,12 +255,13 @@ export const SearchBar = ((doc) => {
 
     const displayTodoMatches = (wordToMatch) => {
         const matches = findTodoMatches(wordToMatch);
-        const projectMatches = matches.projMatches;
-        const todoMatches = matches.todoMatches;
 
-        if (projectMatches === undefined) {
+        if (matches === undefined) {
             return;
         }
+
+        const projectMatches = matches.projMatches;
+        const todoMatches = matches.todoMatches;
 
         // If there are no matches, but project is expanded, make invisible
         if (projectMatches.length === 0 && state.expandedMatchingProject === true) {
