@@ -255,7 +255,7 @@ export const Display = ((doc) => {
                 <label for="create-project-todo-count" class="create-project-label"><span class="warn-hl">*</span> Number of todos:</label>
                 <input type="number" value="" name="create-project-todo-count" 
                 id="create-project-todo-count-input" min="0" max="12" class="required">
-                <p id="todo-input-container-title">Todos:</p>
+                <h3 id="todo-input-container-title">Todos:</h3>
                 <div id="todo-input-container">
                     <!-- Dynamic todo item inputs will be added here -->
                 </div>
@@ -318,10 +318,26 @@ export const Display = ((doc) => {
         const todoNames = [];
         let todoCount = 0;
 
+
+
         // Check if the todo count is a valid number and not over max
         // If so, generate inputs for that number of todos
-        createProjectTodoCountInput.addEventListener('input', () => {
-            todoCount = parseInt(createProjectTodoCountInput.value);
+        createProjectTodoCountInput.addEventListener('input', (ev) => {
+            todoCount = parseInt(ev.target.value);
+
+            const createProjectForm = createProjectModalContainer.querySelector('#create-project-form');
+            if (ev.target.value === "") {
+
+                const existingTodoContainers = Array.from(createProjectForm.querySelectorAll('[id^="todo-input-card-"]'));
+                if (existingTodoContainers.length > 0) {
+                    existingTodoContainers.forEach(container => todoInputContainer.removeChild(container));
+                }
+
+                createProjectForm.classList.remove('todos-counted');
+
+            } else {
+                createProjectForm.classList.add('todos-counted');
+            }
 
             if (isNaN(todoCount)) {
                 const existingWarning = todoInputContainer.querySelector('[id^="warn-"]');
@@ -353,6 +369,8 @@ export const Display = ((doc) => {
             }
 
             todoInputContainer.innerHTML = ''; // Clear existing inputs
+
+
 
             for (let i = 0; i < todoCount; i++) {
 
@@ -736,31 +754,16 @@ export const Display = ((doc) => {
         deleteBtnContainer.classList.add('delete-btn-container');
         deleteBtnContainer.classList.add('big-btn');
 
-        const binBody = doc.createElement('div');
-        binBody.classList.add('bin-body');
-        const binLidBottom = doc.createElement('div');
-        binLidBottom.classList.add('bin-lid-bottom');
-        const binLidTop = doc.createElement('div');
-        binLidTop.classList.add('bin-lid-top');
-        const binLidBottomBlackout = doc.createElement('div');
-        binLidBottomBlackout.classList.add('bin-lid-bottom-blackout');
-        const binLidTopBlackout = doc.createElement('div');
-        binLidTopBlackout.classList.add('bin-lid-top-blackout');
-        const binBodyLineOne = doc.createElement('div');
-        binBodyLineOne.classList.add('bin-body-line-one');
-        const binBodyLineTwo = doc.createElement('div');
-        binBodyLineTwo.classList.add('bin-body-line-two');
-        const binBodyLineThree = doc.createElement('div');
-        binBodyLineThree.classList.add('bin-body-line-three');
-
-        deleteBtnContainer.appendChild(binBody);
-        deleteBtnContainer.appendChild(binLidBottom);
-        deleteBtnContainer.appendChild(binLidTop);
-        deleteBtnContainer.appendChild(binLidBottomBlackout);
-        deleteBtnContainer.appendChild(binLidTopBlackout);
-        deleteBtnContainer.appendChild(binBodyLineOne);
-        deleteBtnContainer.appendChild(binBodyLineTwo);
-        deleteBtnContainer.appendChild(binBodyLineThree);
+        deleteBtnContainer.innerHTML = `
+            <div class="bin-body"></div>
+            <div class="bin-lid-bottom"></div>
+            <div class="bin-lid-top"></div>
+            <div class="bin-lid-bottom-blackout"></div>
+            <div class="bin-lid-top-blackout"></div>
+            <div class="bin-body-line-one"></div>
+            <div class="bin-body-line-two"></div>
+            <div class="bin-body-line-three"></div>
+        `;
 
         return deleteBtnContainer;
     };
@@ -829,6 +832,10 @@ export const Display = ((doc) => {
 
         } else {
             // If keypress event, use target instead of currentTarget
+            // If not a project-card, dont expand
+            if (!ev.target.id.includes("project-card-")) {
+                return;
+            }
             projectCard = ev.target;
             gridRect = ev.target.parentNode.getBoundingClientRect();
         }
@@ -925,8 +932,8 @@ export const Display = ((doc) => {
             projectTodoListContainerOuter.appendChild(projectTodoListContainer);
 
             projectTodoListContainer.innerHTML = `
-                <p class="project-todos-list-title">Todos:</p>
-                <p class="project-todos-checkbox-title">Completed:</p>
+                <h4 class="project-todos-list-title">Todos:</h4>
+                <h4 class="project-todos-checkbox-title">Completed:</h4>
                 <ul class="project-todos-list">
                     <!-- Dynamically add todos later --> 
                 </ul>
@@ -947,7 +954,7 @@ export const Display = ((doc) => {
                 todoContainer.innerHTML = `
                     <div class="todo-title-checkbox-container">
                         <li class="project-todo">
-                        <label for="todo-${index}">${todo.title}</label>
+                        <h4>${todo.title}</h4>
                         </li>
                         <div class="checkbox-container">
                             <input type="checkbox" name="todo-${index}" class="todo-check" tabindex="${index + 2}"></input>
@@ -957,26 +964,11 @@ export const Display = ((doc) => {
                         
                     </div>
                 `;
-                todoContainer.addEventListener('click', function(ev) {
-                    ev.stopPropagation();
+                todoContainer.addEventListener('click', handleTodoExpansion);
 
-                    if (todoContainer.classList.contains("expanded")) {
-                        if (ev.target.classList.contains("todo-check")) {
-                            return;
-                        }
-                        todoContainer.classList.remove("expanded");
-                        const expandedInfo = todoContainer.querySelector('.expanded-todo-info');
-                        todoContainer.removeChild(expandedInfo);
-                        const otherTodos = Array.from(todoContainer.parentNode.querySelectorAll(".todo-container"));
-                        otherTodos.forEach(node => {
-                            setTimeout(() => {
-                                node.classList.remove("shrink");
-                                node.style.visibility = "";
-                            }, 100);
-                        });
-                        return;
-                    }
-                    renderExpandedTodo(ev);
+                todoContainer.addEventListener('searchTodoGrow', function(ev) {
+                    console.log("searchTodoGrow event dispatched!");
+                    handleTodoExpansion(ev);
                 });
 
                 const checkBox = todoContainer.querySelector('.todo-check');
@@ -1023,18 +1015,43 @@ export const Display = ((doc) => {
         }, 600);
     };
 
+    const handleTodoExpansion = (ev) => {
+        const todoContainer = ev.currentTarget;
+        ev.stopPropagation();
+        if (todoContainer.classList.contains("expanded")) {
+            if (ev.target.classList.contains("todo-check")) {
+                return;
+            }
+            todoContainer.classList.remove("expanded");
+            const expandedInfo = todoContainer.querySelector('.expanded-todo-info');
+            todoContainer.removeChild(expandedInfo);
+            const otherTodos = Array.from(todoContainer.parentNode.querySelectorAll(".todo-container"));
+            otherTodos.forEach(todo => {
+                setTimeout(() => {
+                    todo.classList.remove("shrink");
+                    todo.style.visibility = "";
+                }, 100);
+            });
+            return;
+        }
+        renderExpandedTodo(ev);
+    };
+
     const renderExpandedTodo = (ev) => {
         if (ev.target.classList.contains('todo-check')) {
             return;
         }
         const todoContainer = ev.currentTarget;
         const projectId = doc.querySelector('[id^="project-card-"]').id;
-        const projectName = projectId.slice(projectId.lastIndexOf("-") + 1);
-        const todoName = todoContainer.querySelector('label').innerText;
+        const projectName = projectId.slice(projectId.lastIndexOf("card-") + 5).replaceAll("-", " ");
 
+        const todoName = todoContainer.querySelector('h4').innerText;
+        console.log("project name from id => ", projectName);
         const user = TodoApp.getCurrentUser();
         const project = user.getProject(projectName);
         const todoToExpand = project.getTodo(todoName);
+
+        console.log("project name from user.getProject => ", project);
 
         const todoInfo = doc.createElement('div');
         todoInfo.classList.add('expanded-todo-info');
@@ -1204,7 +1221,7 @@ export const Display = ((doc) => {
 
     const handleCheckBox = (ev) => {
         const projectId = doc.querySelector('[id^="project-card-"]').id;
-        const projectName = projectId.slice(projectId.lastIndexOf("-") + 1);
+        const projectName = projectId.slice(projectId.lastIndexOf("card-") + 5);
         const todoIndex = ev.target.name.slice(ev.target.name.lastIndexOf("-") + 1);
 
         const projectTodoList = doc.querySelector('.project-todos-list');
