@@ -197,7 +197,7 @@ export const SearchBar = ((doc) => {
     const findTodoMatches = (wordToMatch) => {
         const projectGrid = Display.getCurrentProjectGrid();
 
-        if (projectGrid.children.length === 0) {
+        if (projectGrid.children === undefined) {
             console.log("project-grid is empty!");
             return;
         }
@@ -297,7 +297,7 @@ export const SearchBar = ((doc) => {
         });
 
         if (projectMatches.length === 1) {
-            const matchTitle = projectMatches[0].id.slice(projectMatches[0].id.lastIndexOf("-") + 1);
+            const matchTitle = projectMatches[0].id.slice(projectMatches[0].id.lastIndexOf("card-") + 5);
             const projectMatch = doc.querySelector(`[id="project-card-${matchTitle}"]`)
 
             // If only one project matches, its expanded but invisible
@@ -316,21 +316,43 @@ export const SearchBar = ((doc) => {
 
             if (todoMatches.length > 1 && state.expandedMatchingTodo) {
                 const expandedProject = doc.querySelector('.expanded');
-                const projectTodos = Array.from(expandedProject.querySelectorAll('.todo-container'));
+                if (expandedProject === undefined) {
+                    setTimeout(() => {
+                        const retryExpandedProject = doc.querySelector('.expanded');
+                        const projectTodos = Array.from(retryExpandedProject.querySelectorAll('.todo-container'));
 
-                projectTodos.forEach(todo => {
-                    if (todo.classList.contains("expanded")) {
-                        todo.classList.remove("expanded");
-                        const expandedInfo = todo.querySelector('.expanded-todo-info');
-                        todo.removeChild(expandedInfo);
-                        state.expandedMatchingTodo = false;
-                    } else {
-                        setTimeout(() => {
-                            todo.classList.remove("shrink");
-                            todo.style.visibility = "";
-                        }, 100);
-                    }
-                });
+                        projectTodos.forEach(todo => {
+                            if (todo.classList.contains("expanded")) {
+                                todo.classList.remove("expanded");
+                                const expandedInfo = todo.querySelector('.expanded-todo-info');
+                                todo.removeChild(expandedInfo);
+                                state.expandedMatchingTodo = false;
+                            } else {
+                                setTimeout(() => {
+                                    todo.classList.remove("shrink");
+                                    todo.style.visibility = "";
+                                }, 100);
+                            }
+                        });
+                    }, 200);
+                } else {
+                    const projectTodos = Array.from(expandedProject.querySelectorAll('.todo-container'));
+
+                    projectTodos.forEach(todo => {
+                        if (todo.classList.contains("expanded")) {
+                            todo.classList.remove("expanded");
+                            const expandedInfo = todo.querySelector('.expanded-todo-info');
+                            todo.removeChild(expandedInfo);
+                            state.expandedMatchingTodo = false;
+                        } else {
+                            setTimeout(() => {
+                                todo.classList.remove("shrink");
+                                todo.style.visibility = "";
+                            }, 100);
+                        }
+                    });
+                }
+
             }
 
             // If only a single todo matches
@@ -345,11 +367,9 @@ export const SearchBar = ((doc) => {
                         expandedProject = doc.querySelector('.expanded');
                         const projectTodos = Array.from(expandedProject.querySelectorAll('.todo-container'));
                         const todoToExpand = projectTodos.find(todo => {
-                            const label = todo.querySelector('label').innerText;
+                            const label = todo.querySelector('h4').innerText;
                             return label === todoMatches[0];
                         });
-
-                        console.log("todoToExpand => ", todoToExpand);
 
                         const singleTodoMatch = new CustomEvent('searchTodoGrow', {
                             target: todoToExpand,
@@ -362,11 +382,9 @@ export const SearchBar = ((doc) => {
                 } else {
                     const projectTodos = Array.from(expandedProject.querySelectorAll('.todo-container'));
                     const todoToExpand = projectTodos.find(todo => {
-                        const label = todo.querySelector('label').innerText;
+                        const label = todo.querySelector('h4').innerText;
                         return label === todoMatches[0];
                     });
-
-                    console.log("todoToExpand => ", todoToExpand);
 
                     const singleTodoMatch = new CustomEvent('searchTodoGrow', {
                         target: todoToExpand,
@@ -382,22 +400,26 @@ export const SearchBar = ((doc) => {
 
         allProjects.forEach((proj) => {
             const projTitle = proj.querySelector('.project-title').innerText.trim();
+            console.log("projTitle => ", projTitle);
 
             const match = projectMatches.some((match) => {
                 const matchTitle = match.querySelector('.project-title').innerText.trim();
+                ;
                 return matchTitle === projTitle;
             });
 
             const displayed = currentlyDisplayedProjects.some((project) => {
                 const title = project.querySelector('.project-title').innerText.trim();
-                if (title === projTitle) {
-                    return true;
-                }
+                return title === projTitle;
             });
 
+            const idProjTitle = projTitle.replaceAll(" ", "-");
             if (!match && displayed) {
                 const projectGrid = Display.getCurrentProjectGrid();
-                const projectToRemove = projectGrid.querySelector(`#project-card-${projTitle}`);
+                console.log("projTitle => ", projTitle);
+                console.log("idProjTitle => ", idProjTitle);
+                const projectToRemove = projectGrid.querySelector(`#project-card-${idProjTitle}`);
+                console.log("projectToRemove => ", projectToRemove);
                 projectToRemove.classList.add("search-invisible");
                 setTimeout(() => {
                     projectToRemove.style.display = "none";
@@ -405,7 +427,7 @@ export const SearchBar = ((doc) => {
             } else if (match && !displayed) {
                 setTimeout(() => {
                     const projectGrid = Display.getCurrentProjectGrid();
-                    const projectToAdd = projectGrid.querySelector(`#project-card-${projTitle}`);
+                    const projectToAdd = projectGrid.querySelector(`#project-card-${idProjTitle}`);
                     projectToAdd.style.display = "grid";
                     projectToAdd.classList.remove("search-invisible");
                 }, 110);
