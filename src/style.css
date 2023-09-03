@@ -414,6 +414,81 @@ textarea:focus-within {
     position: relative;
 }
 
+#search-toggle-container-outer {
+    position: absolute;
+    top: 0;
+    left: -60px;
+    height: 55px;
+    width: 40px;
+    opacity: 1;
+    transition: opacity 200ms ease-in-out;
+}
+
+#search-toggle-container-outer.invisible {
+    opacity: 0;
+}
+
+#search-toggle-container-inner {
+    position: relative;
+    left: 15px;
+    height: 100%;
+    width: 20px;
+}
+
+.invisible-radio {
+    position: absolute;
+    outline: none;
+    border: none;
+    background: transparent;
+    opacity: 0;
+    z-index: 10;
+}
+
+.search-toggle-icon {
+    position: absolute;
+    height: 25px;
+    width: 25px;
+    border-radius: 12.5px;
+    opacity: 0.8;
+    text-align: center;
+    font-weight: 700;
+
+    border: 2px solid var(--contrast-yellow);
+    color: var(--contrast-yellow);
+    text-shadow: 0 0 2px var(--contrast-yellow-faded);
+    box-shadow: inset 0 0 10px var(--contrast-yellow-faded),
+            inset 0 0 5px var(--contrast-yellow),
+            inset 0 0 2px 2px var(--base-black),
+            0 0 10px var(--contrast-yellow-faded),
+            0 0 5px var(--contrast-yellow),
+            0 0 1px var(--base-white);
+}
+.search-toggle-icon.active {
+    background: var(--contrast-yellow);
+    color: var(--shadow-blue);
+}
+
+.search-toggle-icon:first-of-type {
+    left: -10px;
+    top: 14px;
+    padding-left: 0.2rem;
+}
+
+.search-toggle-icon:last-of-type {
+    left: 17.5px;
+    bottom: -3px;
+}
+
+#search-toggle-projects {
+    left: -15px;
+    top: 12px;
+}
+
+#search-toggle-todos {
+    left: 13px;
+    bottom: -5px;
+}
+
 #search-bar-container > input {
     min-height: 55px;
 }
@@ -471,8 +546,8 @@ textarea:focus-within {
 #search-image-glass.minify {
     height: 25px;
     width: 25px;
-    top: 10%;
-    left: -20px;
+    top: 5px;
+    left: -15px;
     box-shadow: 0 0 1px var(--base-white),
                 0 0 3px var(--contrast-yellow),
                 0 0 6px var(--contrast-yellow-faded);
@@ -485,8 +560,8 @@ textarea:focus-within {
 #search-image-handle.minify {
     transform: rotate(0deg); 
     width: 12px;
-    top: 7%;
-    left: -25px;
+    top: 4.5px;
+    left: -20px;
 }
 
 #toggle-search-bar:hover ~ #search-image-handle.minify,
@@ -498,18 +573,19 @@ textarea:focus-within {
 
 #toggle-search-bar {
     z-index: 10;
+    top: 2px;
+    left: 5px;
 }
 
 #toggle-search-bar.activate {
-    top: -25%;
-    left: -11%;
-    height: 55px;
-    width: 55px;
+    top: -10px;
+    left: -30px;
 }
 
 #search-bar {
     border-radius: 27.5px;
     border: 2px solid var(--contrast-yellow);
+    max-width: 55px;
     width: 55px;
     height: 55px;
     scale: 1;
@@ -517,14 +593,17 @@ textarea:focus-within {
     transition: box-shadow 200ms ease-in-out,
                 color 200ms ease-in-out,
                 width 200ms ease-in-out,
+                max-width 200ms ease-in-out,
                 scale 200ms ease-in-out;
 }
 
 #search-bar.active {
     border-radius: 9999px;
     color: var(--base-white);
+    max-width: 40vw;
     width: 40vw;
     height: 30px;
+    padding: 0 2rem;
 }
 
 #search-bar-container:hover > #search-bar:not(.active), 
@@ -754,6 +833,12 @@ textarea:focus-within {
     color: transparent;
     outline: none;
     box-shadow: none;
+}
+
+
+.very-small-btn {
+    height: 25px;
+    width: 25px;
 }
 
 .small-btn {
@@ -1005,7 +1090,7 @@ textarea:focus-within {
     display: grid;
     align-items: start;
     grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: 1fr 1fr 9fr 50px;
+    grid-template-rows: 35px 1fr 9fr 50px;
 }
 
 [id^="project-card-"] > .project-title {
@@ -1022,11 +1107,6 @@ textarea:focus-within {
 [id^="project-card-"].expanded > .project-title {
     font-size: clamp(24px, calc(2.3rem + 0.25vw), 30px);
 
-}
-
-[id^="project-card-"].expanded > .project-description {
-    opacity: 0.8;
-    margin-left: 2rem;
 }
 
 .project-title::after {
@@ -1073,7 +1153,11 @@ textarea:focus-within {
 [id^="project-card-"].expanded > .project-description {
     grid-column: 1 / 6;
     grid-row: 2 / 3;
-
+    white-space: normal;
+    max-width: 80ch; 
+    max-height: 50px;
+    opacity: 0.8;
+    margin-left: 2rem;
 }
 
 /* Todo List */
