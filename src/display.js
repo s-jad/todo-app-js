@@ -447,50 +447,34 @@ export const Display = ((doc) => {
         todoInputContainer.appendChild(todoInputCard);
     };
 
-    const handleTodoDateInputEvent = (ev, todoInputContainer) => {
-        const userInput = ev.target.value;
-        const parsedDate = parse(userInput, 'yyyy-MM-dd', new Date());
-        const isValidDate = isValid(parsedDate);
+    const handleModalInputChanges = () => {
+        const user = TodoApp.getCurrentUser();
+        const newProjectName = doc.getElementById("create-project-name-input").value;
+        const uniqueProjectName = user.checkUniqueProjectName(newProjectName);
 
-        if (!isValidDate) {
-            const existingDateWarning = doc.querySelector('[id^="warn-date-"]');
-            if (existingDateWarning !== null) {
-                todoInputContainer.removeChild(existingDateWarning);
+        const projectTodoCount = doc.getElementById("create-project-todo-count-input");
+        const confirmCreateProjectBtn = doc.getElementById("confirm-create-project-btn");
+        const todoNames = Array.from(doc.querySelectorAll('[name^="new-todo-name-"]'));
+        const todoNamesFilled = todoNames.filter(todoName => todoName.value !== "");
+
+        setTimeout(() => {
+            const warnings = Array.from(doc.querySelectorAll('[id^="warn-"]'));
+            if (uniqueProjectName !== -1 ||
+                parseInt(projectTodoCount.value) > parseInt(projectTodoCount.max) ||
+                projectTodoCount.value === "" ||
+                todoNames.length !== todoNamesFilled.length ||
+                todoNamesFilled.length === 0 ||
+                warnings.length > 0
+            ) {
+                confirmCreateProjectBtn.disabled = true;
+                return;
             }
-            const todoWithWarning = ev.target.name.slice(ev.target.name.lastIndexOf("-") + 1);
-            const warnInvalidDate = doc.createElement('p');
-            warnInvalidDate.id = "warn-date-invalid";
-            warnInvalidDate.innerText = `Todo ${todoWithWarning} :
-                                    ${userInput} is not a valid date, 
-                                    format: YYYY-MM-DD.`;
-            todoInputContainer.appendChild(warnInvalidDate);
-            return;
-        }
 
-        const today = new Date();
+            confirmCreateProjectBtn.disabled = false;
+            confirmCreateProjectBtn.classList.add("activated");
+        }, 300);
 
-        const isAfterOrOnToday = isSameDay(parsedDate, today) || isAfter(parsedDate, today);
-
-        if (!isAfterOrOnToday) {
-            const existingDateWarning = doc.querySelector('[id^="warn-date-"]');
-            if (existingDateWarning !== null) {
-                todoInputContainer.removeChild(existingDateWarning);
-            }
-            const todoWithWarning = ev.target.name.slice(ev.target.name.lastIndexOf("-") + 1);
-            console.log("todoWithWarning => ", todoWithWarning);
-            const warnPastDate = doc.createElement('p');
-            warnPastDate.id = "warn-date-past";
-            warnPastDate.innerText = `Todo ${todoWithWarning} :
-                                    ${userInput} occurs before todays date, ${format(today, 'yyyy-MM-dd')}.`;
-            todoInputContainer.appendChild(warnPastDate);
-            return;
-        }
-
-        const existingDateWarning = doc.querySelector('[id^="warn-date-"]');
-        if (existingDateWarning !== null) {
-            todoInputContainer.removeChild(existingDateWarning);
-        }
-    };
+    }
 
     const handleTodoNameInputEvent = (currentTNI, todoNames, todoNameInput, todoInputContainer) => {
         const todoName = todoNameInput.value;
@@ -522,34 +506,103 @@ export const Display = ((doc) => {
         }
     };
 
-    const handleModalInputChanges = () => {
-        const user = TodoApp.getCurrentUser();
-        const newProjectName = doc.getElementById("create-project-name-input").value;
-        const uniqueProjectName = user.checkUniqueProjectName(newProjectName);
+    const handleTodoDateInputEvent = (ev, todoInputContainer) => {
+        const userInput = ev.target.value;
+        const parsedDate = parse(userInput, 'yyyy-MM-dd', new Date());
+        const isValidDate = isValid(parsedDate);
 
-        const projectTodoCount = doc.getElementById("create-project-todo-count-input");
-        const confirmCreateProjectBtn = doc.getElementById("confirm-create-project-btn");
-        const todoNames = Array.from(doc.querySelectorAll('[name^="new-todo-name-"]'));
-        const todoNamesFilled = todoNames.filter(todoName => todoName.value !== "");
-
-        setTimeout(() => {
-            const warnings = Array.from(doc.querySelectorAll('[id^="warn-"]'));
-            if (uniqueProjectName !== -1 ||
-                parseInt(projectTodoCount.value) > parseInt(projectTodoCount.max) ||
-                projectTodoCount.value === "" ||
-                todoNames.length !== todoNamesFilled.length ||
-                todoNamesFilled.length === 0 ||
-                warnings.length > 0
-            ) {
-                confirmCreateProjectBtn.disabled = true;
-                return;
+        if (!isValidDate) {
+            const existingDateWarning = doc.querySelector('[id^="warn-date-"]');
+            if (existingDateWarning !== null) {
+                todoInputContainer.removeChild(existingDateWarning);
             }
+            const todoWithWarning = ev.target.name.slice(ev.target.name.lastIndexOf("-") + 1);
+            const warnInvalidDate = doc.createElement('p');
+            warnInvalidDate.id = "warn-date-invalid";
+            warnInvalidDate.innerText = `Todo ${todoWithWarning} :
+                                    ${userInput} is not a valid date, 
+                                    format: YYYY-MM-DD.`;
+            todoInputContainer.appendChild(warnInvalidDate);
+            return;
+        }
 
-            confirmCreateProjectBtn.disabled = false;
-            confirmCreateProjectBtn.classList.add("activated");
-        }, 300);
+        const today = new Date();
 
-    }
+        const isAfterOrOnToday = isSameDay(parsedDate, today) || isAfter(parsedDate, today);
+
+        if (!isAfterOrOnToday) {
+            const existingDateWarning = doc.querySelector('[id^="warn-date-"]');
+            if (existingDateWarning !== null) {
+                todoInputContainer.removeChild(existingDateWarning);
+            }
+            const todoWithWarning = ev.target.name.slice(ev.target.name.lastIndexOf("-") + 1);
+            const warnPastDate = doc.createElement('p');
+            warnPastDate.id = "warn-date-past";
+            warnPastDate.innerText = `Todo ${todoWithWarning} :
+                                    ${userInput} occurs before todays date, ${format(today, 'yyyy-MM-dd')}.`;
+            todoInputContainer.appendChild(warnPastDate);
+            return;
+        }
+
+        const existingDateWarning = doc.querySelector('[id^="warn-date-"]');
+        if (existingDateWarning !== null) {
+            todoInputContainer.removeChild(existingDateWarning);
+        }
+    };
+
+    const handleTodoPriorityInputEvent = (ev, todoInputContainer) => {
+        const userInput = ev.target.value;
+
+        if (userInput === "") {
+            const existingPriorityWarning = doc.querySelector('[id^="warn-priority-"]');
+            if (existingPriorityWarning !== null) {
+                todoInputContainer.removeChild(existingPriorityWarning);
+            }
+            const todoWithWarning = ev.target.name.slice(ev.target.name.lastIndexOf("-") + 1);
+            const warnPriorityNaN = doc.createElement('p');
+            warnPriorityNaN.id = "warn-priority-nan";
+            warnPriorityNaN.innerText = `Todo ${todoWithWarning} :
+                                    ${userInput} is not a number.
+                                    Priority = 0-10.`;
+            todoInputContainer.appendChild(warnPriorityNaN);
+            return;
+        }
+
+        if (parseInt(userInput) < parseInt(ev.target.min)) {
+            const existingPriorityWarning = doc.querySelector('[id^="warn-priority-"]');
+            if (existingPriorityWarning !== null) {
+                todoInputContainer.removeChild(existingPriorityWarning);
+            }
+            const todoWithWarning = ev.target.name.slice(ev.target.name.lastIndexOf("-") + 1);
+            const warnPriorityUnderMin = doc.createElement('p');
+            warnPriorityUnderMin.id = "warn-priority-under-min";
+            warnPriorityUnderMin.innerText = `Todo ${todoWithWarning} :
+                                    ${userInput} is too low.
+                                    Min priority = 0.`;
+            todoInputContainer.appendChild(warnPriorityUnderMin);
+            return;
+        }
+
+        if (parseInt(userInput) > parseInt(ev.target.max)) {
+            const existingPriorityWarning = doc.querySelector('[id^="warn-priority-"]');
+            if (existingPriorityWarning !== null) {
+                todoInputContainer.removeChild(existingPriorityWarning);
+            }
+            const todoWithWarning = ev.target.name.slice(ev.target.name.lastIndexOf("-") + 1);
+            const warnPriorityOverMax = doc.createElement('p');
+            warnPriorityOverMax.id = "warn-priority-over-max";
+            warnPriorityOverMax.innerText = `Todo ${todoWithWarning} :
+                                    ${userInput} is too high.
+                                    Max priority = 10.`;
+            todoInputContainer.appendChild(warnPriorityOverMax);
+            return;
+        }
+
+        const existingPriorityWarning = doc.querySelector('[id^="warn-priority-"]');
+        if (existingPriorityWarning !== null) {
+            todoInputContainer.removeChild(existingPriorityWarning);
+        }
+    };
 
     const renderLeftRightTodoBtns = () => {
         // Add left and right buttons for todo carousel
