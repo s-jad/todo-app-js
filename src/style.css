@@ -167,6 +167,12 @@ h4 {
     font-family: var(--ff-urbanist-400);
 }
 
+h5 {
+    font-size: clamp(18px, calc(1.7rem + 0.25vw), 24px);
+    font-family: var(--ff-urbanist-400);
+    opacity: 0.7;
+}
+
 label {
     font-size: clamp(20px, calc(1.9rem + 0.25vw), 26px);
     font-family: var(--ff-urbanist-700);
@@ -322,6 +328,7 @@ textarea:focus-within {
     display: grid;
     grid-template-columns: repeat(8, 1fr);
     grid-template-rows: 1fr 9fr;
+    overflow: hidden;
 }
 
 #dashboard-header {
@@ -932,7 +939,7 @@ textarea:focus-within {
     grid-template-columns: repeat(auto-fit, minmax(300px, max-content));
     justify-content: center;
     gap: 1rem;
-    padding: 0.3rem;
+    padding: 1rem;
     height: 88vh;
     width: 98vw;
     overflow: scroll;
@@ -998,7 +1005,7 @@ textarea:focus-within {
     display: grid;
     align-items: start;
     grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: 1fr 1fr 10fr 35px;
+    grid-template-rows: 1fr 1fr 9fr 50px;
 }
 
 [id^="project-card-"] > .project-title {
@@ -1014,6 +1021,7 @@ textarea:focus-within {
 
 [id^="project-card-"].expanded > .project-title {
     font-size: clamp(24px, calc(2.3rem + 0.25vw), 30px);
+
 }
 
 [id^="project-card-"].expanded > .project-description {
@@ -1097,7 +1105,7 @@ textarea:focus-within {
     grid-column: 1 / 6;
     grid-row: 3 / 4;
     width: 100%;
-    height: 64vh;
+    height: 60vh;
     padding: 0.7rem;
     border-radius: 1rem;
     box-shadow: inset 0 0 1px var(--base-white),
@@ -1250,7 +1258,12 @@ textarea:focus-within {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin: 0 2rem;
+    padding: 0.5rem 2rem;
+}
+
+.todo-container.expanded > .todo-title-checkbox-container {
+    border-radius: 1rem 1rem 0 0 ;
+    background: var(--contrast-red-faded);
 }
 
 .todo-container {
@@ -1265,6 +1278,13 @@ textarea:focus-within {
     transition: height 300ms ease-in-out,
                 padding 300ms ease-in-out,
                 align-items 300ms ease-in-out;
+}
+
+.todo-container.expanded {
+    height: 48vh;
+    align-items: start;
+    padding-top: 1rem;
+    border-radius: 1rem;
 }
 
 .todo-container:first-of-type {
@@ -1366,26 +1386,25 @@ textarea:focus-within {
     box-shadow: 0 0 4px hsla(150, 90%, 90%, 0.7);
 }
 
-.todo-container.expanded {
-    height: 50vh;
-    align-items: start;
-    padding-top: 1rem;
-    border-radius: 1rem;
-}
 
 .expanded-todo-info {
     grid-column: 1 / 6;
     display: grid;
-    grid-template-columns: 1fr 3fr;
-    gap: 1rem;
+    grid-template-columns: 150px 3fr;
+    grid-auto-rows: 60px;
+    gap: 0.5rem;
     opacity: 1;
+    max-height: 45vh;
+    justify-content: center;
+    overflow: scroll;
 }
 
-.expanded-todo-info > h4 {
+.expanded-todo-info > h5 {
+    margin-top: 0;
     margin-bottom: 1rem;
 }
 
-.expanded-todo-info > h4 {
+.expanded-todo-info > h5 {
     margin-bottom: 1rem;
     padding-bottom: 1rem;
     padding-left: 1.5rem;
