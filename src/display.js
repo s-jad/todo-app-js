@@ -1221,9 +1221,9 @@ export const Display = ((doc) => {
 
     const handleCheckBox = (ev) => {
         const projectId = doc.querySelector('[id^="project-card-"]').id;
-        const projectName = projectId.slice(projectId.lastIndexOf("card-") + 5);
+        const projectName = projectId.slice(projectId.lastIndexOf("card-") + 5).replaceAll("-", " ");
+        ;
         const todoIndex = ev.target.name.slice(ev.target.name.lastIndexOf("-") + 1);
-
         const projectTodoList = doc.querySelector('.project-todos-list');
         const checkboxes = Array.from(projectTodoList.querySelectorAll('.todo-check'));
 
