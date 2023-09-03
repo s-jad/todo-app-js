@@ -152,10 +152,10 @@ export const Display = ((doc) => {
         actualCreateProjectBtn.classList.add('header-btn');
         actualCreateProjectBtn.onclick = () => {
             window.removeEventListener("keypress", scrollProjects);
+
             const expandedProject = doc.querySelector('.expanded');
 
             if (expandedProject !== null) {
-                console.log("A project is expanded, shrinking!");
                 const shrinkExpandedAddProject = new CustomEvent('addProjectShrink', {
                     target: expandedProject,
                 });
@@ -1103,10 +1103,6 @@ export const Display = ((doc) => {
     };
 
     const renderShrunkProject = (ev) => {
-        if (!ev.target.classList.contains('expanded')) {
-            return;
-        }
-
         // Check if the target of the click event is the delete icon
         // or one of the todo checkboxes
         // If yes, Return early without triggering the shrinking
@@ -1121,9 +1117,14 @@ export const Display = ((doc) => {
 
         if (ev instanceof MouseEvent) {
             projectCard = ev.currentTarget;
-            console.log("Rendering shrunk project ", ev.currentTarget);
+            if (!projectCard.classList.contains('expanded')) {
+                return;
+            }
         } else {
             projectCard = ev.target;
+            if (!projectCard.classList.contains('expanded')) {
+                return;
+            }
         }
 
         const dashboardContainer = doc.getElementById('dashboard-container');
