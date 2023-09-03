@@ -1272,8 +1272,8 @@ export const Display = ((doc) => {
 
     const refreshProjectGrid = () => {
         const expandedProject = doc.querySelector('.expanded');
-
-        if (expandedProject !== undefined) {
+        console.log("refreshProjectGrid::expandedProject =>", expandedProject);
+        if (expandedProject !== null) {
             const noSearch = new CustomEvent('searchShrink', {
                 target: expandedProject,
             });
@@ -1282,9 +1282,18 @@ export const Display = ((doc) => {
 
             const projectGrid = doc.getElementById('project-grid');
             const invisibleProjects = Array.from(projectGrid.querySelectorAll('[id^="project-card-"].search-invisible'));
-            console.log("refreshProjectGrid::invisibleProjects => ", invisibleProjects);
 
             invisibleProjects.forEach(proj => {
+                proj.classList.remove("search-invisible");
+                proj.style.display = "grid";
+
+            });
+        } else {
+            console.log("No expanded project");
+            const projectGrid = doc.getElementById('project-grid');
+            const projects = Array.from(projectGrid.querySelectorAll('[id^="project-card-"]'));
+
+            projects.forEach(proj => {
                 proj.classList.remove("search-invisible");
                 proj.style.display = "grid";
 
