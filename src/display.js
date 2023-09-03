@@ -1130,9 +1130,17 @@ export const Display = ((doc) => {
                 const progressBarIdNum = parseInt(progressBars[i].id.slice(progressBars[i].id.lastIndexOf("-") + 1));
                 progressBars[i].style.width = `${state.progressBarPercentages[progressBarIdNum]}%`;
                 if (state.progressBarPercentages[progressBarIdNum] === 100) {
-                    progressBars[i].style.background = "hsl(150, 90%, 70%)";
+                    progressBars[i].style.background = "var(--contrast-green-glow)";
+                    progressBars[i].style.boxShadow = `0 0 4px var(--contrast-green), 
+                                                   0 0 1px var(--base-white),
+                                                    inset 0 0 1px var(--base-white),
+                                                    inset 0 0 4px var(--contrast-green)`;
                 } else {
-                    progressBars[i].style.background = "hsl(0, 90%, 70%)";
+                    progressBars[i].style.background = "var(--contrast-red-glow)";
+                    progressBars[i].style.boxShadow = `0 0 4px var(--contrast-red), 
+                                                   0 0 1px var(--base-white),
+                                                    inset 0 0 1px var(--base-white),
+                                                    inset 0 0 4px var(--contrast-red)`;
                 }
             }
 
@@ -1269,11 +1277,17 @@ export const Display = ((doc) => {
         state.progressBarPercentages[progressbarIdNum] = (checkedCount / checkBoxCount) * 100;
 
         if (state.progressBarPercentages[progressbarIdNum] === 100) {
-            progressBar.style.background = "hsl(150, 90%, 70%)";
-            progressBar.style.boxShadow = "0 0 4px hsla(150, 90%, 90%, 0.7)";
+            progressBar.style.background = "var(--contrast-green-glow)";
+            progressBar.style.boxShadow = `0 0 4px var(--contrast-green), 
+                                           0 0 1px var(--base-white),
+                                            inset 0 0 1px var(--base-white),
+                                            inset 0 0 4px var(--contrast-green)`;
         } else {
-            progressBar.style.background = "hsl(0, 90%, 70%)";
-            progressBar.style.boxShadow = "0 0 4px hsla(0, 90%, 90%, 0.7)";
+            progressBar.style.background = "var(--contrast-red-glow)";
+            progressBar.style.boxShadow = `0 0 4px var(--contrast-red), 
+                                           0 0 1px var(--base-white),
+                                            inset 0 0 1px var(--base-white),
+                                            inset 0 0 4px var(--contrast-red)`;
         }
     };
 
