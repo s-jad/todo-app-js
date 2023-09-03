@@ -152,6 +152,16 @@ export const Display = ((doc) => {
         actualCreateProjectBtn.classList.add('header-btn');
         actualCreateProjectBtn.onclick = () => {
             window.removeEventListener("keypress", scrollProjects);
+            const expandedProject = doc.querySelector('.expanded');
+
+            if (expandedProject !== null) {
+                console.log("A project is expanded, shrinking!");
+                const shrinkExpandedAddProject = new CustomEvent('addProjectShrink', {
+                    target: expandedProject,
+                });
+
+                expandedProject.dispatchEvent(shrinkExpandedAddProject);
+            }
             renderCreateNewProjectModal();
         };
 
@@ -724,6 +734,10 @@ export const Display = ((doc) => {
         });
 
         newProjectCard.addEventListener('searchShrink', function(ev) {
+            renderShrunkProject(ev);
+        });
+
+        newProjectCard.addEventListener('addProjectShrink', function(ev) {
             renderShrunkProject(ev);
         });
 
