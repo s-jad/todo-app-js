@@ -1,5 +1,6 @@
 import { TodoApp, UserEvents } from "./app";
 import { SearchBar } from "./searchbar";
+import { isSameDay, isAfter, parse, isValid, format } from "date-fns";
 
 export const Display = ((doc) => {
     const app = doc.createElement('div');
@@ -312,7 +313,6 @@ export const Display = ((doc) => {
             renderTodoContainers(ev, todoCount, createProjectModalContainer, createProjectTodoCountInput);
         });
 
-
         window.removeEventListener("keypress", scrollProjects);
         createProjectModalContainer.addEventListener("keypress", scrollTodosKeyPress);
 
@@ -410,15 +410,15 @@ export const Display = ((doc) => {
         todoInputCard.innerHTML = `
                     <p class="todo-input-card-title">Todo ${i + 1}</p>
                     <input type="text" name="new-todo-name-${i + 1}" class="create-project-todo-input required"
-                    placeholder="Todo ${i + 1} name">
+                    placeholder="Name">
                     <input type="text" name="new-todo-description-${i + 1}" class="create-project-todo-input"
-                    placeholder="Todo ${i + 1} description">
+                    placeholder="Description">
                     <input type="text" name="new-todo-due-date-${i + 1}" class="create-project-todo-input"
-                    placeholder="Todo ${i + 1} due date">
+                    placeholder="Date: YYYY-MM-DD">
                     <input type="number" name="new-todo-priority-${i + 1}" class="create-project-todo-input"
-                    placeholder="Todo ${i + 1} priority">
+                    placeholder="Priority: 0-10" min="0" max="10">
                     <textarea name="new-todo-notes-${i + 1}" class="create-project-todo-textarea"
-                    placeholder="Todo ${i + 1} notes"></textarea>
+                    placeholder="Notes"></textarea>
                 `;
 
         todoInputCard.id = `todo-input-card-${i + 1}`;
@@ -433,7 +433,63 @@ export const Display = ((doc) => {
         todoNameInput.addEventListener('input', () => {
             handleTodoNameInputEvent(i, todoNames, todoNameInput, todoInputContainer);
         });
+
+        const todoDateInput = todoInputCard.querySelector('[name^="new-todo-due-date-"]');
+        todoDateInput.addEventListener('blur', (ev) => {
+            handleTodoDateInputEvent(ev, todoInputContainer);
+        });
+
+        const todoPriorityInput = todoInputCard.querySelector('[name^="new-todo-priority-"]');
+        todoPriorityInput.addEventListener('blur', (ev) => {
+            handleTodoPriorityInputEvent(ev, todoInputContainer);
+        });
+
         todoInputContainer.appendChild(todoInputCard);
+    };
+
+    const handleTodoDateInputEvent = (ev, todoInputContainer) => {
+        const userInput = ev.target.value;
+        const parsedDate = parse(userInput, 'yyyy-MM-dd', new Date());
+        const isValidDate = isValid(parsedDate);
+
+        if (!isValidDate) {
+            const existingDateWarning = doc.querySelector('[id^="warn-date-"]');
+            if (existingDateWarning !== null) {
+                todoInputContainer.removeChild(existingDateWarning);
+            }
+            const todoWithWarning = ev.target.name.slice(ev.target.name.lastIndexOf("-") + 1);
+            const warnInvalidDate = doc.createElement('p');
+            warnInvalidDate.id = "warn-date-invalid";
+            warnInvalidDate.innerText = `Todo ${todoWithWarning} :
+                                    ${userInput} is not a valid date, 
+                                    format: YYYY-MM-DD.`;
+            todoInputContainer.appendChild(warnInvalidDate);
+            return;
+        }
+
+        const today = new Date();
+
+        const isAfterOrOnToday = isSameDay(parsedDate, today) || isAfter(parsedDate, today);
+
+        if (!isAfterOrOnToday) {
+            const existingDateWarning = doc.querySelector('[id^="warn-date-"]');
+            if (existingDateWarning !== null) {
+                todoInputContainer.removeChild(existingDateWarning);
+            }
+            const todoWithWarning = ev.target.name.slice(ev.target.name.lastIndexOf("-") + 1);
+            console.log("todoWithWarning => ", todoWithWarning);
+            const warnPastDate = doc.createElement('p');
+            warnPastDate.id = "warn-date-past";
+            warnPastDate.innerText = `Todo ${todoWithWarning} :
+                                    ${userInput} occurs before todays date, ${format(today, 'yyyy-MM-dd')}.`;
+            todoInputContainer.appendChild(warnPastDate);
+            return;
+        }
+
+        const existingDateWarning = doc.querySelector('[id^="warn-date-"]');
+        if (existingDateWarning !== null) {
+            todoInputContainer.removeChild(existingDateWarning);
+        }
     };
 
     const handleTodoNameInputEvent = (currentTNI, todoNames, todoNameInput, todoInputContainer) => {
