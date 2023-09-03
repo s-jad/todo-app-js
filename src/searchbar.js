@@ -23,6 +23,9 @@ export const SearchBar = ((doc) => {
         const searchBar = doc.createElement('input');
         searchBar.type = "search";
         searchBar.id = "search-bar";
+        searchBar.maxWidth = "55px";
+
+        const searchToggle = generateSearchToggle();
 
         const invisibleToggleBtn = doc.createElement("button");
         invisibleToggleBtn.id = "toggle-search-bar";
@@ -33,14 +36,27 @@ export const SearchBar = ((doc) => {
             if (!invisibleToggleBtn.classList.contains("activate")) {
                 searchBar.classList.add("active");
                 invisibleToggleBtn.classList.add("activate");
+                invisibleToggleBtn.classList.add("small-btn");
+                invisibleToggleBtn.classList.remove("big-btn");
+
                 searchImageGlass.classList.add("minify");
                 searchImageHandle.classList.add("minify");
+                searchToggle.classList.remove("invisible");
+                searchToggle.style.display = "";
+
                 Display.setFocusToFirstInput(searchBar);
             } else {
                 searchBar.classList.remove("active");
                 invisibleToggleBtn.classList.remove("activate");
+                invisibleToggleBtn.classList.remove("small-btn");
+                invisibleToggleBtn.classList.add("big-btn");
+
                 searchImageGlass.classList.remove("minify");
                 searchImageHandle.classList.remove("minify");
+                searchToggle.classList.add("invisible");
+                setTimeout(() => {
+                    searchToggle.style.display = "none";
+                }, 200);
                 searchBar.value = "";
                 Display.refreshProjectGrid();
             }
@@ -58,9 +74,51 @@ export const SearchBar = ((doc) => {
         searchBarContainer.appendChild(searchImageGlass);
         searchBarContainer.appendChild(searchImageHandle);
         searchBarContainer.appendChild(invisibleToggleBtn);
+        searchBarContainer.appendChild(searchToggle);
 
 
         return searchBarContainer;
+    };
+
+    const generateSearchToggle = () => {
+        const searchToggle = doc.createElement('div');
+        searchToggle.id = "search-toggle-container-outer";
+
+        searchToggle.classList.add("invisible");
+        searchToggle.classList.add("big-btn");
+        searchToggle.style.display = "none";
+
+        searchToggle.innerHTML = `
+            <div id="search-toggle-container-inner">
+                <input type="radio" name="search-toggle-radio" id="search-toggle-projects" class="invisible-radio very-small-btn">
+                <input type="radio" name="search-toggle-radio" id="search-toggle-todos" class="invisible-radio very-small-btn">
+                <div class="search-toggle-icon search-projects-icon">P</div>
+                <div class="search-toggle-icon search-todos-icon">T</div>
+            </div>
+        `;
+
+        const searchToggleTodos = searchToggle.querySelector('#search-toggle-todos');
+        const searchToggleProjects = searchToggle.querySelector('#search-toggle-projects');
+        const iconToggleTodos = searchToggle.querySelector('.search-todos-icon');
+        const iconToggleProjects = searchToggle.querySelector('.search-projects-icon');
+
+        searchToggleTodos.addEventListener('change', () => {
+            if (searchToggleTodos.checked) {
+                state.searchBarToggle = "projects";
+                iconToggleProjects.classList.remove("inactive");
+                iconToggleTodos.classList.add("inactive");
+            }
+        });
+
+        searchToggleProjects.addEventListener('change', () => {
+            if (searchToggleProjects.checked) {
+                state.searchBarToggle = "todos";
+                iconToggleProjects.classList.add("inactive");
+                iconToggleTodos.classList.remove("inactive");
+            }
+        });
+
+        return searchToggle;
     };
 
     const findProjectMatches = (wordToMatch) => {
