@@ -840,18 +840,74 @@ export const Display = ((doc) => {
         }
 
         const projectGrid = doc.getElementById('project-grid');
-        const projectGridOuter = projectGrid.parentNode;
-        const cardStyle = getComputedStyle(projectCard);
-        const gridStyle = getComputedStyle(projectGrid);
-
-        // Store the current project grid and its children in state
-        const storeCurrentProjectGrid = () => {
-            state.currentProjectGrid = projectGrid.cloneNode(true);
-        };
-
         // Call the function to store the current project grid
         // before the projectCard is removed from it.
-        storeCurrentProjectGrid();
+        storeCurrentProjectGrid(projectGrid);
+
+        const projectGridOuter = projectGrid.parentNode;
+
+        const styleSheet = getExpansionAnimation(projectCard, projectGrid, gridRect);
+
+        const handleExpansionAnimationEnd = () => {
+            // Stop the stylesheets from piling up
+            if (styleSheet.parentNode) {
+                styleSheet.parentNode.removeChild(styleSheet);
+            }
+
+            const dashboardContainer = doc.getElementById('dashboard-container');
+
+            projectCard.classList.remove('expanding');
+            projectCard.classList.add('expanded');
+            projectCard.tabindex = "1";
+
+            const projectTodoListContainer = doc.createElement('div');
+            const projectTodoListContainerOuter = doc.createElement('div');
+            projectTodoListContainerOuter.classList.add('project-todos-list-container-outer');
+            projectTodoListContainer.classList.add('project-todos-list-container');
+            projectTodoListContainer.classList.add('invisible');
+            projectTodoListContainerOuter.appendChild(projectTodoListContainer);
+
+            projectTodoListContainer.innerHTML = `
+                <h4 class="project-todos-list-title">Todos:</h4>
+                <h4 class="project-todos-checkbox-title">Completed:</h4>
+                <ul class="project-todos-list">
+                    <!-- Dynamically add todos later --> 
+                </ul>
+            `;
+
+            const projectTodoList = projectTodoListContainer.querySelector('.project-todos-list');
+            const currentUser = TodoApp.getCurrentUser();
+            const currentProjectTitle = projectCard.querySelector('.project-title').innerText.trim();
+
+            const currentProject = currentUser.getProject(currentProjectTitle);
+
+            const todosToRender = currentProject.getAllTodos();
+
+            renderTodosForProjectExpansion(todosToRender, projectTodoList);
+
+            projectCard.appendChild(projectTodoListContainerOuter);
+            projectTodoListContainer.classList.remove('invisible');
+            dashboardContainer.removeChild(projectGridOuter);
+            dashboardContainer.appendChild(projectCard);
+
+            projectCard.addEventListener("click", renderShrunkProject);
+        };
+
+        projectCard.addEventListener('animationend', handleExpansionAnimationEnd);
+
+        // Wait for the expansion to finish and remove event listeners
+        // to ensure that it doesnt try to retrigger once expanded
+        setTimeout(() => {
+            projectCard.style.animation = "";
+            projectCard.removeEventListener("click", renderExpandedProject);
+            projectCard.removeEventListener("keypress", renderExpandedProjectKeyEnter);
+            projectCard.removeEventListener('animationend', handleExpansionAnimationEnd);
+        }, 600);
+    };
+
+    const getExpansionAnimation = (projectCard, projectGrid, gridRect) => {
+        const cardStyle = getComputedStyle(projectCard);
+        const gridStyle = getComputedStyle(projectGrid);
 
         // Get borders widths of card and grid.
         const gridBorderWidth = parseFloat(gridStyle.borderTopWidth);
@@ -908,49 +964,15 @@ export const Display = ((doc) => {
 
         projectCard.style.animation = `${animationName} ${animationDuration} ${animationTransition}`;
 
-        const handleExpansionAnimationEnd = () => {
-            // Stop the stylesheets from piling up
-            if (styleSheet.parentNode) {
-                styleSheet.parentNode.removeChild(styleSheet);
-            }
+        return styleSheet;
+    };
 
-            const dashboardContainer = doc.getElementById('dashboard-container');
-            const projectGrid = doc.getElementById('project-grid');
+    const renderTodosForProjectExpansion = (todosToRender, projectTodoList) => {
+        todosToRender.forEach((todo, index) => {
+            const todoContainer = doc.createElement('div');
+            todoContainer.classList.add('todo-container');
 
-            projectCard.classList.remove('expanding');
-            projectCard.classList.add('expanded');
-            projectCard.tabindex = "1";
-
-            const projectDescription = projectCard.querySelector('.project-description');
-
-            const projectTodoListContainer = doc.createElement('div');
-            const projectTodoListContainerOuter = doc.createElement('div');
-            projectTodoListContainerOuter.classList.add('project-todos-list-container-outer');
-            projectTodoListContainer.classList.add('project-todos-list-container');
-            projectTodoListContainer.classList.add('invisible');
-            projectTodoListContainerOuter.appendChild(projectTodoListContainer);
-
-            projectTodoListContainer.innerHTML = `
-                <h4 class="project-todos-list-title">Todos:</h4>
-                <h4 class="project-todos-checkbox-title">Completed:</h4>
-                <ul class="project-todos-list">
-                    <!-- Dynamically add todos later --> 
-                </ul>
-            `;
-
-            const projectTodoList = projectTodoListContainer.querySelector('.project-todos-list');
-            const currentUser = TodoApp.getCurrentUser();
-            const currentProjectTitle = projectCard.querySelector('.project-title').innerText.trim();
-
-            const currentProject = currentUser.getProject(currentProjectTitle);
-
-            const todosToRender = currentProject.getAllTodos();
-
-            todosToRender.forEach((todo, index) => {
-                const todoContainer = doc.createElement('div');
-                todoContainer.classList.add('todo-container');
-
-                todoContainer.innerHTML = `
+            todoContainer.innerHTML = `
                     <div class="todo-title-checkbox-container">
                         <li class="project-todo">
                         <h4>${todo.title}</h4>
@@ -963,55 +985,36 @@ export const Display = ((doc) => {
                         
                     </div>
                 `;
-                todoContainer.addEventListener('click', handleTodoExpansion);
+            todoContainer.addEventListener('click', handleTodoExpansion);
 
-                todoContainer.addEventListener('searchTodoGrow', function(ev) {
-                    console.log("searchTodoGrow event dispatched!");
-                    handleTodoExpansion(ev);
-                });
-
-                const checkBox = todoContainer.querySelector('.todo-check');
-                const checkBoxContainer = todoContainer.querySelector('.checkbox-container');
-
-                checkBox.checked = todo.checked;
-
-                if (checkBox.checked) {
-                    checkBoxContainer.style.border = "2px solid hsl(150, 90%, 70%)";
-                    checkBoxContainer.style.boxShadow = "inset 0 0 5px hsla(150, 90%, 90%, 0.7)";
-                } else {
-                    checkBoxContainer.style.border = "2px solid hsl(0, 90%, 70%)";
-                    checkBoxContainer.style.boxShadow = "inset 0 0 5px hsla(0, 90%, 90%, 0.7)";
-                }
-
-                checkBox.addEventListener("click", handleCheckBox);
-                checkBox.addEventListener("keydown", function(ev) {
-                    if (ev.key === "Enter") {
-                        ev.preventDefault();
-                        handleCheckBox(ev);
-                    }
-                });
-
-                projectTodoList.appendChild(todoContainer);
+            todoContainer.addEventListener('searchTodoGrow', function(ev) {
+                console.log("searchTodoGrow event dispatched!");
+                handleTodoExpansion(ev);
             });
 
-            projectCard.appendChild(projectTodoListContainerOuter);
-            projectTodoListContainer.classList.remove('invisible');
-            dashboardContainer.removeChild(projectGridOuter);
-            dashboardContainer.appendChild(projectCard);
+            const checkBox = todoContainer.querySelector('.todo-check');
+            const checkBoxContainer = todoContainer.querySelector('.checkbox-container');
 
-            projectCard.addEventListener("click", renderShrunkProject);
-        };
+            checkBox.checked = todo.checked;
 
-        projectCard.addEventListener('animationend', handleExpansionAnimationEnd);
+            if (checkBox.checked) {
+                checkBoxContainer.style.border = "2px solid hsl(150, 90%, 70%)";
+                checkBoxContainer.style.boxShadow = "inset 0 0 5px hsla(150, 90%, 90%, 0.7)";
+            } else {
+                checkBoxContainer.style.border = "2px solid hsl(0, 90%, 70%)";
+                checkBoxContainer.style.boxShadow = "inset 0 0 5px hsla(0, 90%, 90%, 0.7)";
+            }
 
-        // Wait for the expansion to finish and remove event listeners
-        // to ensure that it doesnt try to retrigger once expanded
-        setTimeout(() => {
-            projectCard.style.animation = "";
-            projectCard.removeEventListener("click", renderExpandedProject);
-            projectCard.removeEventListener("keypress", renderExpandedProjectKeyEnter);
-            projectCard.removeEventListener('animationend', handleExpansionAnimationEnd);
-        }, 600);
+            checkBox.addEventListener("click", handleCheckBox);
+            checkBox.addEventListener("keydown", function(ev) {
+                if (ev.key === "Enter") {
+                    ev.preventDefault();
+                    handleCheckBox(ev);
+                }
+            });
+
+            projectTodoList.appendChild(todoContainer);
+        });
     };
 
     const handleTodoExpansion = (ev) => {
@@ -1045,23 +1048,20 @@ export const Display = ((doc) => {
         const projectName = projectId.slice(projectId.lastIndexOf("card-") + 5).replaceAll("-", " ");
 
         const todoName = todoContainer.querySelector('h4').innerText;
-        console.log("project name from id => ", projectName);
         const user = TodoApp.getCurrentUser();
         const project = user.getProject(projectName);
         const todoToExpand = project.getTodo(todoName);
 
-        console.log("project name from user.getProject => ", project);
-
         const todoInfo = doc.createElement('div');
         todoInfo.classList.add('expanded-todo-info');
         todoInfo.innerHTML = `
-            <h4>Description</h4>
+            <h5>Description</h5>
             <p class="expanded-todo-description">${todoToExpand.description}</p>
-            <h4>Due Date</h4>
+            <h5>Due Date</h5>
             <p class="expanded-todo-due-date">${todoToExpand.dueDate}</p>
-            <h4>Priority</h4>
+            <h5>Priority</h5>
             <p class="expanded-todo-priority">${todoToExpand.priority}</p>
-            <h4>Notes</h4>
+            <h5>Notes</h5>
             <p class="expanded-todo-notes">${todoToExpand.notes}</p>
         `;
         todoInfo.classList.add('invisible');
@@ -1104,63 +1104,14 @@ export const Display = ((doc) => {
             projectCard = ev.target;
         }
 
+
         const dashboardContainer = doc.getElementById('dashboard-container');
         const projectGrid = state.currentProjectGrid;
+
         const projectGridOuter = doc.createElement('div');
         projectGridOuter.id = "project-grid-outer";
 
-        // Get current dimensions and position of project-card
-        const cardRect = projectCard.getBoundingClientRect();
-        const currentX = cardRect.left;
-        const currentY = cardRect.top;
-        const currentWidth = cardRect.width;
-        const currentHeight = cardRect.height;
-
-        // Get previous dimensions and position of project-card in the grid 
-        const previousY = state.expandedCardPrevPosition.currentY;
-        const previousX = state.expandedCardPrevPosition.currentX;
-        const previousWidth = state.expandedCardPrevPosition.currentWidth;
-        const previousHeight = state.expandedCardPrevPosition.currentHeight;
-
-        const projectTodoListContainerOuter = projectCard.querySelector('.project-todos-list-container-outer');
-        projectCard.removeChild(projectTodoListContainerOuter);
-
-        projectCard.classList.remove('expanded');
-        projectCard.classList.add('shrinking');
-        const gridBorderWidth = 0;
-        const cardBorderWidth = 1;
-        projectCard.style.top = `${currentY + cardBorderWidth + gridBorderWidth}px`;
-        projectCard.style.left = `${currentX + cardBorderWidth + gridBorderWidth}px`;
-
-        // Prepare shrinking animation
-        const animationName = "shrinkingAnimation";
-        const animationDuration = "300ms";
-        const animationTransition = "cubic-bezier(.43,.22,.43,.92)";
-        const animationKeyframes = `
-            @keyframes ${animationName} {
-                0% {
-                    top: ${currentY}px;
-                    left: ${currentX}px;
-                    width: ${currentWidth}px;
-                    height: ${currentHeight}px;
-                    border-radius: 0;
-                }
-                100% {
-                    top: ${previousY}px;
-                    left: ${previousX}px;
-                    width: ${previousWidth}px;
-                    height: ${previousHeight}px;
-                    border-radius: 1rem;
-                }
-            }
-        `;
-
-        // Append animation to the stylesheet
-        const styleSheet = doc.createElement("style");
-        styleSheet.innerHTML = animationKeyframes;
-        doc.head.appendChild(styleSheet);
-
-        projectCard.style.animation = `${animationName} ${animationDuration} ${animationTransition}`;
+        const styleSheet = getShrinkingAnimation(projectCard);
 
         projectGridOuter.appendChild(projectGrid);
         dashboardContainer.appendChild(projectGridOuter);
@@ -1218,6 +1169,62 @@ export const Display = ((doc) => {
         }, 600);
     };
 
+    const getShrinkingAnimation = (projectCard) => {
+        // Get current dimensions and position of project-card
+        const cardRect = projectCard.getBoundingClientRect();
+        const currentX = cardRect.left;
+        const currentY = cardRect.top;
+        const currentWidth = cardRect.width;
+        const currentHeight = cardRect.height;
+
+        // Get previous dimensions and position of project-card in the grid 
+        const previousY = state.expandedCardPrevPosition.currentY;
+        const previousX = state.expandedCardPrevPosition.currentX;
+        const previousWidth = state.expandedCardPrevPosition.currentWidth;
+        const previousHeight = state.expandedCardPrevPosition.currentHeight;
+
+        const projectTodoListContainerOuter = projectCard.querySelector('.project-todos-list-container-outer');
+        projectCard.removeChild(projectTodoListContainerOuter);
+
+        projectCard.classList.remove('expanded');
+        projectCard.classList.add('shrinking');
+        const gridBorderWidth = 0;
+        const cardBorderWidth = 1;
+        projectCard.style.top = `${currentY + cardBorderWidth + gridBorderWidth}px`;
+        projectCard.style.left = `${currentX + cardBorderWidth + gridBorderWidth}px`;
+
+        // Prepare shrinking animation
+        const animationName = "shrinkingAnimation";
+        const animationDuration = "300ms";
+        const animationTransition = "cubic-bezier(.43,.22,.43,.92)";
+        const animationKeyframes = `
+            @keyframes ${animationName} {
+                0% {
+                    top: ${currentY}px;
+                    left: ${currentX}px;
+                    width: ${currentWidth}px;
+                    height: ${currentHeight}px;
+                    border-radius: 0;
+                }
+                100% {
+                    top: ${previousY}px;
+                    left: ${previousX}px;
+                    width: ${previousWidth}px;
+                    height: ${previousHeight}px;
+                    border-radius: 1rem;
+                }
+            }
+        `;
+
+        // Append animation to the stylesheet
+        const styleSheet = doc.createElement("style");
+        styleSheet.innerHTML = animationKeyframes;
+        doc.head.appendChild(styleSheet);
+
+        projectCard.style.animation = `${animationName} ${animationDuration} ${animationTransition}`;
+        return styleSheet;
+    };
+
     const handleCheckBox = (ev) => {
         const projectId = doc.querySelector('[id^="project-card-"]').id;
         const projectName = projectId.slice(projectId.lastIndexOf("card-") + 5).replaceAll("-", " ");
@@ -1272,7 +1279,6 @@ export const Display = ((doc) => {
 
     const refreshProjectGrid = () => {
         const expandedProject = doc.querySelector('.expanded');
-        console.log("refreshProjectGrid::expandedProject =>", expandedProject);
         if (expandedProject !== null) {
             const noSearch = new CustomEvent('searchShrink', {
                 target: expandedProject,
@@ -1289,7 +1295,6 @@ export const Display = ((doc) => {
 
             });
         } else {
-            console.log("No expanded project");
             const projectGrid = doc.getElementById('project-grid');
             const projects = Array.from(projectGrid.querySelectorAll('[id^="project-card-"]'));
 
@@ -1299,6 +1304,10 @@ export const Display = ((doc) => {
 
             });
         }
+    };
+
+    const storeCurrentProjectGrid = (projectGrid) => {
+        state.currentProjectGrid = projectGrid.cloneNode(true);
     };
 
     return {
