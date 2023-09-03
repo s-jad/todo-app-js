@@ -740,7 +740,6 @@ export const Display = ((doc) => {
             ev.stopImmediatePropagation();
             if (ev.target.classList.contains("expanded") ||
                 !ev.target.id.includes("project-card-")
-
             ) {
                 return;
             } else {
@@ -1222,7 +1221,7 @@ export const Display = ((doc) => {
     const handleCheckBox = (ev) => {
         const projectId = doc.querySelector('[id^="project-card-"]').id;
         const projectName = projectId.slice(projectId.lastIndexOf("card-") + 5).replaceAll("-", " ");
-        ;
+
         const todoIndex = ev.target.name.slice(ev.target.name.lastIndexOf("-") + 1);
         const projectTodoList = doc.querySelector('.project-todos-list');
         const checkboxes = Array.from(projectTodoList.querySelectorAll('.todo-check'));
@@ -1271,6 +1270,28 @@ export const Display = ((doc) => {
         }
     };
 
+    const refreshProjectGrid = () => {
+        const expandedProject = doc.querySelector('.expanded');
+
+        if (expandedProject !== undefined) {
+            const noSearch = new CustomEvent('searchShrink', {
+                target: expandedProject,
+            });
+            expandedProject.dispatchEvent(noSearch);
+            state.expandedMatchingProject = false;
+
+            const projectGrid = doc.getElementById('project-grid');
+            const invisibleProjects = Array.from(projectGrid.querySelectorAll('[id^="project-card-"].search-invisible'));
+            console.log("refreshProjectGrid::invisibleProjects => ", invisibleProjects);
+
+            invisibleProjects.forEach(proj => {
+                proj.classList.remove("search-invisible");
+                proj.style.display = "grid";
+
+            });
+        }
+    };
+
     return {
         renderApp,
         renderWelcomeScreen,
@@ -1282,6 +1303,7 @@ export const Display = ((doc) => {
         getCurrentProjectGrid,
         renderExpandedProject,
         renderShrunkProject,
+        refreshProjectGrid,
     };
 
 })(document);

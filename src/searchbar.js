@@ -41,6 +41,8 @@ export const SearchBar = ((doc) => {
                 invisibleToggleBtn.classList.remove("activate");
                 searchImageGlass.classList.remove("minify");
                 searchImageHandle.classList.remove("minify");
+                searchBar.value = "";
+                Display.refreshProjectGrid();
             }
         }
 
@@ -251,6 +253,10 @@ export const SearchBar = ((doc) => {
 
     const displayTodoMatches = (wordToMatch) => {
         const matches = findTodoMatches(wordToMatch);
+
+        if (matches === undefined) {
+            return;
+        }
 
         const projectMatches = matches.projMatches;
         const todoMatches = matches.todoMatches;
