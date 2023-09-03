@@ -333,20 +333,22 @@ export const Display = ((doc) => {
             renderTodoContainers(ev, todoCount, createProjectModalContainer, createProjectTodoCountInput);
         });
 
-        const scrollTodosKeyPress = (ev) => {
-            if (ev.key === ">") {
-                ev.preventDefault();
-                scrollTodosLeft();
-            } else if (ev.key === "<") {
-                ev.preventDefault();
-                scrollTodosRight();
-            }
-        }
+
         window.removeEventListener("keypress", scrollProjects);
         createProjectModalContainer.addEventListener("keypress", scrollTodosKeyPress);
 
         app.appendChild(createProjectModalContainer);
 
+    };
+
+    const scrollTodosKeyPress = (ev) => {
+        if (ev.key === ">") {
+            ev.preventDefault();
+            scrollTodosLeft();
+        } else if (ev.key === "<") {
+            ev.preventDefault();
+            scrollTodosRight();
+        }
     };
 
     const renderTodoContainers = (ev, todoCount, createProjectModalContainer, createProjectTodoCountInput) => {
@@ -400,7 +402,6 @@ export const Display = ((doc) => {
 
         todoInputContainer.innerHTML = ''; // Clear existing inputs
 
-
         for (let i = 0; i < todoCount; i++) {
             renderTodoInputCard(i, todoInputContainer, todoNames);
         };
@@ -436,7 +437,7 @@ export const Display = ((doc) => {
         const todoNameInput = todoInputCard.querySelector('[name^="new-todo-name-"]');
         todoNameInput.addEventListener('input', handleModalInputChanges);
 
-        todoNameInput.addEventListener('input', (ev) => {
+        todoNameInput.addEventListener('input', () => {
             handleTodoNameInputEvent(i, todoNames, todoNameInput, todoInputContainer);
         });
         todoInputContainer.appendChild(todoInputCard);
