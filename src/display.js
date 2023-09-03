@@ -402,8 +402,18 @@ export const Display = ((doc) => {
 
 
         for (let i = 0; i < todoCount; i++) {
-            const todoInputCard = doc.createElement('div');
-            todoInputCard.innerHTML = `
+            renderTodoInputCard(i, todoInputContainer, todoNames);
+        };
+
+        if (todoCount > 0) {
+            todoInputContainer.appendChild(renderLeftRightTodoBtns());
+        }
+
+    };
+
+    const renderTodoInputCard = (i, todoInputContainer, todoNames) => {
+        const todoInputCard = doc.createElement('div');
+        todoInputCard.innerHTML = `
                     <p class="todo-input-card-title">Todo ${i + 1}</p>
                     <input type="text" name="new-todo-name-${i + 1}" class="create-project-todo-input required"
                     placeholder="Todo ${i + 1} name">
@@ -417,56 +427,47 @@ export const Display = ((doc) => {
                     placeholder="Todo ${i + 1} notes"></textarea>
                 `;
 
-            todoInputCard.id = `todo-input-card-${i + 1}`;
+        todoInputCard.id = `todo-input-card-${i + 1}`;
 
-            if (i > 0) {
-                todoInputCard.classList.add('hide-right');
-            }
-
-
-            const todoNameInput = todoInputCard.querySelector('[name^="new-todo-name-"]');
-            todoNameInput.addEventListener('input', handleModalInputChanges);
-
-
-            todoNameInput.addEventListener('input', function() {
-                const currentTNI = i;
-                const todoName = todoNameInput.value;
-                const todoPresentInArr = todoNames.findIndex(existingTodoName => existingTodoName === todoName);
-                if (todoPresentInArr !== -1) {
-                    // If the warning is already present, dont append another one
-                    const existingSameWarning = todoInputContainer.querySelector('#warn-non-unique-todo-name');
-                    if (existingSameWarning !== null) {
-                        return;
-                    }
-
-                    const warnNonUniqueTodoName = doc.createElement('p');
-                    warnNonUniqueTodoName.id = "warn-non-unique-todo-name";
-                    warnNonUniqueTodoName.innerText = `A todo named "${todoName}" already exists in this project,
-                                                            please choose a unique name for each todo in a project.`;
-
-                    todoInputContainer.appendChild(warnNonUniqueTodoName);
-                    return;
-                } else {
-                    // Remove existing warning if present
-                    const existingWarning = todoInputContainer.querySelector('#warn-non-unique-todo-name');
-                    if (existingWarning !== null) {
-                        todoInputContainer.removeChild(existingWarning);
-                    }
-                    if (todoName !== "") {
-                        todoNames[currentTNI] = todoName;
-                        state.currentTodoNames[currentTNI] = todoName;
-                    }
-                }
-            });
-            todoInputContainer.appendChild(todoInputCard);
-        };
-
-        if (todoCount > 0) {
-            todoInputContainer.appendChild(renderLeftRightTodoBtns());
+        if (i > 0) {
+            todoInputCard.classList.add('hide-right');
         }
 
-    };
+        const todoNameInput = todoInputCard.querySelector('[name^="new-todo-name-"]');
+        todoNameInput.addEventListener('input', handleModalInputChanges);
 
+        todoNameInput.addEventListener('input', function() {
+            const currentTNI = i;
+            const todoName = todoNameInput.value;
+            const todoPresentInArr = todoNames.findIndex(existingTodoName => existingTodoName === todoName);
+            if (todoPresentInArr !== -1) {
+                // If the warning is already present, dont append another one
+                const existingSameWarning = todoInputContainer.querySelector('#warn-non-unique-todo-name');
+                if (existingSameWarning !== null) {
+                    return;
+                }
+
+                const warnNonUniqueTodoName = doc.createElement('p');
+                warnNonUniqueTodoName.id = "warn-non-unique-todo-name";
+                warnNonUniqueTodoName.innerText = `A todo named "${todoName}" already exists in this project,
+                                                            please choose a unique name for each todo in a project.`;
+
+                todoInputContainer.appendChild(warnNonUniqueTodoName);
+                return;
+            } else {
+                // Remove existing warning if present
+                const existingWarning = todoInputContainer.querySelector('#warn-non-unique-todo-name');
+                if (existingWarning !== null) {
+                    todoInputContainer.removeChild(existingWarning);
+                }
+                if (todoName !== "") {
+                    todoNames[currentTNI] = todoName;
+                    state.currentTodoNames[currentTNI] = todoName;
+                }
+            }
+        });
+        todoInputContainer.appendChild(todoInputCard);
+    };
 
     const handleModalInputChanges = () => {
         const user = TodoApp.getCurrentUser();
@@ -477,7 +478,6 @@ export const Display = ((doc) => {
         const confirmCreateProjectBtn = doc.getElementById("confirm-create-project-btn");
         const todoNames = Array.from(doc.querySelectorAll('[name^="new-todo-name-"]'));
         const todoNamesFilled = todoNames.filter(todoName => todoName.value !== "");
-
 
         setTimeout(() => {
             const warnings = Array.from(doc.querySelectorAll('[id^="warn-"]'));
