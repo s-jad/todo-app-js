@@ -297,29 +297,8 @@ export const Display = ((doc) => {
 
         createProjectModalContainer.addEventListener("shown.bs.createProjectModalContainer", setFocusToFirstInput(createProjectNameInput));
         // Check the project name is unique
-        createProjectNameInput.addEventListener('blur', () => {
-            const user = TodoApp.getCurrentUser();
-            const uniqueName = user.checkUniqueProjectName(createProjectNameInput.value);
-
-            if (uniqueName !== -1) {
-                const existingWarning = todoInputContainer.querySelector('[id^="warn-"]');
-
-                if (existingWarning !== null) {
-                    todoInputContainer.removeChild(existingWarning);
-                }
-
-                const warnNonUniqueProjectName = doc.createElement('p');
-                warnNonUniqueProjectName.id = "warn-non-unique-project-name";
-                warnNonUniqueProjectName.innerText = `You already have a project named "${createProjectNameInput.value}", 
-                                                      please choose a unique project name`;
-                todoInputContainer.appendChild(warnNonUniqueProjectName);
-            } else {
-                const existingWarning = todoInputContainer.querySelector('[id^="warn-"]');
-
-                if (existingWarning !== null) {
-                    todoInputContainer.removeChild(existingWarning);
-                }
-            }
+        createProjectNameInput.addEventListener('blur', (ev) => {
+            handleCreateProjectNameInputEvent(ev.target, todoInputContainer);
         });
 
         const createProjectTodoCountInput = createProjectModalContainer.querySelector('#create-project-todo-count-input');
@@ -341,16 +320,30 @@ export const Display = ((doc) => {
 
     };
 
-    const scrollTodosKeyPress = (ev) => {
-        if (ev.key === ">") {
-            ev.preventDefault();
-            scrollTodosLeft();
-        } else if (ev.key === "<") {
-            ev.preventDefault();
-            scrollTodosRight();
+    const handleCreateProjectNameInputEvent = (createProjectNameInput, todoInputContainer) => {
+        const user = TodoApp.getCurrentUser();
+        const uniqueName = user.checkUniqueProjectName(createProjectNameInput.value);
+
+        if (uniqueName !== -1) {
+            const existingWarning = todoInputContainer.querySelector('[id^="warn-"]');
+
+            if (existingWarning !== null) {
+                todoInputContainer.removeChild(existingWarning);
+            }
+
+            const warnNonUniqueProjectName = doc.createElement('p');
+            warnNonUniqueProjectName.id = "warn-non-unique-project-name";
+            warnNonUniqueProjectName.innerText = `You already have a project named "${createProjectNameInput.value}", 
+                                                      please choose a unique project name`;
+            todoInputContainer.appendChild(warnNonUniqueProjectName);
+        } else {
+            const existingWarning = todoInputContainer.querySelector('[id^="warn-"]');
+
+            if (existingWarning !== null) {
+                todoInputContainer.removeChild(existingWarning);
+            }
         }
     };
-
     const renderTodoContainers = (ev, todoCount, createProjectModalContainer, createProjectTodoCountInput) => {
         todoCount = parseInt(ev.target.value);
         const todoNames = [];
@@ -595,6 +588,16 @@ export const Display = ((doc) => {
 
     };
 
+    const scrollTodosKeyPress = (ev) => {
+        if (ev.key === ">") {
+            ev.preventDefault();
+            scrollTodosLeft();
+        } else if (ev.key === "<") {
+            ev.preventDefault();
+            scrollTodosRight();
+        }
+    };
+
     const scrollTodosLeft = () => {
         const todos = Array.from(doc.querySelectorAll('[id^="todo-input-card-"]'));
 
@@ -830,8 +833,8 @@ export const Display = ((doc) => {
     };
 
     const renderExpandedProject = (ev) => {
-        console.log("Rendering expanded project ", ev.target);
         ev.target.removeEventListener("keypress", renderExpandedProjectKeyEnter);
+
         if (Array.from(ev.target.classList).includes("expanded")) {
             renderShrunkProject(ev);
             return;
