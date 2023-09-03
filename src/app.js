@@ -77,8 +77,7 @@ export const UserEvents = (() => {
     const createNewProject = (ev) => {
         const projectNameInput = document.getElementById('create-project-name-input');
 
-        const projectName = projectNameInput.value;
-
+        const projectName = projectNameInput.value.replaceAll("  ", " ");
 
         const projectDescriptionInput = document.getElementById('create-project-description-input');
         const projectDescription = projectDescriptionInput.value;
