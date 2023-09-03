@@ -1018,12 +1018,16 @@ export const Display = ((doc) => {
     };
 
     const handleTodoExpansion = (ev) => {
+        if (ev.target.classList.contains("todo-check")) {
+            return;
+        }
+
         const todoContainer = ev.currentTarget;
         ev.stopPropagation();
-        if (todoContainer.classList.contains("expanded")) {
-            if (ev.target.classList.contains("todo-check")) {
-                return;
-            }
+
+        if (todoContainer.classList.contains("expanded") &&
+            ev instanceof MouseEvent
+        ) {
             todoContainer.classList.remove("expanded");
             const expandedInfo = todoContainer.querySelector('.expanded-todo-info');
             todoContainer.removeChild(expandedInfo);
@@ -1034,6 +1038,10 @@ export const Display = ((doc) => {
                     todo.style.visibility = "";
                 }, 100);
             });
+            return;
+        } else if (todoContainer.classList.contains("expanded") &&
+            ev instanceof CustomEvent
+        ) {
             return;
         }
         renderExpandedTodo(ev);
@@ -1081,7 +1089,6 @@ export const Display = ((doc) => {
     };
 
     const renderShrunkProject = (ev) => {
-        console.log("Rendering shrunk project ", ev.target);
         if (!ev.target.classList.contains('expanded')) {
             return;
         }
@@ -1100,10 +1107,10 @@ export const Display = ((doc) => {
 
         if (ev instanceof MouseEvent) {
             projectCard = ev.currentTarget;
+            console.log("Rendering shrunk project ", ev.currentTarget);
         } else {
             projectCard = ev.target;
         }
-
 
         const dashboardContainer = doc.getElementById('dashboard-container');
         const projectGrid = state.currentProjectGrid;
