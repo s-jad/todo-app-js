@@ -436,37 +436,40 @@ export const Display = ((doc) => {
         const todoNameInput = todoInputCard.querySelector('[name^="new-todo-name-"]');
         todoNameInput.addEventListener('input', handleModalInputChanges);
 
-        todoNameInput.addEventListener('input', function() {
-            const currentTNI = i;
-            const todoName = todoNameInput.value;
-            const todoPresentInArr = todoNames.findIndex(existingTodoName => existingTodoName === todoName);
-            if (todoPresentInArr !== -1) {
-                // If the warning is already present, dont append another one
-                const existingSameWarning = todoInputContainer.querySelector('#warn-non-unique-todo-name');
-                if (existingSameWarning !== null) {
-                    return;
-                }
-
-                const warnNonUniqueTodoName = doc.createElement('p');
-                warnNonUniqueTodoName.id = "warn-non-unique-todo-name";
-                warnNonUniqueTodoName.innerText = `A todo named "${todoName}" already exists in this project,
-                                                            please choose a unique name for each todo in a project.`;
-
-                todoInputContainer.appendChild(warnNonUniqueTodoName);
-                return;
-            } else {
-                // Remove existing warning if present
-                const existingWarning = todoInputContainer.querySelector('#warn-non-unique-todo-name');
-                if (existingWarning !== null) {
-                    todoInputContainer.removeChild(existingWarning);
-                }
-                if (todoName !== "") {
-                    todoNames[currentTNI] = todoName;
-                    state.currentTodoNames[currentTNI] = todoName;
-                }
-            }
+        todoNameInput.addEventListener('input', (ev) => {
+            handleTodoNameInputEvent(i, todoNames, todoNameInput, todoInputContainer);
         });
         todoInputContainer.appendChild(todoInputCard);
+    };
+
+    const handleTodoNameInputEvent = (currentTNI, todoNames, todoNameInput, todoInputContainer) => {
+        const todoName = todoNameInput.value;
+        const todoPresentInArr = todoNames.findIndex(existingTodoName => existingTodoName === todoName);
+        if (todoPresentInArr !== -1) {
+            // If the warning is already present, dont append another one
+            const existingSameWarning = todoInputContainer.querySelector('#warn-non-unique-todo-name');
+            if (existingSameWarning !== null) {
+                return;
+            }
+
+            const warnNonUniqueTodoName = doc.createElement('p');
+            warnNonUniqueTodoName.id = "warn-non-unique-todo-name";
+            warnNonUniqueTodoName.innerText = `A todo named "${todoName}" already exists in this project,
+                                                            please choose a unique name for each todo in a project.`;
+
+            todoInputContainer.appendChild(warnNonUniqueTodoName);
+            return;
+        } else {
+            // Remove existing warning if present
+            const existingWarning = todoInputContainer.querySelector('#warn-non-unique-todo-name');
+            if (existingWarning !== null) {
+                todoInputContainer.removeChild(existingWarning);
+            }
+            if (todoName !== "") {
+                todoNames[currentTNI] = todoName;
+                state.currentTodoNames[currentTNI] = todoName;
+            }
+        }
     };
 
     const handleModalInputChanges = () => {
