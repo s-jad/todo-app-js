@@ -325,127 +325,12 @@ export const Display = ((doc) => {
         const createProjectTodoCountInput = createProjectModalContainer.querySelector('#create-project-todo-count-input');
         createProjectTodoCountInput.addEventListener('input', handleModalInputChanges);
         // Stores chosen todo names to check uniqueness and count names
-        const todoNames = [];
         let todoCount = 0;
-
-
 
         // Check if the todo count is a valid number and not over max
         // If so, generate inputs for that number of todos
         createProjectTodoCountInput.addEventListener('input', (ev) => {
-            todoCount = parseInt(ev.target.value);
-
-            const createProjectForm = createProjectModalContainer.querySelector('#create-project-form');
-            if (ev.target.value === "") {
-
-                const existingTodoContainers = Array.from(createProjectForm.querySelectorAll('[id^="todo-input-card-"]'));
-                if (existingTodoContainers.length > 0) {
-                    existingTodoContainers.forEach(container => todoInputContainer.removeChild(container));
-                }
-
-                createProjectForm.classList.remove('todos-counted');
-
-            } else {
-                createProjectForm.classList.add('todos-counted');
-            }
-
-            if (isNaN(todoCount)) {
-                const existingWarning = todoInputContainer.querySelector('[id^="warn-"]');
-
-                if (existingWarning !== null) {
-                    todoInputContainer.removeChild(existingWarning);
-                }
-
-                const warnNotANumber = doc.createElement('p');
-                warnNotANumber.id = "warn-not-a-number";
-                warnNotANumber.innerText = `The value you have entered is not a number, 
-                                            please insert a number, max = 12.`;
-                todoInputContainer.appendChild(warnNotANumber);
-                return;
-            }
-
-            if (todoCount > createProjectTodoCountInput.max) {
-                const existingWarning = todoInputContainer.querySelector('[id^="warn-"]');
-
-                if (existingWarning !== null) {
-                    todoInputContainer.removeChild(existingWarning);
-                }
-
-                const warnTooManyTodos = doc.createElement('p');
-                warnTooManyTodos.id = "warn-too-many-todos";
-                warnTooManyTodos.innerText = `${todoCount} is too many todos, max = 12.`;
-                todoInputContainer.appendChild(warnTooManyTodos);
-                return;
-            }
-
-            todoInputContainer.innerHTML = ''; // Clear existing inputs
-
-
-
-            for (let i = 0; i < todoCount; i++) {
-
-                const todoInputCard = doc.createElement('div');
-                todoInputCard.innerHTML = `
-                    <p class="todo-input-card-title">Todo ${i + 1}</p>
-                    <input type="text" name="new-todo-name-${i + 1}" class="create-project-todo-input required"
-                    placeholder="Todo ${i + 1} name">
-                    <input type="text" name="new-todo-description-${i + 1}" class="create-project-todo-input"
-                    placeholder="Todo ${i + 1} description">
-                    <input type="text" name="new-todo-due-date-${i + 1}" class="create-project-todo-input"
-                    placeholder="Todo ${i + 1} due date">
-                    <input type="number" name="new-todo-priority-${i + 1}" class="create-project-todo-input"
-                    placeholder="Todo ${i + 1} priority">
-                    <textarea name="new-todo-notes-${i + 1}" class="create-project-todo-textarea"
-                    placeholder="Todo ${i + 1} notes"></textarea>
-                `;
-
-                todoInputCard.id = `todo-input-card-${i + 1}`;
-
-                if (i > 0) {
-                    todoInputCard.classList.add('hide-right');
-                }
-
-
-                const todoNameInput = todoInputCard.querySelector('[name^="new-todo-name-"]');
-                todoNameInput.addEventListener('input', handleModalInputChanges);
-
-
-                todoNameInput.addEventListener('input', function() {
-                    const currentTNI = i;
-                    const todoName = todoNameInput.value;
-                    const todoPresentInArr = todoNames.findIndex(existingTodoName => existingTodoName === todoName);
-                    if (todoPresentInArr !== -1) {
-                        // If the warning is already present, dont append another one
-                        const existingSameWarning = todoInputContainer.querySelector('#warn-non-unique-todo-name');
-                        if (existingSameWarning !== null) {
-                            return;
-                        }
-
-                        const warnNonUniqueTodoName = doc.createElement('p');
-                        warnNonUniqueTodoName.id = "warn-non-unique-todo-name";
-                        warnNonUniqueTodoName.innerText = `A todo named "${todoName}" already exists in this project,
-                                                            please choose a unique name for each todo in a project.`;
-
-                        todoInputContainer.appendChild(warnNonUniqueTodoName);
-                        return;
-                    } else {
-                        // Remove existing warning if present
-                        const existingWarning = todoInputContainer.querySelector('#warn-non-unique-todo-name');
-                        if (existingWarning !== null) {
-                            todoInputContainer.removeChild(existingWarning);
-                        }
-                        if (todoName !== "") {
-                            todoNames[currentTNI] = todoName;
-                            state.currentTodoNames[currentTNI] = todoName;
-                        }
-                    }
-                });
-                todoInputContainer.appendChild(todoInputCard);
-            };
-
-            if (todoCount > 0) {
-                todoInputContainer.appendChild(renderLeftRightTodoBtns());
-            }
+            renderTodoContainers(ev, todoCount, createProjectModalContainer, createProjectTodoCountInput);
         });
 
         const scrollTodosKeyPress = (ev) => {
@@ -463,6 +348,125 @@ export const Display = ((doc) => {
         app.appendChild(createProjectModalContainer);
 
     };
+
+    const renderTodoContainers = (ev, todoCount, createProjectModalContainer, createProjectTodoCountInput) => {
+        todoCount = parseInt(ev.target.value);
+        const todoNames = [];
+
+        const todoInputContainer = createProjectModalContainer.querySelector('#todo-input-container');
+        const createProjectForm = createProjectModalContainer.querySelector('#create-project-form');
+
+        if (ev.target.value === "") {
+
+            const existingTodoContainers = Array.from(createProjectForm.querySelectorAll('[id^="todo-input-card-"]'));
+            if (existingTodoContainers.length > 0) {
+                existingTodoContainers.forEach(container => todoInputContainer.removeChild(container));
+            }
+
+            createProjectForm.classList.remove('todos-counted');
+
+        } else {
+            createProjectForm.classList.add('todos-counted');
+        }
+
+        if (isNaN(todoCount)) {
+            const existingWarning = todoInputContainer.querySelector('[id^="warn-"]');
+
+            if (existingWarning !== null) {
+                todoInputContainer.removeChild(existingWarning);
+            }
+
+            const warnNotANumber = doc.createElement('p');
+            warnNotANumber.id = "warn-not-a-number";
+            warnNotANumber.innerText = `The value you have entered is not a number, 
+                                            please insert a number, max = 12.`;
+            todoInputContainer.appendChild(warnNotANumber);
+            return;
+        }
+
+        if (todoCount > createProjectTodoCountInput.max) {
+            const existingWarning = todoInputContainer.querySelector('[id^="warn-"]');
+
+            if (existingWarning !== null) {
+                todoInputContainer.removeChild(existingWarning);
+            }
+
+            const warnTooManyTodos = doc.createElement('p');
+            warnTooManyTodos.id = "warn-too-many-todos";
+            warnTooManyTodos.innerText = `${todoCount} is too many todos, max = 12.`;
+            todoInputContainer.appendChild(warnTooManyTodos);
+            return;
+        }
+
+        todoInputContainer.innerHTML = ''; // Clear existing inputs
+
+
+        for (let i = 0; i < todoCount; i++) {
+            const todoInputCard = doc.createElement('div');
+            todoInputCard.innerHTML = `
+                    <p class="todo-input-card-title">Todo ${i + 1}</p>
+                    <input type="text" name="new-todo-name-${i + 1}" class="create-project-todo-input required"
+                    placeholder="Todo ${i + 1} name">
+                    <input type="text" name="new-todo-description-${i + 1}" class="create-project-todo-input"
+                    placeholder="Todo ${i + 1} description">
+                    <input type="text" name="new-todo-due-date-${i + 1}" class="create-project-todo-input"
+                    placeholder="Todo ${i + 1} due date">
+                    <input type="number" name="new-todo-priority-${i + 1}" class="create-project-todo-input"
+                    placeholder="Todo ${i + 1} priority">
+                    <textarea name="new-todo-notes-${i + 1}" class="create-project-todo-textarea"
+                    placeholder="Todo ${i + 1} notes"></textarea>
+                `;
+
+            todoInputCard.id = `todo-input-card-${i + 1}`;
+
+            if (i > 0) {
+                todoInputCard.classList.add('hide-right');
+            }
+
+
+            const todoNameInput = todoInputCard.querySelector('[name^="new-todo-name-"]');
+            todoNameInput.addEventListener('input', handleModalInputChanges);
+
+
+            todoNameInput.addEventListener('input', function() {
+                const currentTNI = i;
+                const todoName = todoNameInput.value;
+                const todoPresentInArr = todoNames.findIndex(existingTodoName => existingTodoName === todoName);
+                if (todoPresentInArr !== -1) {
+                    // If the warning is already present, dont append another one
+                    const existingSameWarning = todoInputContainer.querySelector('#warn-non-unique-todo-name');
+                    if (existingSameWarning !== null) {
+                        return;
+                    }
+
+                    const warnNonUniqueTodoName = doc.createElement('p');
+                    warnNonUniqueTodoName.id = "warn-non-unique-todo-name";
+                    warnNonUniqueTodoName.innerText = `A todo named "${todoName}" already exists in this project,
+                                                            please choose a unique name for each todo in a project.`;
+
+                    todoInputContainer.appendChild(warnNonUniqueTodoName);
+                    return;
+                } else {
+                    // Remove existing warning if present
+                    const existingWarning = todoInputContainer.querySelector('#warn-non-unique-todo-name');
+                    if (existingWarning !== null) {
+                        todoInputContainer.removeChild(existingWarning);
+                    }
+                    if (todoName !== "") {
+                        todoNames[currentTNI] = todoName;
+                        state.currentTodoNames[currentTNI] = todoName;
+                    }
+                }
+            });
+            todoInputContainer.appendChild(todoInputCard);
+        };
+
+        if (todoCount > 0) {
+            todoInputContainer.appendChild(renderLeftRightTodoBtns());
+        }
+
+    };
+
 
     const handleModalInputChanges = () => {
         const user = TodoApp.getCurrentUser();
@@ -1002,7 +1006,6 @@ export const Display = ((doc) => {
             todoContainer.addEventListener('click', handleTodoExpansion);
 
             todoContainer.addEventListener('searchTodoGrow', function(ev) {
-                console.log("searchTodoGrow event dispatched!");
                 handleTodoExpansion(ev);
             });
 
