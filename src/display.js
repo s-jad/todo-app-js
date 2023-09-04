@@ -1108,20 +1108,22 @@ export const Display = ((doc) => {
         todosToRender.forEach((todo, index) => {
             const todoContainer = doc.createElement('div');
             todoContainer.classList.add('todo-container');
+            todoContainer.tabIndex = (index + 1) * 2;
 
             todoContainer.innerHTML = `
-                    <div class="todo-title-checkbox-container">
-                        <li class="project-todo">
-                        <h4>${todo.title}</h4>
-                        </li>
-                        <div class="checkbox-container">
-                            <input type="checkbox" name="todo-${index}" class="todo-check" tabindex="${index + 2}"></input>
-                            <div class="todo-check-image-left unchecked"></div>
-                            <div class="todo-check-image-right unchecked"></div>
-                        </div>
-                        
+                <div class="todo-title-checkbox-container">
+                    <li class="project-todo">
+                    <h4>${todo.title}</h4>
+                    </li>
+                    <div class="checkbox-container">
+                        <input type="checkbox" name="todo-${index}" class="todo-check" 
+                            tabindex="${((index + 1) * 2) + 1}"></input>
+                        <div class="todo-check-image-left unchecked"></div>
+                        <div class="todo-check-image-right unchecked"></div>
                     </div>
-                `;
+                    
+                </div>
+            `;
             todoContainer.addEventListener('click', handleTodoExpansion);
 
             todoContainer.addEventListener('searchTodoGrow', function(ev) {
@@ -1197,8 +1199,9 @@ export const Display = ((doc) => {
         const user = TodoApp.getCurrentUser();
         const project = user.getProject(projectName);
         const todoToExpand = project.getTodo(todoName);
+        const checkboxTabIndex = parseInt(todoContainer.querySelector('.todo-check').tabIndex);
 
-        const todoInfo = generateExpandedTodoInfo(todoToExpand);
+        const todoInfo = generateExpandedTodoInfo(todoToExpand, checkboxTabIndex);
 
         todoContainer.classList.add("expanded");
         const otherTodos = Array.from(todoContainer.parentNode.childNodes).filter(node => {
@@ -1214,40 +1217,54 @@ export const Display = ((doc) => {
         }, 300);
     };
 
-    const generateExpandedTodoInfo = (todoToExpand) => {
+    const generateExpandedTodoInfo = (todoToExpand, checkboxTabIndex) => {
         const todoInfo = doc.createElement('div');
         todoInfo.classList.add('expanded-todo-info');
         todoInfo.innerHTML = `
             <h5>Description</h5>
             <div class="todo-info-field-wrapper">
-                <p class="expanded-todo-description" data-field-type="description">${todoToExpand.description}</p>
+                <p class="expanded-todo-description" data-field-type="description"
+                    tabindex=${checkboxTabIndex + 1}>${todoToExpand.description}</p>
             </div>
             <h5>Due Date</h5>
             <div class="todo-info-field-wrapper">
-                <p class="expanded-todo-due-date" data-field-type="dueDate">${todoToExpand.dueDate}</p>
+                <p class="expanded-todo-due-date" data-field-type="dueDate"
+                tabindex=${checkboxTabIndex + 2}>${todoToExpand.dueDate}</p>
             </div>
             <h5>Priority</h5>
             <div class="todo-info-field-wrapper">
-                <p class="expanded-todo-priority" data-field-type="priority">${todoToExpand.priority}</p>
+                <p class="expanded-todo-priority" data-field-type="priority"
+                tabindex=${checkboxTabIndex + 3}>${todoToExpand.priority}</p>
             </div>
             <h5>Notes</h5>
             <div class="todo-info-field-wrapper">
-                <p class="expanded-todo-notes" data-field-type="notes">${todoToExpand.notes}</p>
+                <p class="expanded-todo-notes" data-field-type="notes"
+                tabindex=${checkboxTabIndex + 4}>${todoToExpand.notes}</p>
             </div>
         `;
         todoInfo.classList.add('invisible');
 
         const todoInfoFields = Array.from(todoInfo.querySelectorAll('p'));
 
-        todoInfoFields.forEach(field => field.addEventListener("click", handleTodoInfoFieldEvent));
+        todoInfoFields.forEach(field => field.addEventListener("click", (ev) => {
+            ev.stopPropagation();
+            const target = ev.target;
+            handleTodoInfoFieldEvent(target);
+        }));
+        todoInfoFields.forEach(field => field.addEventListener("keypress", (ev) => {
+            ev.stopPropagation();
+            if (ev.key === "Enter") {
+                const target = ev.target;
+                handleTodoInfoFieldEvent(target);
+            }
+        }));
 
         return todoInfo;
     };
 
-    const handleTodoInfoFieldEvent = (ev) => {
-        ev.stopPropagation();
+    const handleTodoInfoFieldEvent = (target) => {
 
-        const fieldInputAlreadyPresent = ev.target.parentNode.querySelector('.todo-expanded-info-input');
+        const fieldInputAlreadyPresent = target.parentNode.querySelector('.todo-expanded-info-input');
 
         if (fieldInputAlreadyPresent !== null && fieldInputAlreadyPresent !== undefined) {
             return;
@@ -1256,21 +1273,25 @@ export const Display = ((doc) => {
         const fieldInput = doc.createElement('input');
         fieldInput.classList.add('invisible');
         fieldInput.classList.add('todo-expanded-info-input');
-        const fieldType = ev.target.dataset.fieldType;
+        const fieldType = target.dataset.fieldType;
         switch (fieldType) {
             case "description":
                 fieldInput.type = "text";
                 fieldInput.name = "todo-expanded-input-description";
-                ev.target.parentNode.appendChild(fieldInput);
+                target.parentNode.appendChild(fieldInput);
+                fieldInput.focus();
                 fieldInput.addEventListener("keypress", (event) => {
                     event.stopPropagation();
                     if (event.key === "Enter") {
                         const parent = event.target.parentNode;
                         const sibling = parent.querySelector('p');
-                        sibling.innerText = `${event.target.value}`;
+
+                        if (event.target.value !== "") {
+                            sibling.innerText = `${event.target.value}`;
+                            postTodoUpdatesToUser(fieldType, event.target.value);
+                        }
+
                         parent.removeChild(event.target);
-                        
-                        postTodoUpdatesToUser(fieldType, event.target.value);
                     }
                 });
                 fieldInput.classList.remove('invisible');
@@ -1279,17 +1300,21 @@ export const Display = ((doc) => {
             case "dueDate":
                 fieldInput.type = "text";
                 fieldInput.name = "todo-expanded-input-duedate";
-                ev.target.parentNode.appendChild(fieldInput);
+                target.parentNode.appendChild(fieldInput);
+                fieldInput.focus();
 
                 fieldInput.addEventListener("keypress", (event) => {
                     event.stopPropagation();
                     if (event.key === "Enter") {
                         const parent = event.target.parentNode;
                         const sibling = parent.querySelector('p');
-                        sibling.innerText = `${event.target.value}`;
-                        parent.removeChild(event.target);
 
-                        postTodoUpdatesToUser(fieldType, event.target.value);
+                        if (event.target.value !== "") {
+                            sibling.innerText = `${event.target.value}`;
+                            postTodoUpdatesToUser(fieldType, event.target.value);
+                        }
+
+                        parent.removeChild(event.target);
                     }
                 });
                 fieldInput.classList.remove('invisible');
@@ -1298,23 +1323,28 @@ export const Display = ((doc) => {
             case "priority":
                 fieldInput.type = "number";
                 fieldInput.name = "todo-expanded-input-priority";
-                ev.target.parentNode.appendChild(fieldInput);
+                target.parentNode.appendChild(fieldInput);
+                fieldInput.focus();
+
                 fieldInput.addEventListener("keypress", (event) => {
                     event.stopPropagation();
                     if (event.key === "Enter") {
                         const parent = event.target.parentNode;
                         const sibling = parent.querySelector('p');
-                        sibling.innerText = `${event.target.value}`;
-                        parent.removeChild(event.target);
 
-                        postTodoUpdatesToUser(fieldType, event.target.value);
+                        if (event.target.value !== "") {
+                            sibling.innerText = `${event.target.value}`;
+                            postTodoUpdatesToUser(fieldType, event.target.value);
+                        }
+
+                        parent.removeChild(event.target);
                     }
                 });
                 fieldInput.classList.remove('invisible');
                 break;
 
             case "notes":
-                const fieldTextareaAlreadyPresent = ev.target.parentNode.querySelector('.todo-expanded-info-textarea');
+                const fieldTextareaAlreadyPresent = target.parentNode.querySelector('.todo-expanded-info-textarea');
 
                 if (fieldTextareaAlreadyPresent !== null && fieldTextareaAlreadyPresent !== undefined) {
                     return;
@@ -1325,16 +1355,21 @@ export const Display = ((doc) => {
                 fieldTextarea.classList.add('todo-expanded-info-textarea');
 
                 fieldTextarea.name = "todo-expanded-input-notes";
-                ev.target.parentNode.appendChild(fieldTextarea);
+                target.parentNode.appendChild(fieldTextarea);
+                fieldTextarea.focus();
+
                 fieldTextarea.addEventListener("keypress", (event) => {
                     event.stopPropagation();
                     if (event.key === "Enter") {
                         const parent = event.target.parentNode;
                         const sibling = parent.querySelector('p');
-                        sibling.innerText = `${event.target.value}`;
-                        parent.removeChild(event.target);
 
-                        postTodoUpdatesToUser(fieldType, event.target.value);
+                        if (event.target.value !== "") {
+                            sibling.innerText = `${event.target.value}`;
+                            postTodoUpdatesToUser(fieldType, event.target.value);
+                        }
+
+                        parent.removeChild(event.target);
                     }
                 });
 
