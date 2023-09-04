@@ -1158,7 +1158,8 @@ export const Display = ((doc) => {
 
     const handleTodoExpansion = (ev) => {
         if (ev.target.classList.contains("todo-check") ||
-            ev.target.classList.contains("todo-expanded-info-input")
+            ev.target.classList.contains("todo-expanded-info-input") ||
+            ev.target.classList.contains("todo-expanded-info-textarea")
         ) {
             return;
         }
