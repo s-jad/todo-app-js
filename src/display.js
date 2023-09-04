@@ -95,17 +95,26 @@ export const Display = ((doc) => {
         const dashboardHeader = doc.createElement('header');
         dashboardHeader.id = "dashboard-header";
 
+        const headerUtilsFlex = doc.createElement('div');
+        headerUtilsFlex.id = "header-utils-flex"
+        headerUtilsFlex.appendChild(SearchBar.generateSearchBar());
+        headerUtilsFlex.appendChild(generateCreateProjectBtn());
+
+        dashboardHeader.appendChild(generateUserNameHeader(username));
+        dashboardHeader.appendChild(headerUtilsFlex);
+
+        return dashboardHeader;
+    };
+
+    const generateUserNameHeader = (username) => {
         const userName = doc.createElement('h1');
         userName.innerText = username;
         userName.id = "user-name";
         userName.classList.add('yellow');
 
-        const userNameMask = doc.createElement('h1');
-        userNameMask.id = "user-name-mask";
         const userNameContainer = doc.createElement('div');
         userNameContainer.id = "user-name-container";
         userNameContainer.appendChild(userName);
-        userNameContainer.appendChild(userNameMask);
 
         userNameContainer.addEventListener("click", function() {
             state.currentUserNameColorIndex = (state.currentUserNameColorIndex + 1) % 4;
@@ -130,11 +139,10 @@ export const Display = ((doc) => {
             }
         });
 
-        const searchBar = SearchBar.generateSearchBar();
+        return userNameContainer;
+    };
 
-        // Allows the add.png icon to be used as 
-        // the style for the invisible button whilst
-        // still being tab selectable
+    const generateCreateProjectBtn = () => {
         const btnContainer = doc.createElement('div');
         btnContainer.classList.add('btn-container');
         btnContainer.classList.add('header-btn');
@@ -169,15 +177,7 @@ export const Display = ((doc) => {
         btnContainer.appendChild(createProjectBtn);
         btnContainer.appendChild(actualCreateProjectBtn);
 
-        const headerUtilsFlex = doc.createElement('div');
-        headerUtilsFlex.id = "header-utils-flex"
-        headerUtilsFlex.appendChild(searchBar);
-        headerUtilsFlex.appendChild(btnContainer);
-
-        dashboardHeader.appendChild(userNameContainer);
-        dashboardHeader.appendChild(headerUtilsFlex);
-
-        return dashboardHeader;
+        return btnContainer;
     };
 
     const renderProjectGrid = () => {
