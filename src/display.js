@@ -1125,7 +1125,11 @@ export const Display = ((doc) => {
                 </div>
             `;
             todoContainer.addEventListener('click', handleTodoExpansion);
-            todoContainer.addEventListener('keypress', handleTodoExpansion);
+            todoContainer.addEventListener('keypress', function(ev) {
+                if (ev.key === "Enter") {
+                    handleTodoExpansion(ev);
+                }
+            });
 
             todoContainer.addEventListener('searchTodoGrow', function(ev) {
                 handleTodoExpansion(ev);
