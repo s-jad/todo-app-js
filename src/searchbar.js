@@ -257,7 +257,7 @@ export const SearchBar = ((doc) => {
     const findTodoMatches = (wordToMatch) => {
         const projectGrid = Display.getCurrentProjectGrid();
 
-        if (projectGrid.children === undefined) {
+        if (projectGrid.children.length === 0) {
             return;
         }
 
