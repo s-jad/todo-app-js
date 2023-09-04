@@ -1125,6 +1125,7 @@ export const Display = ((doc) => {
                 </div>
             `;
             todoContainer.addEventListener('click', handleTodoExpansion);
+            todoContainer.addEventListener('keypress', handleTodoExpansion);
 
             todoContainer.addEventListener('searchTodoGrow', function(ev) {
                 handleTodoExpansion(ev);
@@ -1166,7 +1167,9 @@ export const Display = ((doc) => {
         ev.stopPropagation();
 
         if (todoContainer.classList.contains("expanded") &&
-            ev instanceof MouseEvent
+            ev instanceof MouseEvent ||
+            todoContainer.classList.contains("expanded") &&
+            ev instanceof KeyboardEvent
         ) {
             todoContainer.classList.remove("expanded");
             const expandedInfo = todoContainer.querySelector('.expanded-todo-info');
@@ -1186,6 +1189,19 @@ export const Display = ((doc) => {
         }
         renderExpandedTodo(ev);
     };
+
+    const renderExpandedTodoKeyEnter = (ev) => {
+        if (ev.key === "Enter") {
+            ev.stopImmediatePropagation();
+            if (ev.target.classList.contains("expanded") ||
+                !ev.target.classList.contains(".todo-container")
+            ) {
+                return;
+            } else {
+                renderExpandedTodo(ev);
+            }
+        }
+    }
 
     const renderExpandedTodo = (ev) => {
         if (ev.target.classList.contains('todo-check')) {
