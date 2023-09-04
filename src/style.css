@@ -182,7 +182,7 @@ button:not(.invisible-btn) {
     background: var(--shadow-blue);
     color: var(--base-white);
     border-radius: 1rem;
-    padding: 0.5rem 1rem;
+    padding: 1rem 3rem;
     scale: 1;
     opacity: 1;
     border: none;
@@ -195,6 +195,7 @@ button:not(.invisible-btn) {
                 scale 200ms ease-in-out,
                 box-shadow 200ms ease-in-out;
     font-family: var(--ff-urbanist-400);
+    font-size: clamp(18px, calc(1.7rem + 0.3vw), 24px);
 }
 
 button:disabled,
@@ -339,9 +340,12 @@ textarea:focus-within {
     width: 100vw;
     display: flex;
     align-items: center;
+    padding-bottom: 0.5rem;
+    box-shadow: inset 0 -3px 2px var(--contrast-yellow-glow),
+                inset 0 -6px 5px var(--contrast-yellow-faded);
     justify-content: space-between;
     color: var(--base-white);
-    background: var(--base-black);
+    background: linear-gradient(var(--base-black), var(--base-black-fade), var(--shadow-blue-07), var(--shadow-blue));
     transition: padding 200ms ease-in-out;
 }
 #user-name-container {
@@ -351,10 +355,8 @@ textarea:focus-within {
 
 #user-name {
     width: fit-content;
-    font-size: 32px;
-    padding: 0 3rem;
-    transition: padding, 200ms ease-in-out,
-                text-shadow 500ms ease-in-out,
+    color: var(--base-white);
+    box-shadow: text-shadow 500ms ease-in-out,
                 border 250ms ease-in-out,
                 color 300ms ease-in-out;
 }
@@ -362,42 +364,26 @@ textarea:focus-within {
 #user-name.green {
     color: var(--contrast-green-glow);
     
-    box-shadow: inset 0 -12px 20px var(--base-black);
-    text-shadow: 0 0.1px 1px var(--base-white),
-                0 0 3px var(--contrast-green);
+    text-shadow: 0 1px 1px var(--base-white),
+                0 0 2px var(--contrast-green);
 }
 #user-name.orange {
     color: var(--contrast-orange-glow);
 
-    box-shadow: inset 0 -12px 20px var(--base-black);
     text-shadow: 0 0 1px var(--base-white),
-                0 0 3px var(--contrast-orange);
+                0 0 2px var(--contrast-orange);
 }
 #user-name.red {
     color: var(--contrast-red-glow);
 
-    box-shadow: inset 0 -12px 20px var(--base-black);
     text-shadow: 0 0 1px var(--base-white),
-                0 0 3px var(--contrast-red);
+                0 0 2px var(--contrast-red);
 }
 #user-name.yellow {
     color: var(--contrast-yellow-glow);
 
-    box-shadow: inset 0 -12px 20px var(--base-black);
     text-shadow: 0 0 1px var(--base-white),
-                0 0 3px var(--contrast-yellow);
-}
-
-#user-name-mask {
-    position: absolute;
-    width: fit-content;
-    opacity: 0.6;
-    height: 56px;
-    width: 100%;
-    padding: 4px 3rem;
-    top: 0;
-    left: 0;
-    background: linear-gradient(-20deg, var(--base-black-fade) 43%, var(--base-black));
+                0 0 2px var(--contrast-yellow);
 }
 
 #header-utils-flex {
@@ -466,12 +452,14 @@ textarea:focus-within {
 .search-toggle-icon.active {
     background: var(--contrast-yellow);
     color: var(--shadow-blue);
+    text-shadow: 0 0 2px var(--shadow-blue-07);
 }
 
 .search-toggle-icon:first-of-type {
     left: -10px;
     top: 14px;
-    padding-left: 0.2rem;
+    padding-left: 0.1rem;
+    padding-bottom: 0.1rem;
 }
 
 .search-toggle-icon:last-of-type {
@@ -560,7 +548,7 @@ textarea:focus-within {
 #search-image-handle.minify {
     transform: rotate(0deg); 
     width: 12px;
-    top: 4.5px;
+    top: 4.2px;
     left: -20px;
 }
 
@@ -860,7 +848,7 @@ textarea:focus-within {
 
 .delete-btn-container {
     position: relative;
-    opacity: 0.9;
+    opacity: 0.7;
 }
 
 .bin-body,
@@ -1014,14 +1002,13 @@ textarea:focus-within {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: inset 0 0 3px var(--contrast-yellow),
-                inset 0 0 9px var(--contrast-yellow-faded);
     padding: 0.7rem;
 }
 
 #project-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, max-content));
+    grid-auto-rows: 40vh;
     justify-content: center;
     gap: 1rem;
     padding: 1rem;
@@ -1041,9 +1028,7 @@ textarea:focus-within {
     border-radius: 1rem;
     padding: 1rem;
 
-    height: 250px;
-    width: 300px;
-
+    height: 40vh;
     scale: 1;
     background: var(--shadow-blue);
     box-shadow: inset 0 0 5px var(--contrast-orange-faded),
@@ -1098,7 +1083,7 @@ textarea:focus-within {
 
     grid-column: 1 / 6;
     grid-row: 1 / 2;
-    padding-left: 2.5rem;
+    padding-left: 2rem;
     text-shadow: inset 0 0 2px var(--contrast-orange),
                   0 0 2px var(--base-black);
     transition: margin 200ms ease-in-out;
@@ -1157,7 +1142,7 @@ textarea:focus-within {
     max-width: 80ch; 
     max-height: 50px;
     opacity: 0.8;
-    margin-left: 2rem;
+    padding-left: 2rem;
 }
 
 /* Todo List */
@@ -1294,9 +1279,8 @@ textarea:focus-within {
     width: 0;
     border-radius: 9999px;
     box-shadow: 0 0 5px hsla(0, 90%, 75%, 0.3),
-                inset 0 0 2px white,
-                inset 0 0 5px var(--contrast-red),
-                inset 0 0 20px var(--contrast-yellow-faded);
+                inset 0 0 2px var(--base-white),
+                inset 0 0 10px var(--contrast-yellow-faded);
     transition: width 300ms ease-in-out,
                 box-shadow 300ms ease-in-out;
 }
@@ -1304,9 +1288,8 @@ textarea:focus-within {
 .progress-bar.full {
     background: var(--dark-sea-green);
     box-shadow: 0 0 5px hsla(150, 90%, 75%, 0.3),
-                inset 0 0 2px white,
-                inset 0 0 5px var(--base-white),
-                inset 0 0 20px var(--contrast-yellow-faded);
+                inset 0 0 2px var(--base-white),
+                inset 0 0 10px var(--contrast-yellow-faded);
 }
 
 .progress-bar-bg {
@@ -1343,6 +1326,8 @@ textarea:focus-within {
     align-items: center;
     justify-content: space-between;
     padding: 0.5rem 2rem;
+    transition: background 200ms 200ms ease-in-out,
+                border-radius 200ms ease-in-out;
 }
 
 .todo-container.expanded > .todo-title-checkbox-container {
@@ -1371,10 +1356,10 @@ textarea:focus-within {
     border-radius: 1rem;
 }
 
-.todo-container:first-of-type {
+.todo-container:first-of-type:not(.expanded) {
     border-radius: 1rem 1rem 0 0;
 }
-.todo-container:last-of-type {
+.todo-container:last-of-type:not(.expanded) {
     border-radius: 0 0 1rem 1rem;
 }
 .todo-container:last-of-type:first-of-type {
@@ -1485,26 +1470,71 @@ textarea:focus-within {
 
 .expanded-todo-info > h5 {
     margin-top: 0;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
 }
 
 .expanded-todo-info > h5 {
-    margin-bottom: 1rem;
     padding-bottom: 1rem;
     padding-left: 1.5rem;
 }
 
-.expanded-todo-info > p:not(:last-of-type) {
+.expanded-todo-info > .todo-info-field-wrapper:not(:last-of-type) {
+    border-bottom: 2px solid var(--contrast-orange-faded);
+}
+
+.todo-info-field-wrapper {
     margin-bottom: 1rem;
     margin-right: 1rem;
-    padding-bottom: 1rem;
+    padding-bottom: 0rem;
     padding-left: 1.5rem;
-    border-bottom: 2px solid var(--contrast-orange-faded);
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.todo-info-field-wrapper > p {
+    padding: 0.7rem 0;
+    min-height: 50px;
+    min-width: 100%;
 }
 
 .expanded-todo-info.invisible {
     opacity: 0;
     transition: opacity 200ms ease-in-out;
+}
+
+.todo-expanded-info-input,
+.todo-expanded-info-textarea,
+.todo-expanded-info-textarea:hover,
+.todo-expanded-info-input:hover,
+.todo-expanded-info-input:focus-within,
+.todo-expanded-info-textarea:focus-within {
+    position: absolute;
+    background: var(--shadow-blue);
+    top: 0;
+    left: -1%;
+    z-index: 10;
+    padding-left: 1.5rem;
+    border: 2px solid var(--contrast-orange-faded);
+    box-shadow: none; 
+    opacity: 1;
+    transition: opacity 200ms ease-in-out;
+}
+
+.todo-expanded-info-input {
+    min-height: 50px;
+    width: 102%;
+}
+
+.todo-expanded-info-textarea {
+    height: 110%;
+    width: 100%;
+}
+
+
+.todo-expanded-info-textarea.invisible,
+.todo-expanded-info-input.invisible {
+    opacity: 0;
 }
 
 .todo-container.shrink {
@@ -1689,10 +1719,11 @@ input.create-project-todo-input {
     left: 0;
     opacity: 1;
     width: 80vw;
-    border: 1px solid var(--pastel-blue);
+    border: 1px solid var(--contrast-orange-glow);
     padding: 2rem 3rem;
     border-radius: 1rem;
-    box-shadow: inset 0 2px 10px var(--contrast-yellow-faded);
+    box-shadow: inset 0 0 5px var(--contrast-orange-glow),
+                inset 0 0 10px var(--contrast-orange-faded);
     transition: gap 200ms ease-in-out,
                 opacity 250ms ease-in-out,
                 left 350ms ease-in-out;
@@ -1778,12 +1809,25 @@ input.create-project-todo-input {
 
 }
 
-@media (max-width: 500px) {
-    #user-name,
-    #user-name-mask {
-        padding: 0;
+@media (max-width: 550px) {
+    #user-name {
+        padding: 0.2rem;
     }
+
     #dashboard-header {
         padding: 0 1rem;
+        flex-direction: column;
+        height: 20vh;
     }
+
+    #project-grid {
+        height: 100%;
+    }
+
+    #search-bar-container.active ,
+    #search-bar.active {
+        width: 40vw;
+        max-width: 40vw;
+    }
+
 }
