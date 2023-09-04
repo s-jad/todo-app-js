@@ -30,15 +30,30 @@ export default class Project {
     }
 
     getAllTodos() {
-        console.log("getting all todos");
         return this.todos;
     }
 
-    updateTodo(todoTitle, todoPatch) {
+    updateTodo(todoTitle, fieldToUpdate, todoPatch) {
         const todoIndex = this.todos.findIndex(todo => todo.title === todoTitle);
 
         if (todoIndex !== -1) {
-            this.todos[todoIndex] = todoPatch;
+            switch (fieldToUpdate) {
+                case "description":
+                    this.todos[todoIndex].description = todoPatch;
+                    break;
+
+                case "dueDate":
+                    this.todos[todoIndex].dueDate = todoPatch;
+                    break;
+
+                case "priority":
+                    this.todos[todoIndex].priority = todoPatch;
+                    break;
+
+                case "notes":
+                    this.todos[todoIndex].notes = todoPatch;
+                    break;
+            }
         } else {
             console.log(`Can't find ${todoTitle}`);
         }
