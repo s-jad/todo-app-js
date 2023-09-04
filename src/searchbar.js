@@ -1,6 +1,5 @@
 import { TodoApp } from "./app";
 import { Display } from "./display";
-import User from "./user";
 
 export const SearchBar = ((doc) => {
     let state = {
@@ -8,7 +7,7 @@ export const SearchBar = ((doc) => {
         currentlyExpandedProject: {},
         expandedMatchingTodo: false,
         currentlyExpandedTodo: {},
-        searchBarToggle: "todos",
+        searchBarToggle: "projects",
     };
 
     const generateSearchBar = () => {
@@ -101,20 +100,21 @@ export const SearchBar = ((doc) => {
         const searchToggleProjects = searchToggle.querySelector('#search-toggle-projects');
         const iconToggleTodos = searchToggle.querySelector('.search-todos-icon');
         const iconToggleProjects = searchToggle.querySelector('.search-projects-icon');
+        iconToggleProjects.classList.add("active");
 
         searchToggleTodos.addEventListener('change', () => {
             if (searchToggleTodos.checked) {
-                state.searchBarToggle = "projects";
-                iconToggleProjects.classList.remove("inactive");
-                iconToggleTodos.classList.add("inactive");
+                state.searchBarToggle = "todos";
+                iconToggleProjects.classList.remove("active");
+                iconToggleTodos.classList.add("active");
             }
         });
 
         searchToggleProjects.addEventListener('change', () => {
             if (searchToggleProjects.checked) {
-                state.searchBarToggle = "todos";
-                iconToggleProjects.classList.add("inactive");
-                iconToggleTodos.classList.remove("inactive");
+                state.searchBarToggle = "projects";
+                iconToggleProjects.classList.add("active");
+                iconToggleTodos.classList.remove("active");
             }
         });
 
@@ -258,7 +258,6 @@ export const SearchBar = ((doc) => {
         const projectGrid = Display.getCurrentProjectGrid();
 
         if (projectGrid.children === undefined) {
-            console.log("project-grid is empty!");
             return;
         }
 
@@ -380,7 +379,7 @@ export const SearchBar = ((doc) => {
 
             if (todoMatches.length > 1 && state.expandedMatchingTodo) {
                 const expandedProject = doc.querySelector('.expanded');
-                if (expandedProject === undefined) {
+                if (expandedProject === undefined || expandedProject === null) {
                     setTimeout(() => {
                         const retryExpandedProject = doc.querySelector('.expanded');
                         const projectTodos = Array.from(retryExpandedProject.querySelectorAll('.todo-container'));
