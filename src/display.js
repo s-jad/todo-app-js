@@ -163,8 +163,9 @@ export const Display = ((doc) => {
             window.removeEventListener("keypress", scrollProjects);
 
             const expandedProject = doc.querySelector('.expanded');
-
+            console.log("expandedProject =>", expandedProject);
             if (expandedProject !== null) {
+                console.log("here!");
                 const shrinkExpandedAddProject = new CustomEvent('addProjectShrink', {
                     target: expandedProject,
                 });
@@ -1131,10 +1132,10 @@ export const Display = ((doc) => {
             checkBox.checked = todo.checked;
 
             if (checkBox.checked) {
-                checkBoxContainer.style.border = "2px solid hsl(150, 90%, 70%)";
+                checkBoxContainer.style.border = "2px solid var(--contrast-green)";
                 checkBoxContainer.style.boxShadow = "inset 0 0 5px hsla(150, 90%, 90%, 0.7)";
             } else {
-                checkBoxContainer.style.border = "2px solid hsl(0, 90%, 70%)";
+                checkBoxContainer.style.border = "2px solid var(--contrast-red)";
                 checkBoxContainer.style.boxShadow = "inset 0 0 5px hsla(0, 90%, 90%, 0.7)";
             }
 
@@ -1193,19 +1194,7 @@ export const Display = ((doc) => {
         const project = user.getProject(projectName);
         const todoToExpand = project.getTodo(todoName);
 
-        const todoInfo = doc.createElement('div');
-        todoInfo.classList.add('expanded-todo-info');
-        todoInfo.innerHTML = `
-            <h5>Description</h5>
-            <p class="expanded-todo-description">${todoToExpand.description}</p>
-            <h5>Due Date</h5>
-            <p class="expanded-todo-due-date">${todoToExpand.dueDate}</p>
-            <h5>Priority</h5>
-            <p class="expanded-todo-priority">${todoToExpand.priority}</p>
-            <h5>Notes</h5>
-            <p class="expanded-todo-notes">${todoToExpand.notes}</p>
-        `;
-        todoInfo.classList.add('invisible');
+        const todoInfo = generateExpandedTodoInfo(todoToExpand);
 
         todoContainer.classList.add("expanded");
         const otherTodos = Array.from(todoContainer.parentNode.childNodes).filter(node => {
@@ -1221,6 +1210,21 @@ export const Display = ((doc) => {
         }, 300);
     };
 
+    const generateExpandedTodoInfo = (todoToExpand) => {
+        const todoInfo = doc.createElement('div');
+        todoInfo.classList.add('expanded-todo-info');
+        todoInfo.innerHTML = `
+            <h5>Description</h5>
+            <p class="expanded-todo-description">${todoToExpand.description}</p>
+            <h5>Due Date</h5>
+            <p class="expanded-todo-due-date">${todoToExpand.dueDate}</p>
+            <h5>Priority</h5>
+            <p class="expanded-todo-priority">${todoToExpand.priority}</p>
+            <h5>Notes</h5>
+            <p class="expanded-todo-notes">${todoToExpand.notes}</p>
+        `;
+        todoInfo.classList.add('invisible');
+    };
     const renderShrunkProject = (ev) => {
         // Check if the target of the click event is the delete icon
         // or one of the todo checkboxes
@@ -1273,15 +1277,13 @@ export const Display = ((doc) => {
                 if (state.progressBarPercentages[progressBarIdNum] === 100) {
                     progressBars[i].style.background = "var(--contrast-green-glow)";
                     progressBars[i].style.boxShadow = `0 0 4px var(--contrast-green), 
-                                                   0 0 1px var(--base-white),
-                                                    inset 0 0 1px var(--base-white),
-                                                    inset 0 0 4px var(--contrast-green)`;
+                                                   inset 0 0 1px var(--base-white),
+                                                    inset 0 0 4px var(--contrast-green-faded)`;
                 } else {
                     progressBars[i].style.background = "var(--contrast-red-glow)";
                     progressBars[i].style.boxShadow = `0 0 4px var(--contrast-red), 
-                                                   0 0 1px var(--base-white),
-                                                    inset 0 0 1px var(--base-white),
-                                                    inset 0 0 4px var(--contrast-red)`;
+                                                   inset 0 0 1px var(--base-white),
+                                                    inset 0 0 4px var(--contrast-red-faded)`;
                 }
             }
 
@@ -1420,15 +1422,13 @@ export const Display = ((doc) => {
         if (state.progressBarPercentages[progressbarIdNum] === 100) {
             progressBar.style.background = "var(--contrast-green-glow)";
             progressBar.style.boxShadow = `0 0 4px var(--contrast-green), 
-                                           0 0 1px var(--base-white),
                                             inset 0 0 1px var(--base-white),
-                                            inset 0 0 4px var(--contrast-green)`;
+                                            inset 0 0 4px var(--contrast-green-faded)`;
         } else {
             progressBar.style.background = "var(--contrast-red-glow)";
             progressBar.style.boxShadow = `0 0 4px var(--contrast-red), 
-                                           0 0 1px var(--base-white),
                                             inset 0 0 1px var(--base-white),
-                                            inset 0 0 4px var(--contrast-red)`;
+                                            inset 0 0 4px var(--contrast-red-faded)`;
         }
     };
 
