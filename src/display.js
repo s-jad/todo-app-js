@@ -1,4 +1,6 @@
 import { TodoApp, UserEvents } from "./app";
+import Project from "./project";
+import Todo from "./todo";
 import { SearchBar } from "./searchbar";
 import { isSameDay, isAfter, parse, isValid, format } from "date-fns";
 
@@ -1152,7 +1154,9 @@ export const Display = ((doc) => {
     };
 
     const handleTodoExpansion = (ev) => {
-        if (ev.target.classList.contains("todo-check")) {
+        if (ev.target.classList.contains("todo-check") ||
+            ev.target.classList.contains("todo-expanded-info-input")
+        ) {
             return;
         }
 
@@ -1215,23 +1219,149 @@ export const Display = ((doc) => {
         todoInfo.classList.add('expanded-todo-info');
         todoInfo.innerHTML = `
             <h5>Description</h5>
-            <p class="expanded-todo-description">${todoToExpand.description}</p>
+            <div class="todo-info-field-wrapper">
+                <p class="expanded-todo-description" data-field-type="description">${todoToExpand.description}</p>
+            </div>
             <h5>Due Date</h5>
-            <p class="expanded-todo-due-date">${todoToExpand.dueDate}</p>
+            <div class="todo-info-field-wrapper">
+                <p class="expanded-todo-due-date" data-field-type="dueDate">${todoToExpand.dueDate}</p>
+            </div>
             <h5>Priority</h5>
-            <p class="expanded-todo-priority">${todoToExpand.priority}</p>
+            <div class="todo-info-field-wrapper">
+                <p class="expanded-todo-priority" data-field-type="priority">${todoToExpand.priority}</p>
+            </div>
             <h5>Notes</h5>
-            <p class="expanded-todo-notes">${todoToExpand.notes}</p>
+            <div class="todo-info-field-wrapper">
+                <p class="expanded-todo-notes" data-field-type="notes">${todoToExpand.notes}</p>
+            </div>
         `;
         todoInfo.classList.add('invisible');
+
+        const todoInfoFields = Array.from(todoInfo.querySelectorAll('p'));
+
+        todoInfoFields.forEach(field => field.addEventListener("click", handleTodoInfoFieldEvent));
+
+        return todoInfo;
     };
+
+    const handleTodoInfoFieldEvent = (ev) => {
+        ev.stopPropagation();
+
+        const fieldInputAlreadyPresent = ev.target.parentNode.querySelector('.todo-expanded-info-input');
+
+        if (fieldInputAlreadyPresent !== null && fieldInputAlreadyPresent !== undefined) {
+            return;
+        }
+
+        const fieldInput = doc.createElement('input');
+        fieldInput.classList.add('invisible');
+        fieldInput.classList.add('todo-expanded-info-input');
+        const fieldType = ev.target.dataset.fieldType;
+        switch (fieldType) {
+            case "description":
+                fieldInput.type = "text";
+                fieldInput.name = "todo-expanded-input-description";
+                ev.target.parentNode.appendChild(fieldInput);
+                fieldInput.addEventListener("keypress", (event) => {
+                    event.stopPropagation();
+                    if (event.key === "Enter") {
+                        const parent = event.target.parentNode;
+                        const sibling = parent.querySelector('p');
+                        sibling.innerText = `${event.target.value}`;
+                        parent.removeChild(event.target);
+                        
+                        postTodoUpdatesToUser(fieldType, event.target.value);
+                    }
+                });
+                fieldInput.classList.remove('invisible');
+                break;
+
+            case "dueDate":
+                fieldInput.type = "text";
+                fieldInput.name = "todo-expanded-input-duedate";
+                ev.target.parentNode.appendChild(fieldInput);
+
+                fieldInput.addEventListener("keypress", (event) => {
+                    event.stopPropagation();
+                    if (event.key === "Enter") {
+                        const parent = event.target.parentNode;
+                        const sibling = parent.querySelector('p');
+                        sibling.innerText = `${event.target.value}`;
+                        parent.removeChild(event.target);
+
+                        postTodoUpdatesToUser(fieldType, event.target.value);
+                    }
+                });
+                fieldInput.classList.remove('invisible');
+                break;
+
+            case "priority":
+                fieldInput.type = "number";
+                fieldInput.name = "todo-expanded-input-priority";
+                ev.target.parentNode.appendChild(fieldInput);
+                fieldInput.addEventListener("keypress", (event) => {
+                    event.stopPropagation();
+                    if (event.key === "Enter") {
+                        const parent = event.target.parentNode;
+                        const sibling = parent.querySelector('p');
+                        sibling.innerText = `${event.target.value}`;
+                        parent.removeChild(event.target);
+
+                        postTodoUpdatesToUser(fieldType, event.target.value);
+                    }
+                });
+                fieldInput.classList.remove('invisible');
+                break;
+
+            case "notes":
+                const fieldTextareaAlreadyPresent = ev.target.parentNode.querySelector('.todo-expanded-info-textarea');
+
+                if (fieldTextareaAlreadyPresent !== null && fieldTextareaAlreadyPresent !== undefined) {
+                    return;
+                }
+
+                const fieldTextarea = doc.createElement('textarea');
+                fieldTextarea.classList.add('invisible');
+                fieldTextarea.classList.add('todo-expanded-info-textarea');
+
+                fieldTextarea.name = "todo-expanded-input-notes";
+                ev.target.parentNode.appendChild(fieldTextarea);
+                fieldTextarea.addEventListener("keypress", (event) => {
+                    event.stopPropagation();
+                    if (event.key === "Enter") {
+                        const parent = event.target.parentNode;
+                        const sibling = parent.querySelector('p');
+                        sibling.innerText = `${event.target.value}`;
+                        parent.removeChild(event.target);
+
+                        postTodoUpdatesToUser(fieldType, event.target.value);
+                    }
+                });
+
+                fieldTextarea.classList.remove('invisible');
+                break;
+        }
+    };
+
+    const postTodoUpdatesToUser = (fieldType, newValue) => {
+        const user = TodoApp.getCurrentUser();
+        const currentProject = doc.querySelector('[id^="project-card-"].expanded');
+        const currentProjTitle = currentProject.querySelector('.project-title').innerText;
+        const currentTodo = currentProject.querySelector('.todo-container.expanded');
+        const currentTodoTitle = currentTodo.querySelector('h4').innerText;
+        const project = user.getProject(currentProjTitle);
+        project.updateTodo(currentTodoTitle, fieldType, newValue);
+    };
+
     const renderShrunkProject = (ev) => {
         // Check if the target of the click event is the delete icon
         // or one of the todo checkboxes
         // If yes, Return early without triggering the shrinking
         if (ev.target.classList.contains('invisible-btn') ||
             ev.target.classList.contains('todo-check') ||
-            ev.target.classList.contains('todo-container')
+            ev.target.classList.contains('todo-container') ||
+            ev.target.classList.contains('todo-expanded-info-input') ||
+            ev.target.classList.contains('todo-expanded-info-textarea')
         ) {
             return;
         }
