@@ -148,6 +148,7 @@ export const Display = ((doc) => {
         const btnContainer = doc.createElement('div');
         btnContainer.classList.add('btn-container');
         btnContainer.classList.add('header-btn');
+        btnContainer.classList.add('fade-btn');
 
         const createProjectBtn = doc.createElement('div');
         createProjectBtn.id = "create-project-btn";
@@ -509,102 +510,90 @@ export const Display = ((doc) => {
         }
     };
 
-    const handleTodoDateInputEvent = (ev, todoInputContainer) => {
+    const handleTodoDateInputEvent = (ev, parent) => {
         const userInput = ev.target.value;
         const parsedDate = parse(userInput, 'yyyy-MM-dd', new Date());
         const isValidDate = isValid(parsedDate);
 
+        const today = new Date();
+        const isAfterOrOnToday = isSameDay(parsedDate, today) || isAfter(parsedDate, today);
+
         if (!isValidDate) {
             const existingDateWarning = doc.querySelector('[id^="warn-date-"]');
             if (existingDateWarning !== null) {
-                todoInputContainer.removeChild(existingDateWarning);
+                parent.removeChild(existingDateWarning);
             }
-            const todoWithWarning = ev.target.name.slice(ev.target.name.lastIndexOf("-") + 1);
             const warnInvalidDate = doc.createElement('p');
             warnInvalidDate.id = "warn-date-invalid";
-            warnInvalidDate.innerText = `Todo ${todoWithWarning} :
-                                    ${userInput} is not a valid date, 
-                                    format: YYYY-MM-DD.`;
-            todoInputContainer.appendChild(warnInvalidDate);
-            return;
-        }
+            warnInvalidDate.innerText = `${userInput} is not a valid date, format: YYYY-MM-DD.`;
+            parent.appendChild(warnInvalidDate);
+            return false;
 
-        const today = new Date();
-
-        const isAfterOrOnToday = isSameDay(parsedDate, today) || isAfter(parsedDate, today);
-
-        if (!isAfterOrOnToday) {
+        } else if (!isAfterOrOnToday) {
             const existingDateWarning = doc.querySelector('[id^="warn-date-"]');
             if (existingDateWarning !== null) {
-                todoInputContainer.removeChild(existingDateWarning);
+                parent.removeChild(existingDateWarning);
             }
-            const todoWithWarning = ev.target.name.slice(ev.target.name.lastIndexOf("-") + 1);
             const warnPastDate = doc.createElement('p');
             warnPastDate.id = "warn-date-past";
-            warnPastDate.innerText = `Todo ${todoWithWarning} :
-                                    ${userInput} occurs before todays date, ${format(today, 'yyyy-MM-dd')}.`;
-            todoInputContainer.appendChild(warnPastDate);
-            return;
+            warnPastDate.innerText = `${userInput} occurs before todays date, ${format(today, 'yyyy-MM-dd')}.`;
+            parent.appendChild(warnPastDate);
+            return false;
+
         }
 
         const existingDateWarning = doc.querySelector('[id^="warn-date-"]');
         if (existingDateWarning !== null) {
-            todoInputContainer.removeChild(existingDateWarning);
+            parent.removeChild(existingDateWarning);
         }
+
+        return true;
     };
 
-    const handleTodoPriorityInputEvent = (ev, todoInputContainer) => {
+    const handleTodoPriorityInputEvent = (ev, parent) => {
         const userInput = ev.target.value;
-
         if (userInput === "") {
             const existingPriorityWarning = doc.querySelector('[id^="warn-priority-"]');
             if (existingPriorityWarning !== null) {
-                todoInputContainer.removeChild(existingPriorityWarning);
+                parent.removeChild(existingPriorityWarning);
             }
-            const todoWithWarning = ev.target.name.slice(ev.target.name.lastIndexOf("-") + 1);
             const warnPriorityNaN = doc.createElement('p');
             warnPriorityNaN.id = "warn-priority-nan";
-            warnPriorityNaN.innerText = `Todo ${todoWithWarning} :
-                                    ${userInput} is not a number.
-                                    Priority = 0-10.`;
-            todoInputContainer.appendChild(warnPriorityNaN);
-            return;
-        }
+            warnPriorityNaN.innerText = `Priority input is not a number. Priority = 0-10.`;
+            parent.appendChild(warnPriorityNaN);
 
-        if (parseInt(userInput) < parseInt(ev.target.min)) {
+            return false;
+
+        } else if (parseInt(userInput) < parseInt(ev.target.min)) {
             const existingPriorityWarning = doc.querySelector('[id^="warn-priority-"]');
             if (existingPriorityWarning !== null) {
-                todoInputContainer.removeChild(existingPriorityWarning);
+                parent.removeChild(existingPriorityWarning);
             }
-            const todoWithWarning = ev.target.name.slice(ev.target.name.lastIndexOf("-") + 1);
             const warnPriorityUnderMin = doc.createElement('p');
             warnPriorityUnderMin.id = "warn-priority-under-min";
-            warnPriorityUnderMin.innerText = `Todo ${todoWithWarning} :
-                                    ${userInput} is too low.
-                                    Min priority = 0.`;
-            todoInputContainer.appendChild(warnPriorityUnderMin);
-            return;
-        }
+            warnPriorityUnderMin.innerText = `${userInput} is too low. Min priority = 0.`;
+            parent.appendChild(warnPriorityUnderMin);
+            return false;
 
-        if (parseInt(userInput) > parseInt(ev.target.max)) {
+        } else if (parseInt(userInput) > parseInt(ev.target.max)) {
             const existingPriorityWarning = doc.querySelector('[id^="warn-priority-"]');
             if (existingPriorityWarning !== null) {
-                todoInputContainer.removeChild(existingPriorityWarning);
+                parent.removeChild(existingPriorityWarning);
             }
-            const todoWithWarning = ev.target.name.slice(ev.target.name.lastIndexOf("-") + 1);
             const warnPriorityOverMax = doc.createElement('p');
             warnPriorityOverMax.id = "warn-priority-over-max";
-            warnPriorityOverMax.innerText = `Todo ${todoWithWarning} :
-                                    ${userInput} is too high.
-                                    Max priority = 10.`;
-            todoInputContainer.appendChild(warnPriorityOverMax);
-            return;
+            warnPriorityOverMax.innerText = `${userInput} is too high. Max priority = 10.`;
+            parent.appendChild(warnPriorityOverMax);
+            return false;
+
         }
 
         const existingPriorityWarning = doc.querySelector('[id^="warn-priority-"]');
         if (existingPriorityWarning !== null) {
-            todoInputContainer.removeChild(existingPriorityWarning);
+            parent.removeChild(existingPriorityWarning);
         }
+
+        return true;
     };
 
     const renderLeftRightTodoBtns = () => {
@@ -1272,6 +1261,7 @@ export const Display = ((doc) => {
             const target = ev.target;
             handleTodoInfoFieldEvent(target);
         }));
+
         todoInfoFields.forEach(field => field.addEventListener("keypress", (ev) => {
             ev.stopPropagation();
             if (ev.key === "Enter") {
@@ -1295,25 +1285,15 @@ export const Display = ((doc) => {
         fieldInput.classList.add('invisible');
         fieldInput.classList.add('todo-expanded-info-input');
         const fieldType = target.dataset.fieldType;
+
         switch (fieldType) {
             case "description":
                 fieldInput.type = "text";
                 fieldInput.name = "todo-expanded-input-description";
                 target.parentNode.appendChild(fieldInput);
                 fieldInput.focus();
-                fieldInput.addEventListener("keypress", (event) => {
-                    event.stopPropagation();
-                    if (event.key === "Enter") {
-                        const parent = event.target.parentNode;
-                        const sibling = parent.querySelector('p');
-
-                        if (event.target.value !== "") {
-                            sibling.innerText = `${event.target.value}`;
-                            postTodoUpdatesToUser(fieldType, event.target.value);
-                        }
-
-                        parent.removeChild(event.target);
-                    }
+                fieldInput.addEventListener("keypress", function(event) {
+                    handleTodoFieldInputEvent(event, fieldType);
                 });
                 fieldInput.classList.remove('invisible');
                 break;
@@ -1324,18 +1304,12 @@ export const Display = ((doc) => {
                 target.parentNode.appendChild(fieldInput);
                 fieldInput.focus();
 
-                fieldInput.addEventListener("keypress", (event) => {
-                    event.stopPropagation();
+                fieldInput.addEventListener("keypress", function(event) {
                     if (event.key === "Enter") {
-                        const parent = event.target.parentNode;
-                        const sibling = parent.querySelector('p');
-
-                        if (event.target.value !== "") {
-                            sibling.innerText = `${event.target.value}`;
-                            postTodoUpdatesToUser(fieldType, event.target.value);
+                        const validDate = handleTodoDateInputEvent(event, target.parentNode);
+                        if (validDate) {
+                            handleTodoFieldInputEvent(event, fieldType);
                         }
-
-                        parent.removeChild(event.target);
                     }
                 });
                 fieldInput.classList.remove('invisible');
@@ -1343,22 +1317,18 @@ export const Display = ((doc) => {
 
             case "priority":
                 fieldInput.type = "number";
+                fieldInput.max = 10;
+                fieldInput.min = 0;
                 fieldInput.name = "todo-expanded-input-priority";
                 target.parentNode.appendChild(fieldInput);
                 fieldInput.focus();
 
-                fieldInput.addEventListener("keypress", (event) => {
-                    event.stopPropagation();
+                fieldInput.addEventListener("keypress", function(event) {
                     if (event.key === "Enter") {
-                        const parent = event.target.parentNode;
-                        const sibling = parent.querySelector('p');
-
-                        if (event.target.value !== "") {
-                            sibling.innerText = `${event.target.value}`;
-                            postTodoUpdatesToUser(fieldType, event.target.value);
+                        const validPriority = handleTodoPriorityInputEvent(event, target.parentNode);
+                        if (validPriority) {
+                            handleTodoFieldInputEvent(event, fieldType);
                         }
-
-                        parent.removeChild(event.target);
                     }
                 });
                 fieldInput.classList.remove('invisible');
@@ -1379,25 +1349,29 @@ export const Display = ((doc) => {
                 target.parentNode.appendChild(fieldTextarea);
                 fieldTextarea.focus();
 
-                fieldTextarea.addEventListener("keypress", (event) => {
-                    event.stopPropagation();
-                    if (event.key === "Enter") {
-                        const parent = event.target.parentNode;
-                        const sibling = parent.querySelector('p');
-
-                        if (event.target.value !== "") {
-                            sibling.innerText = `${event.target.value}`;
-                            postTodoUpdatesToUser(fieldType, event.target.value);
-                        }
-
-                        parent.removeChild(event.target);
-                    }
+                fieldTextarea.addEventListener("keypress", function(event) {
+                    handleTodoFieldInputEvent(event, fieldType);
                 });
 
                 fieldTextarea.classList.remove('invisible');
                 break;
         }
     };
+
+
+    const handleTodoFieldInputEvent = (event, fieldType) => {
+        event.stopPropagation();
+        const parent = event.target.parentNode;
+        const sibling = parent.querySelector('p');
+
+        if (event.target.value !== "") {
+            sibling.innerText = `${event.target.value}`;
+            postTodoUpdatesToUser(fieldType, event.target.value);
+        }
+
+        parent.removeChild(event.target);
+
+    }
 
     const postTodoUpdatesToUser = (fieldType, newValue) => {
         const user = TodoApp.getCurrentUser();
