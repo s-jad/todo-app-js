@@ -13,7 +13,7 @@ export const SearchBar = ((doc) => {
     const generateSearchBar = () => {
         const searchBarContainer = doc.createElement('div');
         searchBarContainer.id = "search-bar-container"
-
+        searchBarContainer.classList.add('fade-btn');
         const searchImageGlass = doc.createElement('div');
         const searchImageHandle = doc.createElement('div');
         searchImageGlass.id = "search-image-glass";
@@ -75,8 +75,46 @@ export const SearchBar = ((doc) => {
         searchBarContainer.appendChild(invisibleToggleBtn);
         searchBarContainer.appendChild(searchToggle);
 
+        searchBarContainer.addEventListener("keypress", function(ev) {
+            toggleSearchBarModeKeyPress(ev, searchBarContainer);
+        });
+
 
         return searchBarContainer;
+    };
+
+    const toggleSearchBarModeKeyPress = (ev, searchBarContainer) => {
+        if (ev.key === "<") {
+            ev.preventDefault();
+            ev.stopImmediatePropagation();
+
+            const searchToggleContainer = searchBarContainer.querySelector('#search-toggle-container-inner');
+            const searchProjectsToggle = searchToggleContainer.querySelector('#search-toggle-projects');
+            const searchTodosToggle = searchToggleContainer.querySelector('#search-toggle-todos');
+            const toggleProjectsIcon = searchBarContainer.querySelector(".search-icon-projects");
+            const toggleTodosIcon = searchBarContainer.querySelector(".search-icon-todos");
+
+
+            if (searchProjectsToggle.checked) {
+                searchTodosToggle.checked = true;
+                searchProjectsToggle.checked = false;
+
+                toggleProjectsIcon.classList.remove("active");
+                toggleTodosIcon.classList.add("active");
+
+                state.searchBarToggle = "todos";
+            } else if (searchTodosToggle.checked) {
+
+                searchTodosToggle.checked = false;
+                searchProjectsToggle.checked = true;
+
+                toggleProjectsIcon.classList.add("active");
+                toggleTodosIcon.classList.remove("active");
+
+                state.searchBarToggle = "projects";
+            }
+        }
+
     };
 
     const generateSearchToggle = () => {
@@ -89,17 +127,19 @@ export const SearchBar = ((doc) => {
 
         searchToggle.innerHTML = `
             <div id="search-toggle-container-inner">
-                <input type="radio" name="search-toggle-radio" id="search-toggle-projects" class="invisible-radio very-small-btn">
-                <input type="radio" name="search-toggle-radio" id="search-toggle-todos" class="invisible-radio very-small-btn">
-                <div class="search-toggle-icon search-projects-icon">P</div>
-                <div class="search-toggle-icon search-todos-icon">T</div>
-            </div>
+                <input type="radio" name="search-toggle-radio" id="search-toggle-projects" 
+                    class="invisible-radio very-small-btn" checked="true">
+                <input type="radio" name="search-toggle-radio" id="search-toggle-todos" 
+                    class="invisible-radio very-small-btn" checked="false">
+                <div class="search-toggle-icon search-icon-projects">P</div>
+                <div class="search-toggle-icon search-icon-todos">T</div>
+            </input>
         `;
 
         const searchToggleTodos = searchToggle.querySelector('#search-toggle-todos');
         const searchToggleProjects = searchToggle.querySelector('#search-toggle-projects');
-        const iconToggleTodos = searchToggle.querySelector('.search-todos-icon');
-        const iconToggleProjects = searchToggle.querySelector('.search-projects-icon');
+        const iconToggleTodos = searchToggle.querySelector('.search-icon-todos');
+        const iconToggleProjects = searchToggle.querySelector('.search-icon-projects');
         iconToggleProjects.classList.add("active");
 
         searchToggleTodos.addEventListener('change', () => {
