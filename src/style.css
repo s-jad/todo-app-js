@@ -588,6 +588,8 @@ textarea:focus-within {
 #search-bar.active {
     border-radius: 9999px;
     color: var(--base-white);
+    font-size: clamp(18px, calc(1.7rem + 0.3vw), 24px);
+    font-weight: 700; 
     max-width: 40vw;
     width: 40vw;
     height: 30px;
@@ -629,7 +631,6 @@ textarea:focus-within {
 .btn-container {
     position: relative;
 }
-
 
 .right-todos-btn-top,
 .left-todos-btn-top,
@@ -842,6 +843,10 @@ textarea:focus-within {
 .header-btn {
     height: 55px;
     width: 55px;
+}
+
+.fade-btn {
+    opacity: 0.8;
 }
 
 /* DELETE PROJECT BUTTON */
@@ -1326,6 +1331,7 @@ textarea:focus-within {
     align-items: center;
     justify-content: space-between;
     padding: 0.5rem 2rem;
+    margin-bottom: 1rem;
     transition: background 200ms 200ms ease-in-out,
                 border-radius 200ms ease-in-out;
 }
@@ -1531,7 +1537,6 @@ textarea:focus-within {
     width: 100%;
 }
 
-
 .todo-expanded-info-textarea.invisible,
 .todo-expanded-info-input.invisible {
     opacity: 0;
@@ -1540,6 +1545,25 @@ textarea:focus-within {
 .todo-container.shrink {
     height: 0;
     overflow: hidden;
+}
+
+[id^="warn-"] {
+    position: absolute;
+    color: var(--contrast-red);
+    top: -65px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--shadow-blue);
+    text-align: center;
+    padding: 1rem;
+    height: 60px;
+    font-size: clamp(18px, calc(1.7rem + 0.3vw), 24px);
+    font-weight: 700;
+    border: 2px solid var(--contrast-red);
+    border-radius: 1rem;
+    box-shadow: inset 0 0 4px var(--contrast-red),
+                inset 0 0 10px var(--contrast-red-faded);
+    z-index: 1000;
 }
 
 
@@ -1615,6 +1639,7 @@ textarea:focus-within {
 }
 
 #create-project-form.todos-counted > #todo-input-container {
+    position: relative;
     height: 60vh;
     opacity: 1;
 }
@@ -1702,13 +1727,6 @@ input.create-project-todo-input {
 
 .create-project-todo-textarea {
     max-height: 60px;
-}
-
-[id^="warn-"] {
-    color: hsl(0, 90%, 72%);
-    text-shadow: 0 0 1px var(--contrast-yellow);
-    grid-column: 1 / 6;
-    text-align: center;
 }
 
 [id^="todo-input-card-"] {
