@@ -433,9 +433,9 @@ textarea:focus-within {
 
 .search-toggle-icon {
     position: absolute;
-    height: 25px;
-    width: 25px;
-    border-radius: 12.5px;
+    height: 30px;
+    width: 30px;
+    border-radius: 15px;
     opacity: 0.8;
     text-align: center;
     font-weight: 700;
@@ -445,7 +445,7 @@ textarea:focus-within {
     text-shadow: 0 0 2px var(--contrast-yellow-faded);
     box-shadow: inset 0 0 10px var(--contrast-yellow-faded),
             inset 0 0 5px var(--contrast-yellow),
-            inset 0 0 2px 2px var(--base-black),
+            inset 0 0 0 2px var(--base-black),
             0 0 10px var(--contrast-yellow-faded),
             0 0 5px var(--contrast-yellow),
             0 0 1px var(--base-white);
@@ -457,24 +457,24 @@ textarea:focus-within {
 }
 
 .search-toggle-icon:first-of-type {
-    left: -10px;
-    top: 14px;
+    left: -23px;
+    top: 5px;
     padding-left: 0.1rem;
     padding-bottom: 0.1rem;
 }
 
 .search-toggle-icon:last-of-type {
-    left: 17.5px;
+    left: 5.5px;
     bottom: -3px;
 }
 
 #search-toggle-projects {
-    left: -15px;
-    top: 12px;
+    left: -27px;
+    top: 4px;
 }
 
 #search-toggle-todos {
-    left: 13px;
+    left: 2px;
     bottom: -5px;
 }
 
@@ -533,13 +533,17 @@ textarea:focus-within {
 }
 
 #search-image-glass.minify {
-    height: 25px;
-    width: 25px;
-    top: 5px;
-    left: -15px;
+    height: 30px;
+    width: 30px;
+    border-radius: 15px;
+    top: 8px;
+    left: -19px;
     box-shadow: 0 0 1px var(--base-white),
-                0 0 3px var(--contrast-yellow),
-                0 0 6px var(--contrast-yellow-faded);
+                inset 0 0 0 2px var(--base-black-07),
+                inset 0 0 5px var(--contrast-yellow),
+                inset 0 0 10px var(--contrast-yellow-faded),
+                0 0 5px var(--contrast-yellow),
+                0 0 10px var(--contrast-yellow-faded);
     border: 2px solid var(--contrast-yellow-glow);
     scale: 1;
     transition: scale 200ms ease-in-out;
@@ -548,9 +552,11 @@ textarea:focus-within {
 
 #search-image-handle.minify {
     transform: rotate(0deg); 
-    width: 12px;
-    top: 4.2px;
-    left: -20px;
+    background: var(--contrast-yellow);
+    width: 16px;
+    height: 3px;
+    top: 6.3px;
+    left: -27px;
 }
 
 #toggle-search-bar:hover ~ #search-image-handle.minify,
@@ -567,7 +573,7 @@ textarea:focus-within {
 }
 
 #toggle-search-bar.activate {
-    top: -10px;
+    top: -8px;
     left: -30px;
 }
 
@@ -2047,6 +2053,26 @@ input.create-project-todo-input {
 
 #cancel-delete-project-btn {
     grid-column: 4 / 5;
+}
+
+/* TODO LIST VIEW */ 
+
+#todo-list-view-container {
+    grid-column: 1 / 9;
+    grid-row: 2 / 7;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.7rem;
+}
+
+
+#todo-list-view {
+    height: 88vh;
+    width: 98vw;
+    background: var(--contrast-yellow-glow);
+    overflow: scroll;
 }
 
 /* Media Queries */ 
