@@ -84,6 +84,7 @@ select {
 :root {
     --base-white: hsl(205, 70%, 98%);
     --base-black: hsl(205, 36%, 6%);
+    --base-black-07: hsla(205, 36%, 6%, 0.7);
     --base-black-fade: hsla(205, 36%, 6%, 0.1);
     --pastel-blue: hsl(205, 28%, 85%);
     --steel-teal: hsl(205, 22%, 44%);
@@ -632,6 +633,46 @@ textarea:focus-within {
     position: relative;
 }
 
+.invisible-btn {
+    position: absolute;
+    align-self: flex-end;
+    content: "";
+    top: 0;
+    left: 0;
+    z-index: 10;
+    background: transparent;
+    border: none;
+    color: transparent;
+    outline: none;
+    box-shadow: none;
+}
+
+.very-small-btn {
+    height: 25px;
+    width: 25px;
+}
+
+.small-btn {
+    height: 30px;
+    width: 30px;
+}
+
+.big-btn {
+    height: 50px;
+    width: 50px;
+}
+
+.header-btn {
+    height: 55px;
+    width: 55px;
+}
+
+.fade-btn {
+    opacity: 0.8;
+}
+
+/* LEFT/RIGHT TODO BUTTONS */
+
 .right-todos-btn-top,
 .left-todos-btn-top,
 .right-todos-btn-bottom,
@@ -715,6 +756,9 @@ textarea:focus-within {
                 inset 0 0 7px var(--contrast-green),
                 0 0 14px var(--contrast-green-faded);
 }
+
+
+/* CREATE PROJECT BUTTON */
 
 .btn-container > #create-project-btn {
     position: relative;
@@ -808,45 +852,6 @@ textarea:focus-within {
                 0 0 5px var(--contrast-green),
                 0 0 10px var(--contrast-green-faded);
 
-}
-
-.invisible-btn {
-    position: absolute;
-    align-self: flex-end;
-    content: "";
-    top: 0;
-    left: 0;
-    z-index: 10;
-    background: transparent;
-    border: none;
-    color: transparent;
-    outline: none;
-    box-shadow: none;
-}
-
-
-.very-small-btn {
-    height: 25px;
-    width: 25px;
-}
-
-.small-btn {
-    height: 30px;
-    width: 30px;
-}
-
-.big-btn {
-    height: 50px;
-    width: 50px;
-}
-
-.header-btn {
-    height: 55px;
-    width: 55px;
-}
-
-.fade-btn {
-    opacity: 0.8;
 }
 
 /* DELETE PROJECT BUTTON */
@@ -985,6 +990,237 @@ textarea:focus-within {
     top: 1%;
     left: 39%;
 }
+
+/* SWITCH VIEW BUTTON */
+
+#switch-view-btn-container {
+    position: relative;
+    opacity: 0.7;
+}
+
+#switch-view-btn,
+[id^="switch-btn-"],
+.switch-btn-eyelash {
+    position: absolute;
+}
+
+#switch-btn-circle {
+    left: 0;
+    top: 0;
+    height: 55px;
+    width: 55px;
+    border-radius: 27.5px;
+    background: none;
+    border: 2px solid var(--contrast-orange);
+    box-shadow: inset 0 0 1px var(--base-white),
+                inset 0 0 5px var(--contrast-orange),
+                inset 0 0 10px var(--contrast-orange-faded);
+    transition: height 200ms ease-in-out,
+                width 200ms ease-in-out,
+                border-radius 200ms ease-in,
+                top 200ms ease-in-out,
+                left 200ms ease-in-out,
+                box-shadow 200ms ease-in-out,
+                scale 200ms ease-in-out;
+    scale: 1;
+}
+
+#switch-view-btn-container:hover > #switch-btn-circle:not(.split),
+#switch-view-btn-container:focus-within > #switch-btn-circle:not(.split) {
+    box-shadow: 0 0 1px var(--base-white),
+                0 0 5px var(--contrast-orange),
+                0 0 10px var(--contrast-orange-faded),
+                inset 0 0 1px var(--base-white),
+                inset 0 0 5px var(--contrast-orange),
+                inset 0 0 10px var(--contrast-orange-faded);
+    scale: 1.1
+}
+
+#switch-btn-eye {
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    height: 30px;
+    width: 50px;
+    border: 2px solid var(--contrast-orange);
+    border-radius: 50%;
+    shape-outside: ellipse();
+    box-shadow: 0 0 1px var(--base-white),
+                0 0 3px var(--contrast-orange),
+                0 0 6px var(--contrast-orange-faded),
+                inset 0 0 1px var(--base-white),
+                inset 0 0 5px var(--contrast-orange),
+                inset 0 0 10px var(--contrast-orange-faded);
+    
+    opacity: 1;
+    transition: top 150ms ease-in-out,
+                left 150ms ease-in-out,
+                box-shadow 200ms ease-in-out,
+                opacity 200ms ease-in-out;
+}
+
+#switch-view-btn-container:hover #switch-btn-eye:not(.split),
+#switch-view-btn-container:focus-within #switch-btn-eye:not(.split) {
+    box-shadow: 0 0 1px var(--base-white),
+                0 0 4px var(--contrast-orange),
+                0 0 8px var(--contrast-orange-faded),
+                inset 0 0 1px var(--base-white),
+                inset 0 0 6px var(--contrast-orange),
+                inset 0 0 12px var(--contrast-orange-faded);
+}
+
+#switch-btn-eyelid {
+    top: 56%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    height: 25px;
+    width: 50px;
+    border-top: 2px solid var(--contrast-orange);
+    border-radius: 50%;
+    shape-outside: ellipse();
+    opacity: 1;
+    box-shadow: 0 -3px 0 var(--base-black-07),
+                0 -4px 0 var(--contrast-orange);
+
+    transition: opacity 200ms ease-in-out;
+}
+
+#switch-btn-pupil {
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    height: 30px;
+    width: 30px;
+    color: transparent;
+    border-radius: 15px;
+    border: 2px solid var(--contrast-orange);
+    box-shadow: inset 0 0 1px var(--base-white),
+                inset 0 0 5px var(--contrast-orange),
+                inset 0 0 0 6px var(--contrast-orange-faded),
+                inset 0 0 10px var(--contrast-orange-faded);
+
+    transition: height 200ms ease-in-out,
+                width 200ms ease-in-out,
+                border-radius 200ms ease-in,
+                top 200ms ease-in-out,
+                left 200ms ease-in-out;
+}
+
+#switch-view-btn-container:hover #switch-btn-pupil:not(.split),
+#switch-view-btn-container:focus-within #switch-btn-pupil:not(.split) {
+    box-shadow: inset 0 0 1px var(--base-white),
+                inset 0 0 10px var(--contrast-orange),
+                inset 0 0 0 8px var(--contrast-orange-faded),
+                inset 0 0 20px var(--contrast-orange-faded);
+}
+
+#switch-btn-iris {
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    height: 12px;
+    width: 12px;
+    color: transparent;
+    border-radius: 6px;
+    border: 1px solid var(--contrast-orange);
+    box-shadow: 0 0 1px 2px var(--base-black),
+                inset 0 0 2px var(--contrast-orange);
+
+
+    transition: box-shadow 200ms ease-in-out,
+                height 200ms ease-in-out,
+                width 200ms ease-in-out,
+                border-radius 200ms ease-in,
+                top 200ms ease-in-out,
+                left 200ms ease-in-out;
+}
+
+#switch-btn-circle.split {
+    top: -5px;
+    left: 4px;
+    height: 30px;
+    width: 30px;
+    border-radius: 15px;
+}
+
+#switch-btn-eye.split {
+    top: 10px;
+    left: 19px;
+    height: 2px;
+    width: 16px;
+    border-radius: 3px;
+    shape-outside: none;
+    box-shadow: 0 0 3px var(--contrast-orange);
+}
+
+
+#switch-btn-eyelid.split {
+    opacity: 0;
+}
+
+#switch-btn-pupil.split {
+    top: 23px;
+    left: 51px;
+    height: 30px;
+    width: 30px;
+    text-align: center;
+    border-radius: 15px;
+    color: var(--contrast-orange);
+}
+
+#split-btn-pupil {
+    top: 8px;
+    left: 36px;
+    z-index: 10;
+}
+
+#switch-btn-iris.split {
+    top: 44px;
+    left: 24px;
+    height: 30px;
+    width: 30px;
+    text-align: center;
+    font-weight: 700;
+    border-radius: 15px;
+    border: 2px solid var(--contrast-orange);
+    color: var(--contrast-orange);
+}
+
+#switch-btn-pupil.split.active,
+#switch-btn-iris.split.active {
+    background: var(--contrast-orange);
+    color: var(--base-black);
+}
+
+#split-btn-iris {
+    top: 29px;
+    left: 9px;
+    z-index: 10;
+}
+
+#split-btn-pupil.hide-btn,
+#split-btn-iris.hide-btn {
+    display: none;
+}
+
+#switch-btn-iris.split,
+#switch-btn-pupil.split,
+#switch-btn-circle.split {
+    box-shadow: inset 0 0 0 2px var(--base-black-07),
+                inset 0 0 1px var(--base-white),
+                0 0 5px var(--contrast-orange),
+                inset 0 0 5px var(--contrast-orange),
+                inset 0 0 10px var(--contrast-orange-faded);
+}
+
+#switch-view-btn-container > .invisible-btn.split {
+    height: 30px;
+    width: 30px;
+    top: -5px;
+    left: 4px;
+}
+
+
 /* DASHBOARD SIDEBAR */
 
 #dashboard-sidebar {
@@ -1556,7 +1792,6 @@ textarea:focus-within {
     background: var(--shadow-blue);
     text-align: center;
     padding: 1rem;
-    height: 60px;
     font-size: clamp(18px, calc(1.7rem + 0.3vw), 24px);
     font-weight: 700;
     border: 2px solid var(--contrast-red);
