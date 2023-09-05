@@ -1,6 +1,5 @@
-import { TodoApp, UserEvents } from "./app";
-import Project from "./project";
-import Todo from "./todo";
+import { TodoApp } from "./app";
+import { UserEvents } from "./user-events";
 import { SearchBar } from "./searchbar";
 import { isSameDay, isAfter, parse, isValid, format } from "date-fns";
 
@@ -8,9 +7,6 @@ export const Display = ((doc) => {
     const app = doc.createElement('div');
     app.id = "app-container";
 
-    // To contain the projectGrid and its current project-cards
-    // when one of the cards expands to fill the whole container
-    // so it can be put back again when the card shrinks
     let state = {
         currentProjectGrid: {},
         expandedCardPrevPosition: {},
@@ -128,6 +124,7 @@ export const Display = ((doc) => {
 
         iris.innerText = "T";
         pupil.innerText = "P";
+        pupil.classList.add("active");
 
         const splitBtnIris = doc.createElement('button');
         splitBtnIris.id = "split-btn-iris";
@@ -135,9 +132,13 @@ export const Display = ((doc) => {
         splitBtnIris.classList.add("small-btn");
         splitBtnIris.classList.add("hide-btn");
         splitBtnIris.onclick = () => {
+            if (iris.classList.contains("active")) {
+                return;
+            }
+
             iris.classList.add("active");
             pupil.classList.remove("active");
-            console.log("Opening todo list!");
+            switchToTodoList();
         };
 
         const splitBtnPupil = doc.createElement('button');
@@ -145,10 +146,15 @@ export const Display = ((doc) => {
         splitBtnPupil.classList.add("invisible-btn");
         splitBtnPupil.classList.add("small-btn");
         splitBtnPupil.classList.add("hide-btn");
+
         splitBtnPupil.onclick = () => {
+            if (pupil.classList.contains("active")) {
+                return;
+            }
+
             iris.classList.remove("active");
             pupil.classList.add("active");
-            console.log("Opening project grid!");
+            switchToProjectGrid();
         };
 
 
@@ -172,6 +178,42 @@ export const Display = ((doc) => {
         btnContainer.appendChild(splitBtnPupil);
 
         return btnContainer;
+    };
+
+    const switchToProjectGrid = () => {
+        const dashboardContainer = doc.getElementById('dashboard-container');
+        const todoList = doc.getElementById('todo-list-view-container');
+        dashboardContainer.removeChild(todoList);
+
+        const projectGridOuter = doc.createElement('div');
+        const projectGrid = state.currentProjectGrid;
+
+        projectGridOuter.id = "project-grid-outer";
+        projectGrid.id = "project-grid";
+
+        projectGridOuter.appendChild(projectGrid);
+
+        window.addEventListener("keypress", scrollProjects);
+
+        dashboardContainer.appendChild(projectGridOuter);
+
+    };
+
+    const switchToTodoList = () => {
+        const dashboardContainer = doc.getElementById('dashboard-container');
+        const projectGrid = doc.getElementById('project-grid-outer');
+        dashboardContainer.removeChild(projectGrid);
+
+        const todoListContainer = doc.createElement("div");
+        todoListContainer.id = "todo-list-view-container";
+
+        const todoList = doc.createElement("div");
+        todoList.id = "todo-list-view";
+
+        window.removeEventListener("keypress", scrollProjects);
+
+        todoListContainer.appendChild(todoList);
+        dashboardContainer.appendChild(todoListContainer);
     };
 
     const generateUserNameHeader = (username) => {
