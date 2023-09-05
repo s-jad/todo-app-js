@@ -101,11 +101,77 @@ export const Display = ((doc) => {
         headerUtilsFlex.id = "header-utils-flex"
         headerUtilsFlex.appendChild(SearchBar.generateSearchBar());
         headerUtilsFlex.appendChild(generateCreateProjectBtn());
-
+        headerUtilsFlex.appendChild(generateSwitchViewBtn());
         dashboardHeader.appendChild(generateUserNameHeader(username));
         dashboardHeader.appendChild(headerUtilsFlex);
 
         return dashboardHeader;
+    };
+
+    const generateSwitchViewBtn = () => {
+        const btnContainer = doc.createElement('div');
+        btnContainer.id = "switch-view-btn-container";
+        btnContainer.classList.add('btn-container');
+        btnContainer.classList.add('header-btn');
+        btnContainer.classList.add('fade-btn');
+
+        btnContainer.innerHTML = `
+            <div id ="switch-btn-circle"></div>
+            <div id="switch-btn-eye"></div>
+            <div id="switch-btn-pupil"></div>
+            <div id="switch-btn-iris"></div>
+            <div id="switch-btn-eyelid"></div>
+        `;
+
+        const iris = btnContainer.querySelector("#switch-btn-iris");
+        const pupil = btnContainer.querySelector("#switch-btn-pupil");
+
+        iris.innerText = "T";
+        pupil.innerText = "P";
+
+        const splitBtnIris = doc.createElement('button');
+        splitBtnIris.id = "split-btn-iris";
+        splitBtnIris.classList.add("invisible-btn");
+        splitBtnIris.classList.add("small-btn");
+        splitBtnIris.classList.add("hide-btn");
+        splitBtnIris.onclick = () => {
+            iris.classList.add("active");
+            pupil.classList.remove("active");
+            console.log("Opening todo list!");
+        };
+
+        const splitBtnPupil = doc.createElement('button');
+        splitBtnPupil.id = "split-btn-pupil";
+        splitBtnPupil.classList.add("invisible-btn");
+        splitBtnPupil.classList.add("small-btn");
+        splitBtnPupil.classList.add("hide-btn");
+        splitBtnPupil.onclick = () => {
+            iris.classList.remove("active");
+            pupil.classList.add("active");
+            console.log("Opening project grid!");
+        };
+
+
+        const actualBtn = doc.createElement('button');
+        actualBtn.classList.add('invisible-btn');
+        actualBtn.classList.add('header-btn');
+        actualBtn.onclick = () => {
+            const eyeComponents = Array.from(btnContainer.querySelectorAll('[id^="switch-btn-"]'));
+
+            eyeComponents.forEach(component => {
+                component.classList.toggle("split")
+            });
+
+            actualBtn.classList.toggle("split");
+            splitBtnPupil.classList.toggle("hide-btn");
+            splitBtnIris.classList.toggle("hide-btn");
+        };
+
+        btnContainer.appendChild(actualBtn);
+        btnContainer.appendChild(splitBtnIris);
+        btnContainer.appendChild(splitBtnPupil);
+
+        return btnContainer;
     };
 
     const generateUserNameHeader = (username) => {
