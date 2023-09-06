@@ -14,6 +14,7 @@ export const Display = ((doc) => {
         progressBarPercentages: [],
         currentTodoNames: [],
         currentUserNameColorIndex: 0,
+        currentView: "project-grid",
     };
 
     const getCurrentProjectGrid = () => {
@@ -104,89 +105,19 @@ export const Display = ((doc) => {
         return dashboardHeader;
     };
 
-    const generateSwitchViewBtn = () => {
-        const btnContainer = doc.createElement('div');
-        btnContainer.id = "switch-view-btn-container";
-        btnContainer.classList.add('btn-container');
-        btnContainer.classList.add('header-btn');
-        btnContainer.classList.add('fade-btn');
-
-        btnContainer.innerHTML = `
-            <div id ="switch-btn-circle"></div>
-            <div id="switch-btn-eye"></div>
-            <div id="switch-btn-pupil"></div>
-            <div id="switch-btn-iris"></div>
-            <div id="switch-btn-eyelid"></div>
-        `;
-
-        const iris = btnContainer.querySelector("#switch-btn-iris");
-        const pupil = btnContainer.querySelector("#switch-btn-pupil");
-
-        iris.innerText = "T";
-        pupil.innerText = "P";
-        pupil.classList.add("active");
-
-        const splitBtnIris = doc.createElement('button');
-        splitBtnIris.id = "split-btn-iris";
-        splitBtnIris.classList.add("invisible-btn");
-        splitBtnIris.classList.add("small-btn");
-        splitBtnIris.classList.add("hide-btn");
-        splitBtnIris.onclick = () => {
-            if (iris.classList.contains("active")) {
-                return;
-            }
-
-            iris.classList.add("active");
-            pupil.classList.remove("active");
-            switchToTodoList();
-        };
-
-        const splitBtnPupil = doc.createElement('button');
-        splitBtnPupil.id = "split-btn-pupil";
-        splitBtnPupil.classList.add("invisible-btn");
-        splitBtnPupil.classList.add("small-btn");
-        splitBtnPupil.classList.add("hide-btn");
-
-        splitBtnPupil.onclick = () => {
-            if (pupil.classList.contains("active")) {
-                return;
-            }
-
-            iris.classList.remove("active");
-            pupil.classList.add("active");
-            switchToProjectGrid();
-        };
-
-
-        const actualBtn = doc.createElement('button');
-        actualBtn.classList.add('invisible-btn');
-        actualBtn.classList.add('header-btn');
-        actualBtn.onclick = () => {
-            const eyeComponents = Array.from(btnContainer.querySelectorAll('[id^="switch-btn-"]'));
-
-            eyeComponents.forEach(component => {
-                component.classList.toggle("split")
-            });
-
-            actualBtn.classList.toggle("split");
-            splitBtnPupil.classList.toggle("hide-btn");
-            splitBtnIris.classList.toggle("hide-btn");
-        };
-
-        btnContainer.appendChild(actualBtn);
-        btnContainer.appendChild(splitBtnIris);
-        btnContainer.appendChild(splitBtnPupil);
-
-        return btnContainer;
-    };
-
     const switchToProjectGrid = () => {
         const dashboardContainer = doc.getElementById('dashboard-container');
         const todoList = doc.getElementById('todo-list-view-container');
         dashboardContainer.removeChild(todoList);
 
         const projectGridOuter = doc.createElement('div');
-        const projectGrid = state.currentProjectGrid;
+        let projectGrid;
+
+        if (state.currentProjectGrid.childNodes === undefined) {
+            projectGrid = doc.createElement('div');
+        } else {
+            projectGrid = state.currentProjectGrid;
+        }
 
         projectGridOuter.id = "project-grid-outer";
         projectGrid.id = "project-grid";
@@ -197,6 +128,7 @@ export const Display = ((doc) => {
 
         dashboardContainer.appendChild(projectGridOuter);
 
+        state.currentView = "project-grid";
     };
 
     const switchToTodoList = () => {
@@ -204,17 +136,82 @@ export const Display = ((doc) => {
         const projectGrid = doc.getElementById('project-grid-outer');
         dashboardContainer.removeChild(projectGrid);
 
+
+        window.removeEventListener("keypress", scrollProjects);
+
+
+        const todoListContainer = renderTodoListView();
+        dashboardContainer.appendChild(todoListContainer);
+
+        state.currentView = "todo-list";
+    };
+
+    const renderTodoListView = () => {
         const todoListContainer = doc.createElement("div");
         todoListContainer.id = "todo-list-view-container";
 
         const todoList = doc.createElement("div");
         todoList.id = "todo-list-view";
 
-        window.removeEventListener("keypress", scrollProjects);
+        const user = TodoApp.getCurrentUser();
+        const projects = user.getAllProjects();
+
+        projects.forEach(project => {
+            const todos = project.getAllTodos();
+            todos.forEach((todo, index) => {
+                const todoCard = doc.createElement("div");
+                todoCard.classList.add("todo-list-view-row");
+                todoCard.style.border = `2px solid hsl(${90 - (todo.priority * 9)}, 95%, 78%)`;
+
+                const projectTitle = doc.createElement("p");
+                projectTitle.classList.add("todo-list-view-project-title");
+                projectTitle.innerText = project.title;
+                todoCard.appendChild(projectTitle)
+
+                const todoTitle = doc.createElement('p');
+                todoTitle.classList.add("todo-list-view-todo-title")
+                todoTitle.innerText = todo.title;
+
+                todoCard.appendChild(todoTitle);
+
+                const checkBoxContainer = doc.createElement("div");
+                checkBoxContainer.classList.add("checkbox-container");
+                checkBoxContainer.innerHTML = `
+                    <input type="checkbox" name="todo-${index}" class="todo-check" 
+                        tabindex="${(index + 2)}"></input>
+                    <div class="todo-check-image-left unchecked"></div>
+                    <div class="todo-check-image-right unchecked"></div>
+                `;
+
+                const checkBox = checkBoxContainer.querySelector('.todo-check');
+
+                checkBox.checked = todo.checked;
+
+                if (checkBox.checked) {
+                    checkBoxContainer.style.border = "2px solid var(--contrast-green)";
+                    checkBoxContainer.style.boxShadow = "inset 0 0 5px hsla(150, 90%, 90%, 0.7)";
+                } else {
+                    checkBoxContainer.style.border = "2px solid var(--contrast-red)";
+                    checkBoxContainer.style.boxShadow = "inset 0 0 5px hsla(0, 90%, 90%, 0.7)";
+                }
+
+                checkBox.addEventListener("click", handleCheckBox);
+                checkBox.addEventListener("keydown", function(ev) {
+                    if (ev.key === "Enter") {
+                        ev.preventDefault();
+                        handleCheckBox(ev);
+                    }
+                });
+
+                todoCard.appendChild(checkBoxContainer);
+
+                todoList.appendChild(todoCard);
+            });
+        });
 
         todoListContainer.appendChild(todoList);
-        dashboardContainer.appendChild(todoListContainer);
-    };
+        return todoListContainer;
+    }
 
     const generateUserNameHeader = (username) => {
         const userName = doc.createElement('h1');
@@ -291,6 +288,84 @@ export const Display = ((doc) => {
 
         return btnContainer;
     };
+
+    const generateSwitchViewBtn = () => {
+        const btnContainer = doc.createElement('div');
+        btnContainer.id = "switch-view-btn-container";
+        btnContainer.classList.add('btn-container');
+        btnContainer.classList.add('header-btn');
+        btnContainer.classList.add('fade-btn');
+
+        btnContainer.innerHTML = `
+            <div id ="switch-btn-circle"></div>
+            <div id="switch-btn-eye"></div>
+            <div id="switch-btn-pupil"></div>
+            <div id="switch-btn-iris"></div>
+            <div id="switch-btn-eyelid"></div>
+        `;
+
+        const iris = btnContainer.querySelector("#switch-btn-iris");
+        const pupil = btnContainer.querySelector("#switch-btn-pupil");
+
+        iris.innerText = "T";
+        pupil.innerText = "P";
+        pupil.classList.add("active");
+
+        const splitBtnIris = doc.createElement('button');
+        splitBtnIris.id = "split-btn-iris";
+        splitBtnIris.classList.add("invisible-btn");
+        splitBtnIris.classList.add("small-btn");
+        splitBtnIris.classList.add("hide-btn");
+        splitBtnIris.onclick = () => {
+            if (iris.classList.contains("active")) {
+                return;
+            }
+
+            iris.classList.add("active");
+            pupil.classList.remove("active");
+            switchToTodoList();
+        };
+
+        const splitBtnPupil = doc.createElement('button');
+        splitBtnPupil.id = "split-btn-pupil";
+        splitBtnPupil.classList.add("invisible-btn");
+        splitBtnPupil.classList.add("small-btn");
+        splitBtnPupil.classList.add("hide-btn");
+
+        splitBtnPupil.onclick = () => {
+            if (pupil.classList.contains("active")) {
+                return;
+            }
+
+            iris.classList.remove("active");
+            pupil.classList.add("active");
+            switchToProjectGrid();
+        };
+
+
+        const actualBtn = doc.createElement('button');
+        actualBtn.classList.add('invisible-btn');
+        actualBtn.classList.add('header-btn');
+        actualBtn.onclick = () => {
+            const eyeComponents = Array.from(btnContainer.querySelectorAll('[id^="switch-btn-"]'));
+
+            eyeComponents.forEach(component => {
+                component.classList.toggle("split")
+            });
+
+            actualBtn.classList.toggle("split");
+            splitBtnPupil.classList.toggle("hide-btn");
+            splitBtnIris.classList.toggle("hide-btn");
+        };
+
+        btnContainer.appendChild(actualBtn);
+        btnContainer.appendChild(splitBtnIris);
+        btnContainer.appendChild(splitBtnPupil);
+
+        return btnContainer;
+    };
+
+
 
     const renderProjectGrid = () => {
         const projectGridOuter = doc.createElement('div');
@@ -528,7 +603,7 @@ export const Display = ((doc) => {
                     <input type="text" name="new-todo-due-date-${i + 1}" class="create-project-todo-input"
                     placeholder="Date: YYYY-MM-DD">
                     <input type="number" name="new-todo-priority-${i + 1}" class="create-project-todo-input"
-                    placeholder="Priority: 0-10" min="0" max="10">
+                    placeholder="Priority: 0-10" min="1" max="10">
                     <textarea name="new-todo-notes-${i + 1}" class="create-project-todo-textarea"
                     placeholder="Notes"></textarea>
                 `;
@@ -667,7 +742,7 @@ export const Display = ((doc) => {
             }
             const warnPriorityNaN = doc.createElement('p');
             warnPriorityNaN.id = "warn-priority-nan";
-            warnPriorityNaN.innerText = `Priority input is not a number. Priority = 0-10.`;
+            warnPriorityNaN.innerText = `Priority input is not a number. Priority = 1-10.`;
             parent.appendChild(warnPriorityNaN);
 
             return false;
@@ -679,7 +754,7 @@ export const Display = ((doc) => {
             }
             const warnPriorityUnderMin = doc.createElement('p');
             warnPriorityUnderMin.id = "warn-priority-under-min";
-            warnPriorityUnderMin.innerText = `${userInput} is too low. Min priority = 0.`;
+            warnPriorityUnderMin.innerText = `${userInput} is too low. Min priority = 1.`;
             parent.appendChild(warnPriorityUnderMin);
             return false;
 
@@ -1426,7 +1501,7 @@ export const Display = ((doc) => {
             case "priority":
                 fieldInput.type = "number";
                 fieldInput.max = 10;
-                fieldInput.min = 0;
+                fieldInput.min = 1;
                 fieldInput.name = "todo-expanded-input-priority";
                 target.parentNode.appendChild(fieldInput);
                 fieldInput.focus();
@@ -1645,6 +1720,9 @@ export const Display = ((doc) => {
     };
 
     const handleCheckBox = (ev) => {
+        if (state.currentView === "project-grid") {
+
+        }
         const projectId = doc.querySelector('[id^="project-card-"]').id;
         const projectName = projectId.slice(projectId.lastIndexOf("card-") + 5).replaceAll("-", " ");
 
