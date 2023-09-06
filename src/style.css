@@ -2070,9 +2070,24 @@ input.create-project-todo-input {
 
 #todo-list-view {
     height: 88vh;
-    width: 98vw;
-    background: var(--contrast-yellow-glow);
+    width: 100vw;
+    background: var(--shadow-blue);
     overflow: scroll;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+}
+
+.todo-list-view-row {
+    padding: 1rem 2rem;
+    border-radius: 1rem;
+    background: var(--shadow-blue);
+    color: var(--base-white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 /* Media Queries */ 
@@ -2085,7 +2100,6 @@ input.create-project-todo-input {
     [id^="todo-input-card-"] {
         gap: 0.3rem;
     }
-
 }
 
 @media (max-width: 550px) {
@@ -2108,5 +2122,4 @@ input.create-project-todo-input {
         width: 40vw;
         max-width: 40vw;
     }
-
 }
