@@ -488,6 +488,12 @@ export const Display = ((doc) => {
         } else if (ev.key === "Enter" && !ev.target.classList.contains("invisible-btn")) {
             // Only if not currently focussed on button that could use the Enter key
             ev.preventDefault();
+            
+            if (ev.target.classList.contains("expanding") ||
+                ev.target.classList.contains("shrinking")
+            ) {
+                return;
+            }
             renderExpandedProject(ev);
         }
     };
@@ -1138,10 +1144,12 @@ export const Display = ((doc) => {
     };
 
     const renderExpandedProjectKeyEnter = (ev) => {
+        ev.target.removeEventListener("keypress", renderExpandedProjectKeyEnter);
         if (ev.key === "Enter") {
             ev.stopImmediatePropagation();
             if (ev.target.classList.contains("expanded") ||
-                !ev.target.id.includes("project-card-")
+                !ev.target.id.includes("project-card-") ||
+                ev.target.classList.contains("expanding")
             ) {
                 return;
             } else {
@@ -1211,7 +1219,6 @@ export const Display = ((doc) => {
 
     const renderExpandedProject = (ev) => {
         ev.target.removeEventListener("keypress", renderExpandedProjectKeyEnter);
-
         if (Array.from(ev.target.classList).includes("expanded")) {
             renderShrunkProject(ev);
             return;
@@ -1240,6 +1247,8 @@ export const Display = ((doc) => {
             projectCard = ev.target;
             gridRect = ev.target.parentNode.getBoundingClientRect();
         }
+
+        projectCard.removeEventListener("click", renderExpandedProject);
 
         const projectGrid = doc.getElementById('project-grid');
         // Call the function to store the current project grid
@@ -1291,8 +1300,6 @@ export const Display = ((doc) => {
             projectTodoListContainer.classList.remove('invisible');
             dashboardContainer.removeChild(projectGridOuter);
             dashboardContainer.appendChild(projectCard);
-
-            projectCard.addEventListener("click", renderShrunkProject);
         };
 
         projectCard.addEventListener('animationend', handleExpansionAnimationEnd);
@@ -1301,10 +1308,9 @@ export const Display = ((doc) => {
         // to ensure that it doesnt try to retrigger once expanded
         setTimeout(() => {
             projectCard.style.animation = "";
-            projectCard.removeEventListener("click", renderExpandedProject);
-            projectCard.removeEventListener("keypress", renderExpandedProjectKeyEnter);
             projectCard.removeEventListener('animationend', handleExpansionAnimationEnd);
-        }, 600);
+            projectCard.addEventListener("click", renderShrunkProject);
+        }, 350);
     };
 
     const getExpansionAnimation = (projectCard, projectGrid, gridRect) => {
@@ -1686,6 +1692,8 @@ export const Display = ((doc) => {
             }
         }
 
+        projectCard.removeEventListener("click", renderShrunkProject);
+
         const dashboardContainer = doc.getElementById('dashboard-container');
         const projectGrid = state.currentProjectGrid;
 
@@ -1703,7 +1711,6 @@ export const Display = ((doc) => {
                 styleSheet.parentNode.removeChild(styleSheet);
             }
 
-            const projectsInGrid = Array.from(projectGrid.querySelectorAll('[id^="project-card-"]'));
             const deleteBtns = Array.from(projectGrid.querySelectorAll('.invisible-btn'));
             const progressBars = Array.from(projectGrid.querySelectorAll('.progress-bar'));
 
@@ -1730,6 +1737,8 @@ export const Display = ((doc) => {
                 });
             });
 
+            const projectsInGrid = Array.from(projectGrid.querySelectorAll('[id^="project-card-"]'));
+
             projectsInGrid.forEach(proj => {
                 proj.addEventListener('click', renderExpandedProject);
                 proj.addEventListener('keypress', renderExpandedProjectKeyEnter);
@@ -1743,6 +1752,7 @@ export const Display = ((doc) => {
                 proj.classList.remove('search-invisible');
                 proj.classList.remove('expanded');
             });
+
             projectCard.classList.remove('shrinking');
             dashboardContainer.removeChild(projectCard);
         };
@@ -1751,9 +1761,8 @@ export const Display = ((doc) => {
 
         setTimeout(() => {
             projectCard.style.animation = "";
-            projectCard.removeEventListener("click", renderShrunkProject);
             projectCard.removeEventListener('animationend', handleShrinkingAnimationEnd);
-        }, 600);
+        }, 350);
     };
 
     const getShrinkingAnimation = (projectCard) => {
