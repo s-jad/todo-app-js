@@ -150,8 +150,16 @@ export const Display = ((doc) => {
         const todoListContainer = doc.createElement("div");
         todoListContainer.id = "todo-list-view-container";
 
-        const todoList = doc.createElement("div");
-        todoList.id = "todo-list-view";
+        const todoList = doc.createElement("table");
+        todoList.id = "todo-list-table";
+        todoList.innerHTML = `
+            <tr class="todo-list-table-header-row">
+                <th class="todo-list-table-header">Project</th>
+                <th class="todo-list-table-header">Todo</th>
+                <th class="todo-list-table-header">Due Date</th>
+                <th class="todo-list-table-header">Completed</th>
+            </tr>
+        `;
 
         const user = TodoApp.getCurrentUser();
         const projects = user.getAllProjects();
@@ -159,21 +167,32 @@ export const Display = ((doc) => {
         projects.forEach(project => {
             const todos = project.getAllTodos();
             todos.forEach((todo, index) => {
-                const todoCard = doc.createElement("div");
-                todoCard.classList.add("todo-list-view-row");
-                todoCard.style.border = `2px solid hsl(${90 - (todo.priority * 9)}, 95%, 78%)`;
+                const todoRow = doc.createElement("tr");
+                todoRow.classList.add("todo-list-row");
+                todoRow.style.backgroundImage = `
+                    linear-gradient(-90deg, hsl(${-10 + (todo.priority * 11)}, 95%, 78%) 1%, 
+                                    var(--shadow-blue) 3%,
+                                    var(--shadow-blue) 97%,
+                                    hsl(${-10 + (todo.priority * 11)}, 95%, 78%) 99%)`;
 
-                const projectTitle = doc.createElement("p");
-                projectTitle.classList.add("todo-list-view-project-title");
+                const projectTitle = doc.createElement("td");
+                projectTitle.classList.add("todo-list-row-project-title");
                 projectTitle.innerText = project.title;
-                todoCard.appendChild(projectTitle)
+                todoRow.appendChild(projectTitle)
 
-                const todoTitle = doc.createElement('p');
-                todoTitle.classList.add("todo-list-view-todo-title")
+                const todoTitle = doc.createElement('td');
+                todoTitle.classList.add("todo-list-row-todo-title")
                 todoTitle.innerText = todo.title;
 
-                todoCard.appendChild(todoTitle);
+                todoRow.appendChild(todoTitle);
 
+                const todoDueDate = doc.createElement('td');
+                todoDueDate.classList.add("todo-list-row-todo-due-date");
+                todoDueDate.innerText = todo.dueDate;
+
+                todoRow.appendChild(todoDueDate);
+
+                const checkBoxWrapper = doc.createElement("td");
                 const checkBoxContainer = doc.createElement("div");
                 checkBoxContainer.classList.add("checkbox-container");
                 checkBoxContainer.innerHTML = `
@@ -195,17 +214,18 @@ export const Display = ((doc) => {
                     checkBoxContainer.style.boxShadow = "inset 0 0 5px hsla(0, 90%, 90%, 0.7)";
                 }
 
-                checkBox.addEventListener("click", handleCheckBox);
+                checkBox.addEventListener("click", handleCheckBoxTodoList);
                 checkBox.addEventListener("keydown", function(ev) {
                     if (ev.key === "Enter") {
                         ev.preventDefault();
-                        handleCheckBox(ev);
+                        handleCheckBoxTodoList(ev);
                     }
                 });
 
-                todoCard.appendChild(checkBoxContainer);
+                checkBoxWrapper.appendChild(checkBoxContainer);
+                todoRow.appendChild(checkBoxWrapper);
 
-                todoList.appendChild(todoCard);
+                todoList.appendChild(todoRow);
             });
         });
 
@@ -1320,11 +1340,11 @@ export const Display = ((doc) => {
                 checkBoxContainer.style.boxShadow = "inset 0 0 5px hsla(0, 90%, 90%, 0.7)";
             }
 
-            checkBox.addEventListener("click", handleCheckBox);
+            checkBox.addEventListener("click", handleCheckBoxProjectGrid);
             checkBox.addEventListener("keydown", function(ev) {
                 if (ev.key === "Enter") {
                     ev.preventDefault();
-                    handleCheckBox(ev);
+                    handleCheckBoxProjectGrid(ev);
                 }
             });
 
@@ -1719,10 +1739,7 @@ export const Display = ((doc) => {
         return styleSheet;
     };
 
-    const handleCheckBox = (ev) => {
-        if (state.currentView === "project-grid") {
-
-        }
+    const handleCheckBoxProjectGrid = (ev) => {
         const projectId = doc.querySelector('[id^="project-card-"]').id;
         const projectName = projectId.slice(projectId.lastIndexOf("card-") + 5).replaceAll("-", " ");
 
@@ -1776,6 +1793,41 @@ export const Display = ((doc) => {
                                             inset 0 0 1px var(--base-white),
                                             inset 0 0 4px var(--contrast-red-faded)`;
         }
+    };
+
+    const handleCheckBoxTodoList = (ev) => {
+        const todoRow = ev.target.parentNode.parentNode.parentNode;
+
+        const projectName = todoRow.querySelector('.todo-list-row-project-title').innerText;
+
+        const checkBoxContainer = ev.target.parentNode;
+
+        const todoIndex = ev.target.name.slice(ev.target.name.lastIndexOf("-") + 1);
+
+        const user = TodoApp.getCurrentUser();
+        const project = user.getProject(projectName);
+
+        if (ev.key === "Enter") {
+            if (ev.target.checked) {
+                ev.target.checked = false;
+                checkBoxContainer.style.border = "2px solid hsl(0, 90%, 70%)";
+                checkBoxContainer.style.boxShadow = "inset 0 0 5px hsla(0, 90%, 90%, 0.7)";
+            } else {
+                ev.target.checked = true;
+                checkBoxContainer.style.border = "2px solid hsl(150, 90%, 70%)";
+                checkBoxContainer.style.boxShadow = "inset 0 0 5px hsla(150, 90%, 90%, 0.7)"
+            }
+        } else {
+            if (ev.target.checked) {
+                checkBoxContainer.style.border = "2px solid hsl(150, 90%, 70%)";
+                checkBoxContainer.style.boxShadow = "inset 0 0 5px hsla(150, 90%, 90%, 0.7)"
+            } else {
+                checkBoxContainer.style.border = "2px solid hsl(0, 90%, 70%)";
+                checkBoxContainer.style.boxShadow = "inset 0 0 5px hsla(0, 90%, 90%, 0.7)";
+            }
+        }
+
+        project.todos[todoIndex].checked = ev.target.checked;
     };
 
     const refreshProjectGrid = () => {
