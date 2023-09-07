@@ -1588,11 +1588,11 @@ textarea:focus-within {
     grid-template-columns: repeat(5, 1fr);
     align-items: center;
     justify-content: space-between;
-    border: 1px solid var(--contrast-orange-glow);
     padding: 0 1rem;
     height: 4rem;
 
-    transition: height 300ms ease-in-out,
+    transition: border 150ms ease-in-out,
+                height 300ms ease-in-out,
                 padding 300ms ease-in-out,
                 align-items 300ms ease-in-out;
 }
@@ -1612,6 +1612,12 @@ textarea:focus-within {
 }
 .todo-container:last-of-type:first-of-type {
     border-radius: 1rem;
+}
+
+.todo-container.shrink {
+    border: transparent;
+    height: 0;
+    overflow: hidden;
 }
 
 .checkbox-container input[type="checkbox"] {
@@ -1784,10 +1790,7 @@ textarea:focus-within {
     opacity: 0;
 }
 
-.todo-container.shrink {
-    height: 0;
-    overflow: hidden;
-}
+
 
 [id^="warn-"] {
     position: absolute;

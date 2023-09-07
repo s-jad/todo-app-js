@@ -1552,6 +1552,8 @@ export const Display = ((doc) => {
                 handleTodoExpansion(ev);
             });
 
+            todoContainer.style.border = "1px solid var(--contrast-orange-glow)";
+
             const checkBox = todoContainer.querySelector('.todo-check');
             const checkBoxContainer = todoContainer.querySelector('.checkbox-container');
 
@@ -1601,6 +1603,9 @@ export const Display = ((doc) => {
                 setTimeout(() => {
                     todo.classList.remove("shrink");
                     todo.style.visibility = "";
+                    setTimeout(() => {
+                        todo.style.border = "1px solid var(--contrast-orange-glow)";
+                    }, 300);
                 }, 100);
             });
             return;
@@ -1647,6 +1652,7 @@ export const Display = ((doc) => {
         });
 
         otherTodos.forEach(todo => todo.classList.add('shrink'));
+        otherTodos.forEach(todo => todo.style.border = "transparent");
 
         setTimeout(() => {
             otherTodos.forEach(todo => todo.style.visibility = "hidden");
