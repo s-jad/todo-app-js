@@ -24,6 +24,10 @@ export const Display = ((doc) => {
         return state.currentProjectGrid;
     }
 
+    const getCurrentView = () => {
+        return state.currentView;
+    };
+
     const renderApp = () => {
         return app;
     };
@@ -254,10 +258,10 @@ export const Display = ((doc) => {
                 const todoRow = doc.createElement("tr");
                 todoRow.classList.add("todo-list-row");
                 todoRow.style.backgroundImage = `
-                    linear-gradient(-90deg, hsl(${-10 + (todo.priority * 11)}, 95%, 78%) 1%, 
+                    linear-gradient(-90deg, hsl(${-10 + (todo.priority * 15)}, 95%, 78%) 1%, 
                                     var(--shadow-blue) 3%,
                                     var(--shadow-blue) 97%,
-                                    hsl(${-10 + (todo.priority * 11)}, 95%, 78%) 99%)`;
+                                    hsl(${-10 + (todo.priority * 15)}, 95%, 78%) 99%)`;
 
                 const projectTitle = doc.createElement("td");
                 projectTitle.classList.add("todo-list-row-project-title");
@@ -1716,8 +1720,11 @@ export const Display = ((doc) => {
                 fieldInput.name = "todo-expanded-input-description";
                 target.parentNode.appendChild(fieldInput);
                 fieldInput.focus();
+
                 fieldInput.addEventListener("keypress", function(event) {
-                    handleTodoFieldInputEvent(event, fieldType);
+                    if (event.key === "Enter") {
+                        handleTodoFieldInputEvent(event, fieldType);
+                    }
                 });
                 fieldInput.classList.remove('invisible');
                 break;
@@ -2096,6 +2103,7 @@ export const Display = ((doc) => {
         removeProjectFromProjectGrid,
         setFocusToFirstInput,
         getCurrentProjectGrid,
+        getCurrentView,
         renderExpandedProject,
         renderShrunkProject,
         refreshProjectGrid,

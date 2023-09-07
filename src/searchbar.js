@@ -56,8 +56,14 @@ export const SearchBar = ((doc) => {
                 setTimeout(() => {
                     searchToggle.style.display = "none";
                 }, 200);
+
                 searchBar.value = "";
-                Display.refreshProjectGrid();
+
+                const view = Display.getCurrentView();
+
+                if (view === "project-grid") {
+                    Display.refreshProjectGrid();
+                }
             }
         }
 
@@ -262,7 +268,6 @@ export const SearchBar = ((doc) => {
 
         allProjects.forEach((proj) => {
             const projTitle = proj.querySelector('.project-title').innerText.trim();
-            console.log("projTitle => ", projTitle);
 
             const match = matches.some((match) => {
                 const matchTitle = match.querySelector('.project-title').innerText.trim();
@@ -465,11 +470,13 @@ export const SearchBar = ((doc) => {
                 if (todoMatches[0] === state.currentlyExpandedTodo) {
                     return;
                 }
+
                 let expandedProject = doc.querySelector('.expanded');
-                if (expandedProject === null) {
-                    // Wait for the project to expand and expand it.
+                if (expandedProject === null || expandedProject === undefined) {
+                    // Wait for the project to expand and expand todo.
                     setTimeout(() => {
                         expandedProject = doc.querySelector('.expanded');
+                        console.log("expandedProject => ", expandedProject);
                         const projectTodos = Array.from(expandedProject.querySelectorAll('.todo-container'));
                         const todoToExpand = projectTodos.find(todo => {
                             const label = todo.querySelector('h4').innerText;
@@ -535,8 +542,7 @@ export const SearchBar = ((doc) => {
                 }, 110);
             }
         });
-
-    }
+    };
 
     return {
         generateSearchBar,
