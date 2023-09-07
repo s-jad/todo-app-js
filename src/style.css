@@ -2068,10 +2068,9 @@ input.create-project-todo-input {
 }
 
 
-#todo-list-view {
+#todo-list-table {
     height: 88vh;
     width: 100vw;
-    background: var(--shadow-blue);
     overflow: scroll;
 
     display: flex;
@@ -2080,14 +2079,46 @@ input.create-project-todo-input {
     padding: 0.5rem 1rem;
 }
 
-.todo-list-view-row {
+tr {
     padding: 1rem 2rem;
     border-radius: 1rem;
-    background: var(--shadow-blue);
     color: var(--base-white);
-    display: flex;
+    display: grid;
+    grid-template-columns: 2fr 2.5fr 1fr 100px;
     align-items: center;
     justify-content: space-between;
+    text-align: left;
+}
+
+tr > :nth-child(1) {
+    margin-left: 2rem;
+}
+
+th {
+    font-size: clamp(18px, calc(1.7rem + 0.3vw), 24px);
+    font-weight: 700;
+    opacity: 0.8;
+}
+
+.todo-list-row {
+    border: 2px solid var(--base-black);
+    opacity: 0.7;
+    scale: 1;
+
+    transition: scale 200ms ease-in-out,
+                opacity 200ms ease-in-out;
+}
+
+.todo-list-row:hover,
+.todo-list-row:focus-within {
+    opacity: 1;
+    scale: 1.02
+}
+
+.todo-list-row > td:last-of-type {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Media Queries */ 
