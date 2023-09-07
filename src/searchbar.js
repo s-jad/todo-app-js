@@ -205,8 +205,7 @@ export const SearchBar = ((doc) => {
         const matches = findProjectMatches(wordToMatch);
         // If only one project title matches, auto-expand that project
         if (matches.length === 1) {
-            const matchTitle = matches[0].id.slice(matches[0].id.lastIndexOf("-") + 1);
-            const match = doc.querySelector(`[id="project-card-${matchTitle}"]`)
+            const match = doc.querySelector(`[id="${matches[0].id}"]`)
 
             // If only one project matches, its expanded but invisible
             if (match.classList.contains("search-invisible")) {
@@ -263,6 +262,7 @@ export const SearchBar = ((doc) => {
 
         allProjects.forEach((proj) => {
             const projTitle = proj.querySelector('.project-title').innerText.trim();
+            console.log("projTitle => ", projTitle);
 
             const match = matches.some((match) => {
                 const matchTitle = match.querySelector('.project-title').innerText.trim();
@@ -278,7 +278,8 @@ export const SearchBar = ((doc) => {
 
             if (!match && displayed) {
                 const projectGrid = Display.getCurrentProjectGrid();
-                const projectToRemove = projectGrid.querySelector(`#project-card-${projTitle}`);
+                const idProjTitle = projTitle.replaceAll(" ", "-");
+                const projectToRemove = projectGrid.querySelector(`#project-card-${idProjTitle}`);
                 projectToRemove.classList.add("search-invisible");
                 setTimeout(() => {
                     projectToRemove.style.display = "none";
@@ -286,7 +287,8 @@ export const SearchBar = ((doc) => {
             } else if (match && !displayed) {
                 setTimeout(() => {
                     const projectGrid = Display.getCurrentProjectGrid();
-                    const projectToAdd = projectGrid.querySelector(`#project-card-${projTitle}`);
+                    const idProjTitle = projTitle.replaceAll(" ", "-");
+                    const projectToAdd = projectGrid.querySelector(`#project-card-${idProjTitle}`);
                     projectToAdd.style.display = "grid";
                     projectToAdd.classList.remove("search-invisible");
                 }, 110);
@@ -297,7 +299,7 @@ export const SearchBar = ((doc) => {
     const findTodoMatches = (wordToMatch) => {
         const projectGrid = Display.getCurrentProjectGrid();
 
-        if (projectGrid.children.length === 0) {
+        if (projectGrid.children === undefined) {
             return;
         }
 
@@ -437,7 +439,7 @@ export const SearchBar = ((doc) => {
                                 }, 100);
                             }
                         });
-                    }, 200);
+                    }, 300);
                 } else {
                     const projectTodos = Array.from(expandedProject.querySelectorAll('.todo-container'));
 
@@ -500,10 +502,8 @@ export const SearchBar = ((doc) => {
             }
         }
 
-
         allProjects.forEach((proj) => {
             const projTitle = proj.querySelector('.project-title').innerText.trim();
-            console.log("projTitle => ", projTitle);
 
             const match = projectMatches.some((match) => {
                 const matchTitle = match.querySelector('.project-title').innerText.trim();
@@ -519,17 +519,16 @@ export const SearchBar = ((doc) => {
             const idProjTitle = projTitle.replaceAll(" ", "-");
             if (!match && displayed) {
                 const projectGrid = Display.getCurrentProjectGrid();
-                console.log("projTitle => ", projTitle);
-                console.log("idProjTitle => ", idProjTitle);
                 const projectToRemove = projectGrid.querySelector(`#project-card-${idProjTitle}`);
-                console.log("projectToRemove => ", projectToRemove);
                 projectToRemove.classList.add("search-invisible");
+
                 setTimeout(() => {
                     projectToRemove.style.display = "none";
                 }, 110);
             } else if (match && !displayed) {
                 setTimeout(() => {
                     const projectGrid = Display.getCurrentProjectGrid();
+
                     const projectToAdd = projectGrid.querySelector(`#project-card-${idProjTitle}`);
                     projectToAdd.style.display = "grid";
                     projectToAdd.classList.remove("search-invisible");
