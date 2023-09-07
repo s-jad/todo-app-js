@@ -2103,84 +2103,52 @@ th {
     opacity: 0.8;
 }
 
+#project-header,
+#completed-header,
+#todo-header,
 #due-date-header {
     position: relative;
     isolation: isolate;
     cursor: pointer;
 }
 
-#completed-header {
-    position: relative;
-    isolation: isolate;
-    cursor: pointer;
-}
 
-#project-header {
-    position: relative;
-    isolation: isolate;
-    cursor: pointer;
-}
-
+#completed-header::after,
+#project-header::after,
+#todo-header::after,
 #due-date-header::after {
     content: "";
     position: absolute;
     bottom: 0;
     left: 0;
     height: 2px;
-    width: 100px;
     background: var(--contrast-orange-glow);
 
     scale: 0 1;
     transform-origin: right;
 
     transition: scale 300ms ease-in-out;
+}
+
+
+#project-header::after,
+#todo-header::after,
+#due-date-header::after {
+    width: 100px;
 }
 
 #completed-header::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 2px;
     width: 114px;
-    background: var(--contrast-orange-glow);
-
-    scale: 0 1;
-    transform-origin: right;
-
-    transition: scale 300ms ease-in-out;
 }
 
-#project-header::after {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    bottom: 0;
-    left: 0;
-    height: 2px;
-    width: 100px;
-    background: var(--contrast-orange-glow);
-    
-    scale: 0 1;
-    transform-origin: right;
-
-    transition: scale 300ms ease-in-out;
-}
-
+#todo-header:hover::after, 
+#todo-header:focus-within::after,
+#due-date-header:hover::after, 
+#due-date-header:focus-within::after,
+#completed-header:hover::after, 
+#completed-header:focus-within::after,
 #project-header:hover::after,
 #project-header:focus-within::after {
-    transform-origin: left;
-    scale: 1 1;
-}
-
-#due-date-header:hover::after, 
-#due-date-header:focus-within::after {
-    transform-origin: left;
-    scale: 1 1;
-}
-
-#completed-header:hover::after, 
-#completed-header:focus-within::after {
     transform-origin: left;
     scale: 1 1;
 }

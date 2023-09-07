@@ -16,6 +16,7 @@ export const Display = ((doc) => {
         currentUserNameColorIndex: 0,
         currentView: "project-grid",
         todoListSortByProjAsc: true,
+        todoListSortByTodoAsc: true,
         todoListSortByDueDateAsc: true,
         todoListSortByCheckAsc: true,
     };
@@ -235,17 +236,19 @@ export const Display = ((doc) => {
         todoList.innerHTML = `
             <tr class="todo-list-table-header-row">
                 <th id="project-header" class="todo-list-table-header">Project</th>
-                <th class="todo-list-table-header">Todo</th>
+                <th id="todo-header" class="todo-list-table-header">Todo</th>
                 <th id="due-date-header" class="todo-list-table-header">Due Date</th>
                 <th id="completed-header" class="todo-list-table-header">Completed</th>
             </tr>
         `;
 
         const projectHeader = todoList.querySelector("#project-header");
+        const todoHeader = todoList.querySelector("#todo-header");
         const dueDateHeader = todoList.querySelector("#due-date-header");
         const completedHeader = todoList.querySelector("#completed-header");
 
         projectHeader.addEventListener("click", sortByProject);
+        todoHeader.addEventListener("click", sortByTodo);
         dueDateHeader.addEventListener("click", sortByDueDate);
         completedHeader.addEventListener("click", sortByCompletion);
 
@@ -321,7 +324,6 @@ export const Display = ((doc) => {
         return todoListContainer;
     };
 
-
     const sortByProject = () => {
         const todoTable = doc.getElementById('todo-list-table');
 
@@ -356,6 +358,51 @@ export const Display = ((doc) => {
                     return 1;
                 }
                 if (projA > projB) {
+                    return -1;
+                }
+
+                return 0;
+            });
+        }
+
+        todoTable.appendChild(headerRow);
+        rows.forEach(row => todoTable.appendChild(row));
+    };
+
+    const sortByTodo = () => {
+        const todoTable = doc.getElementById('todo-list-table');
+
+        const rows = Array.from(todoTable.rows);
+        const headerRow = rows.shift();
+
+        if (state.todoListSortByTodoAsc) {
+
+            state.todoListSortByTodoAsc = false;
+
+            rows.sort(function(a, b) {
+                const todoA = a.cells[1].textContent.toLowerCase();
+                const todoB = b.cells[1].textContent.toLowerCase();
+
+                if (todoA < todoB) {
+                    return -1;
+                }
+                if (todoA > todoB) {
+                    return 1;
+                }
+
+                return 0;
+            });
+        } else {
+            state.todoListSortByTodoAsc = true;
+
+            rows.sort(function(a, b) {
+                const todoA = a.cells[1].textContent.toLowerCase();
+                const todoB = b.cells[1].textContent.toLowerCase();
+
+                if (todoA < todoB) {
+                    return 1;
+                }
+                if (todoA > todoB) {
                     return -1;
                 }
 
