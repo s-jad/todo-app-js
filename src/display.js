@@ -1,7 +1,7 @@
 import { TodoApp } from "./app";
 import { UserEvents } from "./user-events";
 import { SearchBar } from "./searchbar";
-import { isSameDay, isAfter, parse, isValid, format } from "date-fns";
+import { compareAsc, compareDesc, isSameDay, isAfter, parse, isValid, format } from "date-fns";
 
 export const Display = ((doc) => {
     const app = doc.createElement('div');
@@ -15,6 +15,9 @@ export const Display = ((doc) => {
         currentTodoNames: [],
         currentUserNameColorIndex: 0,
         currentView: "project-grid",
+        todoListSortByProjAsc: true,
+        todoListSortByDueDateAsc: true,
+        todoListSortByCheckAsc: true,
     };
 
     const getCurrentProjectGrid = () => {
@@ -136,7 +139,7 @@ export const Display = ((doc) => {
         if (state.currentProjectGrid.childNodes === undefined) {
             return;
         }
-        
+
         const projectCards = Array.from(projectGrid.querySelectorAll('[id^="project-card-"]'));
 
         projectCards.forEach((project, index) => {
@@ -163,7 +166,7 @@ export const Display = ((doc) => {
 
     const countProgressBarPercentages = (todoList) => {
         const rows = Array.from(todoList.querySelectorAll('.todo-list-row'));
-        
+
         const projectTitleArr = [];
         const checkBoxCheckedArr = []
 
@@ -171,7 +174,7 @@ export const Display = ((doc) => {
             const projectTitle = row.querySelector('.todo-list-row-project-title').innerText;
 
             const checkBoxChecked = row.querySelector('.todo-check').checked;
-            
+
             projectTitleArr.push(projectTitle);
             checkBoxCheckedArr.push(checkBoxChecked);
         });
@@ -187,17 +190,17 @@ export const Display = ((doc) => {
                 progressBarPercentages[progressBarPercentagesIndex] = (checkedCount / checkboxCount) * 100;
                 progressBarPercentagesIndex++;
                 prevProjectTitle = projectTitleArr[i];
-                
+
                 checkedCount = 0;
                 checkboxCount = 0;
-            } 
+            }
 
             if (checkBoxCheckedArr[i]) {
                 checkedCount++;
-            } 
+            }
 
             checkboxCount++;
-            
+
             if (i === projectTitleArr.length - 1) {
                 progressBarPercentages[progressBarPercentagesIndex] = (checkedCount / checkboxCount) * 100;
             }
@@ -227,12 +230,20 @@ export const Display = ((doc) => {
         todoList.id = "todo-list-table";
         todoList.innerHTML = `
             <tr class="todo-list-table-header-row">
-                <th class="todo-list-table-header">Project</th>
+                <th id="project-header" class="todo-list-table-header">Project</th>
                 <th class="todo-list-table-header">Todo</th>
-                <th class="todo-list-table-header">Due Date</th>
-                <th class="todo-list-table-header">Completed</th>
+                <th id="due-date-header" class="todo-list-table-header">Due Date</th>
+                <th id="completed-header" class="todo-list-table-header">Completed</th>
             </tr>
         `;
+
+        const projectHeader = todoList.querySelector("#project-header");
+        const dueDateHeader = todoList.querySelector("#due-date-header");
+        const completedHeader = todoList.querySelector("#completed-header");
+
+        projectHeader.addEventListener("click", sortByProject);
+        dueDateHeader.addEventListener("click", sortByDueDate);
+        completedHeader.addEventListener("click", sortByCompletion);
 
         const user = TodoApp.getCurrentUser();
         const projects = user.getAllProjects();
@@ -304,7 +315,137 @@ export const Display = ((doc) => {
 
         todoListContainer.appendChild(todoList);
         return todoListContainer;
-    }
+    };
+
+
+    const sortByProject = () => {
+        const todoTable = doc.getElementById('todo-list-table');
+
+        const rows = Array.from(todoTable.rows);
+        const headerRow = rows.shift();
+
+        if (state.todoListSortByProjAsc) {
+
+            state.todoListSortByProjAsc = false;
+
+            rows.sort(function(a, b) {
+                const projA = a.cells[0].textContent.toLowerCase();
+                const projB = b.cells[0].textContent.toLowerCase();
+
+                if (projA < projB) {
+                    return -1;
+                }
+                if (projA > projB) {
+                    return 1;
+                }
+
+                return 0;
+            });
+        } else {
+            state.todoListSortByProjAsc = true;
+
+            rows.sort(function(a, b) {
+                const projA = a.cells[0].textContent.toLowerCase();
+                const projB = b.cells[0].textContent.toLowerCase();
+
+                if (projA < projB) {
+                    return 1;
+                }
+                if (projA > projB) {
+                    return -1;
+                }
+
+                return 0;
+            });
+        }
+
+        todoTable.appendChild(headerRow);
+        rows.forEach(row => todoTable.appendChild(row));
+    };
+
+    const sortByDueDate = () => {
+        const todoTable = doc.getElementById('todo-list-table');
+
+        const rows = Array.from(todoTable.rows);
+        const headerRow = rows.shift();
+
+
+        if (state.todoListSortByDueDateAsc) {
+
+            state.todoListSortByDueDateAsc = false;
+
+            rows.sort(function(a, b) {
+                const dateA = parse(a.cells[2].textContent, 'yyyy-MM-dd', new Date());
+                const dateB = parse(b.cells[2].textContent, 'yyyy-MM-dd', new Date());
+
+                return compareAsc(dateA, dateB);
+            });
+
+        } else {
+            state.todoListSortByDueDateAsc = true;
+
+            rows.sort(function(a, b) {
+                const dateA = parse(a.cells[2].textContent, 'yyyy-MM-dd', new Date());
+                const dateB = parse(b.cells[2].textContent, 'yyyy-MM-dd', new Date());
+
+                return compareDesc(dateA, dateB);
+            });
+        }
+
+        todoTable.appendChild(headerRow);
+        rows.forEach(row => todoTable.appendChild(row));
+    };
+
+    const sortByCompletion = () => {
+        const todoTable = doc.getElementById('todo-list-table');
+
+        const rows = Array.from(todoTable.rows);
+        const headerRow = rows.shift();
+
+
+        if (state.todoListSortByCheckAsc) {
+
+            state.todoListSortByCheckAsc = false;
+
+            rows.sort(function(a, b) {
+                const checkA = a.cells[3].querySelector('.todo-check').checked;
+                const checkB = b.cells[3].querySelector('.todo-check').checked;
+
+                if (checkA && !checkB) {
+                    return 1;
+                }
+
+                if (!checkA && checkB) {
+                    return -1;
+                }
+
+                return 0;
+            });
+
+        } else {
+
+            state.todoListSortByCheckAsc = true;
+
+            rows.sort(function(a, b) {
+                const checkA = a.cells[3].querySelector('.todo-check').checked;
+                const checkB = b.cells[3].querySelector('.todo-check').checked;
+
+                if (checkA && !checkB) {
+                    return -1;
+                }
+
+                if (!checkA && checkB) {
+                    return 1;
+                }
+
+                return 0;
+            });
+
+        }
+
+        todoTable.appendChild(headerRow);
+        rows.forEach(row => todoTable.appendChild(row));
+    };
 
     const generateUserNameHeader = (username) => {
         const userName = doc.createElement('h1');
@@ -488,7 +629,7 @@ export const Display = ((doc) => {
         } else if (ev.key === "Enter" && !ev.target.classList.contains("invisible-btn")) {
             // Only if not currently focussed on button that could use the Enter key
             ev.preventDefault();
-            
+
             if (ev.target.classList.contains("expanding") ||
                 ev.target.classList.contains("shrinking")
             ) {
@@ -551,7 +692,7 @@ export const Display = ((doc) => {
                 <textarea type="text" value="" name="create-project-description" id="create-project-description-input"></textarea>
                 <label for="create-project-todo-count" class="create-project-label"><span class="warn-hl">*</span> Number of todos:</label>
                 <input type="number" value="" name="create-project-todo-count" 
-                id="create-project-todo-count-input" min="0" max="12" class="required">
+                id="create-project-todo-count-input" min="1" max="12" class="required">
                 <h3 id="todo-input-container-title">Todos:</h3>
                 <div id="todo-input-container">
                     <!-- Dynamic todo item inputs will be added here -->
@@ -630,6 +771,7 @@ export const Display = ((doc) => {
             }
         }
     };
+
     const renderTodoContainers = (ev, todoCount, createProjectModalContainer, createProjectTodoCountInput) => {
         todoCount = parseInt(ev.target.value);
         const todoNames = [];
