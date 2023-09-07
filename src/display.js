@@ -108,6 +108,9 @@ export const Display = ((doc) => {
     const switchToProjectGrid = () => {
         const dashboardContainer = doc.getElementById('dashboard-container');
         const todoList = doc.getElementById('todo-list-view-container');
+
+        const progressBarPercentages = countProgressBarPercentages(todoList);
+
         dashboardContainer.removeChild(todoList);
 
         const projectGridOuter = doc.createElement('div');
@@ -129,6 +132,78 @@ export const Display = ((doc) => {
         dashboardContainer.appendChild(projectGridOuter);
 
         state.currentView = "project-grid";
+
+        if (state.currentProjectGrid.childNodes === undefined) {
+            return;
+        }
+        
+        const projectCards = Array.from(projectGrid.querySelectorAll('[id^="project-card-"]'));
+
+        projectCards.forEach((project, index) => {
+            const progressBar = project.querySelector('.progress-bar');
+            progressBar.style.width = `${progressBarPercentages[index]}%`;
+
+            const progressbarIdNum = parseInt((progressBar.id).slice(progressBar.id.lastIndexOf("-") + 1));
+
+            state.progressBarPercentages[progressbarIdNum] = progressBarPercentages[index];
+
+            if (state.progressBarPercentages[progressbarIdNum] === 100) {
+                progressBar.style.background = "var(--contrast-green-glow)";
+                progressBar.style.boxShadow = `0 0 4px var(--contrast-green), 
+                    inset 0 0 1px var(--base-white),
+                    inset 0 0 4px var(--contrast-green-faded)`;
+            } else {
+                progressBar.style.background = "var(--contrast-red-glow)";
+                progressBar.style.boxShadow = `0 0 4px var(--contrast-red), 
+                    inset 0 0 1px var(--base-white),
+                    inset 0 0 4px var(--contrast-red-faded)`;
+            }
+        });
+    };
+
+    const countProgressBarPercentages = (todoList) => {
+        const rows = Array.from(todoList.querySelectorAll('.todo-list-row'));
+        
+        const projectTitleArr = [];
+        const checkBoxCheckedArr = []
+
+        rows.forEach(row => {
+            const projectTitle = row.querySelector('.todo-list-row-project-title').innerText;
+
+            const checkBoxChecked = row.querySelector('.todo-check').checked;
+            
+            projectTitleArr.push(projectTitle);
+            checkBoxCheckedArr.push(checkBoxChecked);
+        });
+
+        let prevProjectTitle = projectTitleArr[0];
+        let checkedCount = 0;
+        let checkboxCount = 0;
+        let progressBarPercentagesIndex = 0;
+        const progressBarPercentages = [];
+
+        for (let i = 0; i < projectTitleArr.length; i++) {
+            if (projectTitleArr[i] !== prevProjectTitle) {
+                progressBarPercentages[progressBarPercentagesIndex] = (checkedCount / checkboxCount) * 100;
+                progressBarPercentagesIndex++;
+                prevProjectTitle = projectTitleArr[i];
+                
+                checkedCount = 0;
+                checkboxCount = 0;
+            } 
+
+            if (checkBoxCheckedArr[i]) {
+                checkedCount++;
+            } 
+
+            checkboxCount++;
+            
+            if (i === projectTitleArr.length - 1) {
+                progressBarPercentages[progressBarPercentagesIndex] = (checkedCount / checkboxCount) * 100;
+            }
+        }
+
+        return progressBarPercentages;
     };
 
     const switchToTodoList = () => {
@@ -136,9 +211,7 @@ export const Display = ((doc) => {
         const projectGrid = doc.getElementById('project-grid-outer');
         dashboardContainer.removeChild(projectGrid);
 
-
         window.removeEventListener("keypress", scrollProjects);
-
 
         const todoListContainer = renderTodoListView();
         dashboardContainer.appendChild(todoListContainer);
