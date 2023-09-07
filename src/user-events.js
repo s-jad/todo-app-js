@@ -21,13 +21,19 @@ export const UserEvents = (() => {
         const todoCards = Array.from(document.querySelectorAll('[id^="todo-input-card-"]'));
 
         let projectTodos = [];
+        
+
 
         todoCards.forEach(todoCard => {
+            let priority = parseInt(todoCard.querySelector('[name^="new-todo-priority-"]').value);
+            
+            priority = isNaN(priority) ? 10 : priority;
+
             const todo = new Todo(
                 todoCard.querySelector('[name^="new-todo-name-"]').value,
                 todoCard.querySelector('[name^="new-todo-description-"]').value,
                 todoCard.querySelector('[name^="new-todo-due-date-"]').value,
-                parseInt(todoCard.querySelector('[name^="new-todo-priority-"]').value),
+                priority,
                 todoCard.querySelector('[name^="new-todo-notes-"]').value,
             );
 
