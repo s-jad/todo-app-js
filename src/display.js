@@ -1659,12 +1659,16 @@ export const Display = ((doc) => {
             const expandedInfo = todoContainer.querySelector('.expanded-todo-info');
             todoContainer.removeChild(expandedInfo);
             const otherTodos = Array.from(todoContainer.parentNode.querySelectorAll(".todo-container"));
+            const checkBoxes = Array.from(todoContainer.parentNode.querySelectorAll(".checkbox-container"));
+
+
             otherTodos.forEach(todo => {
                 setTimeout(() => {
                     todo.classList.remove("shrink");
                     todo.style.visibility = "";
                     setTimeout(() => {
                         todo.style.border = "1px solid var(--contrast-orange-glow)";
+                        checkBoxes.forEach(box => box.style.opacity = "1");
                     }, 300);
                 }, 100);
             });
@@ -1711,8 +1715,13 @@ export const Display = ((doc) => {
             return node.nodeType === 1 && node !== todoContainer;
         });
 
-        otherTodos.forEach(todo => todo.classList.add('shrink'));
-        otherTodos.forEach(todo => todo.style.border = "transparent");
+        otherTodos.forEach(todo => {
+            todo.classList.add('shrink');
+            todo => todo.style.border = "transparent";
+
+            const checkbox = todo.querySelector('.checkbox-container');
+            checkbox.style.opacity = "0";
+        });
 
         setTimeout(() => {
             otherTodos.forEach(todo => todo.style.visibility = "hidden");
