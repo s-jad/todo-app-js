@@ -828,9 +828,9 @@ export const Display = ((doc) => {
         const todoNames = [];
 
         const todoInputContainer = createProjectModalContainer.querySelector('#todo-input-container');
-        const warn = todoInputContainer.querySelector('#warn-non-unique-project-name');
+        const warnNonUniqueProjectName = todoInputContainer.querySelector('#warn-non-unique-project-name');
 
-        if (warn) {
+        if (warnNonUniqueProjectName) {
             return;
         }
 
@@ -861,6 +861,13 @@ export const Display = ((doc) => {
             warnNotANumber.innerText = `The value you have entered is not a number, 
                                             please insert a number, max = 12.`;
             todoInputContainer.appendChild(warnNotANumber);
+
+            const btnsPresent = todoInputContainer.querySelector('#left-right-todo-btns-container');
+
+            if (btnsPresent) {
+                todoInputContainer.removeChild(btnsPresent);
+            }
+
             return;
         }
 
