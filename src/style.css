@@ -313,6 +313,8 @@ textarea:focus-within {
     gap: 2rem;
     height: 60vh;
     width: 60vw;
+
+    transition: width 200ms ease-in-out;
 }
 
 #welcome-flex > input {
@@ -1433,6 +1435,10 @@ textarea:focus-within {
     font-size: clamp(16px, calc(1.5rem + 0.3vw), 22px);
 }
 
+ul.project-todos-list {
+    padding: 0;
+}
+
 /* SCROLLBAR STYLING */
 ::-webkit-scrollbar {
   width: 12px;
@@ -1641,7 +1647,8 @@ textarea:focus-within {
     border: 2px solid var(--contrast-red);
     box-shadow: inset 0 0 5px var(--contrast-red-glow);
     scale: 1;
-    transition: scale 200ms ease-in-out,
+    transition: opacity 150ms ease-in-out,
+                scale 200ms ease-in-out,
                 border 200ms ease-in-out,
                 box-shadow 200ms ease-in-out;
 
@@ -1736,6 +1743,12 @@ textarea:focus-within {
     border-bottom: 2px solid var(--contrast-orange-faded);
 }
 
+.expanded-todo-description,
+.expanded-todo-notes {
+    text-overflow: hidden;
+    overflow: scroll;
+}
+
 .todo-info-field-wrapper {
     margin-bottom: 1rem;
     margin-right: 1rem;
@@ -1790,8 +1803,6 @@ textarea:focus-within {
     opacity: 0;
 }
 
-
-
 [id^="warn-"] {
     position: absolute;
     color: var(--contrast-red);
@@ -1807,9 +1818,8 @@ textarea:focus-within {
     border-radius: 1rem;
     box-shadow: inset 0 0 4px var(--contrast-red),
                 inset 0 0 10px var(--contrast-red-faded);
-    z-index: 1000;
+    z-index: 10000;
 }
-
 
 /* MODALS */
 
@@ -1834,11 +1844,11 @@ textarea:focus-within {
 #create-project-form {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: 50px fit-content fit-content 50px 50px 1fr 50px;
+    grid-template-rows: 50px min-content min-content 50px 50px 1fr 50px;
     align-items: center;
     justify-content: center;
-    min-height: 98vh;
-    min-width: 99.5vw;
+    min-height: 100vh;
+    min-width: 100vw;
     background: var(--base-black);
     padding: 1rem 2rem;
     gap: 1rem;
@@ -1868,10 +1878,9 @@ textarea:focus-within {
 }
 
 #create-project-form > #todo-input-container {
+    position: relative;
     height: 0;
-    opacity: 0;
-    transition: opacity 200ms ease-in-out,
-            height 200ms ease-in-out;
+    transition: height 200ms ease-in-out;
 }
 
 
@@ -1883,9 +1892,7 @@ textarea:focus-within {
 }
 
 #create-project-form.todos-counted > #todo-input-container {
-    position: relative;
-    height: 60vh;
-    opacity: 1;
+    height: 58vh;
 }
 
 #create-project-form.todos-counted > #todo-input-container > [id^="todo-input-card-"] {
@@ -1914,6 +1921,7 @@ textarea:focus-within {
 }
 
 #create-project-form > input[name="create-project-name"] {
+    position: relative;
     grid-row: 2 / 3;
 }
 #create-project-form > textarea[name="create-project-description"] {
@@ -2098,7 +2106,7 @@ tr > :nth-child(1) {
 }
 
 th {
-    font-size: clamp(18px, calc(1.7rem + 0.3vw), 24px);
+    font-size: clamp(16px, calc(1.5rem + 0.4vw), 24px);
     font-weight: 700;
     opacity: 0.8;
 }
@@ -2201,9 +2209,86 @@ th {
         height: 100%;
     }
 
+    #todo-list-table {
+        height: 100%;
+        gap: 1rem;
+        padding: 0;
+    }
+
+    tr {
+        padding: 1rem 0.35rem;
+        grid-template-columns: 2fr 2.5fr 1fr 50px;
+    }
+
+    td.todo-list-row-project-title,
+    td.todo-list-row-todo-title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    #project-header::after,
+    #todo-header::after,
+    #completed-header::after,
+    #due-date-header::after {
+        width: 50px;
+    }
+
+    #completed-header {
+        opacity: 0;
+    }
+
     #search-bar-container.active ,
     #search-bar.active {
         width: 40vw;
         max-width: 40vw;
+    }
+    
+    #welcome-flex {
+        width: 98vw;
+    }
+    #create-project-form {
+        grid-template-columns: repeat(5, 1fr);
+    }
+    #create-project-form > #create-project-title {
+        grid-column: 1 / 6;
+    }
+        
+    #create-project-form > label {
+        grid-column: 1 / 2;
+    }
+
+    #create-project-form > [id^="create-project-"] {
+        grid-column: 2 / 6;
+    }
+
+    #create-project-form > #confirm-create-project-btn {
+        grid-column: 1 / 3;
+    }
+
+    #create-project-form > #cancel-create-project-btn {
+        grid-column: 4 / 6;
+    }
+
+    #create-project-form > button {
+        padding: 0.5rem 1rem;
+    }
+
+    [id^="project-card-"] > .project-todos-list-container-outer > .project-todos-list-container {
+        padding: 0rem;
+    }
+    
+    [id^="project-card-"] .todo-container.expanded {
+        padding: 0;
+    }
+
+    [id^="project-card-"] h5 {
+        grid-column: 1 / 2;
+        padding: 0;
+        padding-left: 0.3rem;
+    }
+
+    [id^="project-card-"] .expanded-todo-info {
+        grid-template-columns: min-content 1fr;
+        gap: 0.3rem;
     }
 }
