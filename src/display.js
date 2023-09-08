@@ -556,16 +556,20 @@ export const Display = ((doc) => {
             window.removeEventListener("keypress", scrollProjects);
 
             const expandedProject = doc.querySelector('.expanded');
-            console.log("expandedProject =>", expandedProject);
+
             if (expandedProject !== null) {
-                console.log("here!");
                 const shrinkExpandedAddProject = new CustomEvent('addProjectShrink', {
                     target: expandedProject,
                 });
 
                 expandedProject.dispatchEvent(shrinkExpandedAddProject);
             }
+
             renderCreateNewProjectModal();
+
+            if (state.currentView === "todo-list") {
+                switchToProjectGrid();
+            }
         };
 
         btnContainer.appendChild(createProjectBtn);
