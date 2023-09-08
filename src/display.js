@@ -801,7 +801,7 @@ export const Display = ((doc) => {
     const handleCreateProjectNameInputEvent = (createProjectNameInput, todoInputContainer) => {
         const user = TodoApp.getCurrentUser();
         const uniqueName = user.checkUniqueProjectName(createProjectNameInput.value);
-
+        console.log("uniqueName => ", uniqueName);
         if (uniqueName !== -1) {
             const existingWarning = todoInputContainer.querySelector('[id^="warn-"]');
 
@@ -828,6 +828,12 @@ export const Display = ((doc) => {
         const todoNames = [];
 
         const todoInputContainer = createProjectModalContainer.querySelector('#todo-input-container');
+        const warn = todoInputContainer.querySelector('#warn-non-unique-project-name');
+
+        if (warn) {
+            return;
+        }
+
         const createProjectForm = createProjectModalContainer.querySelector('#create-project-form');
 
         if (ev.target.value === "") {
