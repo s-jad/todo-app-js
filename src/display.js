@@ -45,6 +45,7 @@ export const Display = ((doc) => {
         const welcomeInput = doc.createElement('input');
         welcomeInput.id = "welcome-input";
         welcomeInput.placeholder = "Username";
+        welcomeInput.maxLength = "20";
 
         const welcomeConfirmBtn = doc.createElement('button');
         welcomeConfirmBtn.id = "welcome-confirm-btn";
@@ -764,9 +765,11 @@ export const Display = ((doc) => {
             <form action="#" id="create-project-form" method="POST">
                 <h2 id="create-project-title">Create a new Project</h2>
                 <label for="create-project-name" class="create-project-label"><span class="warn-hl">*</span> Name: </label>
-                <input type="text" value="" name="create-project-name" id="create-project-name-input" class="required">
+                <input type="text" value="" name="create-project-name" id="create-project-name-input" 
+                maxlength="60" class="required">
                 <label for="create-project-description" class="create-project-label">Description:</label>
-                <textarea type="text" value="" name="create-project-description" id="create-project-description-input"></textarea>
+                <textarea type="text" value="" name="create-project-description" id="create-project-description-input" 
+                maxlength="150"></textarea>
                 <label for="create-project-todo-count" class="create-project-label"><span class="warn-hl">*</span> Number of todos:</label>
                 <input type="number" value="" name="create-project-todo-count" 
                 id="create-project-todo-count-input" min="1" max="12" class="required">
@@ -934,15 +937,15 @@ export const Display = ((doc) => {
         todoInputCard.innerHTML = `
                     <p class="todo-input-card-title">Todo ${i + 1}</p>
                     <input type="text" name="new-todo-name-${i + 1}" class="create-project-todo-input required"
-                    placeholder="Name">
+                    maxlength="40" placeholder="Name">
                     <input type="text" name="new-todo-description-${i + 1}" class="create-project-todo-input"
-                    placeholder="Description">
+                    maxlength="150" placeholder="Description">
                     <input type="text" name="new-todo-due-date-${i + 1}" class="create-project-todo-input"
                     placeholder="Date: YYYY-MM-DD">
                     <input type="number" name="new-todo-priority-${i + 1}" class="create-project-todo-input"
                     placeholder="Priority: 0-10" min="1" max="10">
                     <textarea name="new-todo-notes-${i + 1}" class="create-project-todo-textarea"
-                    placeholder="Notes"></textarea>
+                    maxlength="150" placeholder="Notes"></textarea>
                 `;
 
         todoInputCard.id = `todo-input-card-${i + 1}`;
