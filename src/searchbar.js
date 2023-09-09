@@ -68,10 +68,18 @@ export const SearchBar = ((doc) => {
         }
 
         searchBar.addEventListener("input", function() {
-            if (state.searchBarToggle === "projects") {
-                displayProjectMatches(searchBar.value);
-            } else if (state.searchBarToggle === "todos") {
-                displayTodoMatches(searchBar.value);
+            if (Display.getCurrentView() === "project-grid") {
+                if (state.searchBarToggle === "projects") {
+                    displayProjectMatches(searchBar.value);
+                } else if (state.searchBarToggle === "todos") {
+                    displayTodoMatches(searchBar.value);
+                }
+            } else if (Display.getCurrentView() === "todo-list") {
+                if (state.searchBarToggle === "projects") {
+                    displayTodoViewProjectMatches(searchBar.value);
+                } else if (state.searchBarToggle === "todos") {
+                    displayTodoViewTodoMatches(searchBar.value);
+                }
             }
         });
 
@@ -476,7 +484,7 @@ export const SearchBar = ((doc) => {
                     // Wait for the project to expand and expand todo.
                     setTimeout(() => {
                         expandedProject = doc.querySelector('.expanded');
-                        console.log("expandedProject => ", expandedProject);
+
                         const projectTodos = Array.from(expandedProject.querySelectorAll('.todo-container'));
                         const todoToExpand = projectTodos.find(todo => {
                             const label = todo.querySelector('h4').innerText;
@@ -542,6 +550,116 @@ export const SearchBar = ((doc) => {
                 }, 110);
             }
         });
+    };
+
+    const selectProjectMatches = (rows, wordToMatch) => {
+        const regex = new RegExp(wordToMatch, 'gi');
+
+        let matches = [];
+
+        rows.find(row => {
+            const projectTitle = row.cells[0].innerText.trim();
+
+            if (projectTitle.match(regex)) {
+                matches.push(projectTitle);
+            };
+        });
+        
+        return matches;
+    };
+
+    const sortProjectMatches = (rows, matches) => {
+
+         rows.sort(function(a, b) {
+
+            const projA = a.cells[0].innerText.trim();
+            const projB = b.cells[0].innerText.trim();
+
+            if (matches.includes(projA) && !matches.includes(projB)) {
+                return -1;
+            }
+
+            if (!matches.includes(projA) && matches.includes(projB)) {
+                return 1
+            }
+
+            return 0;
+        });
+
+        return rows;
+    };
+
+    const displayTodoViewProjectMatches = (wordToMatch) => {
+        const todoTable = doc.getElementById('todo-list-table');
+
+        const rows = Array.from(todoTable.rows);
+        const headerRow = rows.shift();
+
+        const matches = selectProjectMatches(rows, wordToMatch);
+    
+        if (matches === undefined) {
+            return;
+        }
+
+        const sortedRows = sortProjectMatches(rows, matches);
+
+        todoTable.appendChild(headerRow);
+        sortedRows.forEach(row => todoTable.appendChild(row));
+    };
+
+    const selectTodoMatches = (rows, wordToMatch) => {
+        const regex = new RegExp(wordToMatch, 'gi');
+
+        let matches = [];
+
+        rows.find(row => {
+            const todoTitle = row.cells[1].innerText.trim();
+
+            if (todoTitle.match(regex)) {
+                matches.push(todoTitle);
+            }
+        });
+
+        return matches;
+    };
+
+    const sortTodoMatches = (rows, matches) => {
+
+         rows.sort(function(a, b) {
+            
+            const todoA = a.cells[1].innerText.trim();
+            const todoB = b.cells[1].innerText.trim();
+
+            if (matches.includes(todoA) && !matches.includes(todoB)) {
+                return -1;
+            }
+
+            if (!matches.includes(todoA) && matches.includes(todoB)) {
+                return 1
+            }
+
+            return 0;
+        });
+
+        return rows;
+    };
+
+    const displayTodoViewTodoMatches = (wordToMatch) => {
+        const todoTable = doc.getElementById('todo-list-table');
+
+        const rows = Array.from(todoTable.rows);
+        const headerRow = rows.shift();
+
+        const matches = selectTodoMatches(rows, wordToMatch);
+
+        if (matches === undefined) {
+            return;
+        }
+
+        const sortedRows = sortTodoMatches(rows, matches);
+        
+        todoTable.appendChild(headerRow);
+        sortedRows.forEach(row => todoTable.appendChild(row));
     };
 
     return {
