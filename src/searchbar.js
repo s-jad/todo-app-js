@@ -555,31 +555,31 @@ export const SearchBar = ((doc) => {
     const selectProjectMatches = (rows, wordToMatch) => {
         const regex = new RegExp(wordToMatch, 'gi');
 
-        let matches = [];
+        const matches = new Set();
 
         rows.find(row => {
             const projectTitle = row.cells[0].innerText.trim();
 
             if (projectTitle.match(regex)) {
-                matches.push(projectTitle);
+                matches.add(projectTitle);
             };
         });
-        
+
         return matches;
     };
 
     const sortProjectMatches = (rows, matches) => {
 
-         rows.sort(function(a, b) {
+        rows.sort(function(a, b) {
 
             const projA = a.cells[0].innerText.trim();
             const projB = b.cells[0].innerText.trim();
 
-            if (matches.includes(projA) && !matches.includes(projB)) {
+            if (matches.has(projA) && !matches.has(projB)) {
                 return -1;
             }
 
-            if (!matches.includes(projA) && matches.includes(projB)) {
+            if (!matches.has(projA) && matches.has(projB)) {
                 return 1
             }
 
@@ -596,9 +596,32 @@ export const SearchBar = ((doc) => {
         const headerRow = rows.shift();
 
         const matches = selectProjectMatches(rows, wordToMatch);
-    
+
         if (matches === undefined) {
+            const prevMatch = Array.from(doc.querySelectorAll('tr.matched'));
+
+            if (prevMatch.length !== 0) {
+                prevMatch.forEach(match => match.classList.remove('matched'));
+            }
+
             return;
+        }
+
+        if (matches.size === 1) {
+            const matchedRow = rows.filter(row => row.cells[0].innerText.trim() === matches.values().next().value);
+            console.log("matches[0] => ", matches[0]);
+            for (let i = 0; i < rows.length; i++) {
+                console.log(`rows[${i}] => `, rows[i].cells[0].innerText.trim());
+            }
+            console.log("matchedRow => ", matchedRow);
+            matchedRow.forEach(match => match.classList.add('matched'));
+
+        } else {
+            const prevMatch = Array.from(doc.querySelectorAll('tr.matched'));
+
+            if (prevMatch.length !== 0) {
+                prevMatch.forEach(match => match.classList.remove('matched'));
+            }
         }
 
         const sortedRows = sortProjectMatches(rows, matches);
@@ -610,13 +633,13 @@ export const SearchBar = ((doc) => {
     const selectTodoMatches = (rows, wordToMatch) => {
         const regex = new RegExp(wordToMatch, 'gi');
 
-        let matches = [];
+        const matches = new Set();
 
         rows.find(row => {
             const todoTitle = row.cells[1].innerText.trim();
 
             if (todoTitle.match(regex)) {
-                matches.push(todoTitle);
+                matches.add(todoTitle);
             }
         });
 
@@ -625,16 +648,16 @@ export const SearchBar = ((doc) => {
 
     const sortTodoMatches = (rows, matches) => {
 
-         rows.sort(function(a, b) {
-            
+        rows.sort(function(a, b) {
+
             const todoA = a.cells[1].innerText.trim();
             const todoB = b.cells[1].innerText.trim();
 
-            if (matches.includes(todoA) && !matches.includes(todoB)) {
+            if (matches.has(todoA) && !matches.has(todoB)) {
                 return -1;
             }
 
-            if (!matches.includes(todoA) && matches.includes(todoB)) {
+            if (!matches.has(todoA) && matches.has(todoB)) {
                 return 1
             }
 
@@ -653,11 +676,29 @@ export const SearchBar = ((doc) => {
         const matches = selectTodoMatches(rows, wordToMatch);
 
         if (matches === undefined) {
+            const prevMatch = Array.from(doc.querySelectorAll('tr.matched'));
+
+            if (prevMatch.length !== 0) {
+                prevMatch.forEach(match => match.classList.remove('matched'));
+            }
+
             return;
         }
 
+        if (matches.size === 1) {
+            const matchedRow = rows.filter(row => row.cells[1].innerText.trim() === matches.values().next().value);
+
+            matchedRow.forEach(match => match.classList.add('matched'));
+        } else {
+            const prevMatch = Array.from(doc.querySelectorAll('tr.matched'));
+
+            if (prevMatch.length !== 0) {
+                prevMatch.forEach(match => match.classList.remove('matched'));
+            }
+        }
+
         const sortedRows = sortTodoMatches(rows, matches);
-        
+
         todoTable.appendChild(headerRow);
         sortedRows.forEach(row => todoTable.appendChild(row));
     };

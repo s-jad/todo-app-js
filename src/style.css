@@ -2099,7 +2099,7 @@ tr {
     align-items: center;
     justify-content: space-between;
     text-align: left;
-}
+};
 
 tr > :nth-child(1) {
     margin-left: 2rem;
@@ -2166,8 +2166,16 @@ th {
     opacity: 0.7;
     scale: 1 1;
 
-    transition: scale 200ms ease-in-out,
+    transition: border 150ms ease-in-out,
+                scale 200ms ease-in-out,
                 opacity 200ms ease-in-out;
+}
+
+.todo-list-row.matched {
+    border: 2px solid var(--contrast-orange-glow);
+    opacity: 1;
+    scale: 1 1.1;
+
 }
 
 .todo-list-row:hover,
