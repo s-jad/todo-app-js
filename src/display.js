@@ -103,11 +103,16 @@ export const Display = ((doc) => {
         dashboardHeader.id = "dashboard-header";
 
         const headerUtilsFlex = doc.createElement('div');
-        headerUtilsFlex.id = "header-utils-flex"
-        headerUtilsFlex.appendChild(SearchBar.generateSearchBar());
+        headerUtilsFlex.id = "header-utils-flex";
         headerUtilsFlex.appendChild(generateCreateProjectBtn());
         headerUtilsFlex.appendChild(generateSwitchViewBtn());
+
+        const searchFlex = doc.createElement('div');
+        searchFlex.id = "search-flex";
+        searchFlex.appendChild(SearchBar.generateSearchBar());
+
         dashboardHeader.appendChild(generateUserNameHeader(username));
+        dashboardHeader.appendChild(searchFlex);
         dashboardHeader.appendChild(headerUtilsFlex);
 
         return dashboardHeader;
@@ -568,7 +573,7 @@ export const Display = ((doc) => {
             renderCreateNewProjectModal();
 
             if (state.currentView === "todo-list") {
-                
+
                 switchToProjectGrid();
             }
         };
@@ -653,11 +658,11 @@ export const Display = ((doc) => {
             eyeComponents.forEach(component => {
                 component.classList.remove("split")
             });
-            
+
             actualBtn.classList.remove("split");
             splitBtnPupil.classList.add("hide-btn");
             splitBtnIris.classList.add("hide-btn");
-            
+
             if (state.currentView === "todo-list") {
                 iris.classList.remove("active");
                 pupil.classList.add("active");
@@ -1883,7 +1888,9 @@ export const Display = ((doc) => {
                 fieldTextarea.focus();
 
                 fieldTextarea.addEventListener("keypress", function(event) {
-                    handleTodoFieldInputEvent(event, fieldType);
+                    if (event.key === "Enter") {
+                        handleTodoFieldInputEvent(event, fieldType);
+                    }
                 });
 
                 fieldTextarea.classList.remove('invisible');
