@@ -237,8 +237,8 @@ export const Display = ((doc) => {
             <tr class="todo-list-table-header-row">
                 <th id="project-header" class="todo-list-table-header">Project</th>
                 <th id="todo-header" class="todo-list-table-header">Todo</th>
-                <th id="due-date-header" class="todo-list-table-header">Due Date</th>
-                <th id="completed-header" class="todo-list-table-header">Completed</th>
+                <th id="due-date-header" class="todo-list-table-header">Due</th>
+                <th id="completed-header" class="todo-list-table-header">Complete</th>
             </tr>
         `;
 
@@ -568,6 +568,7 @@ export const Display = ((doc) => {
             renderCreateNewProjectModal();
 
             if (state.currentView === "todo-list") {
+                
                 switchToProjectGrid();
             }
         };
@@ -635,9 +636,10 @@ export const Display = ((doc) => {
         const actualBtn = doc.createElement('button');
         actualBtn.classList.add('invisible-btn');
         actualBtn.classList.add('header-btn');
-        actualBtn.onclick = () => {
-            const eyeComponents = Array.from(btnContainer.querySelectorAll('[id^="switch-btn-"]'));
+        actualBtn.id = "switch-view-btn";
+        const eyeComponents = Array.from(btnContainer.querySelectorAll('[id^="switch-btn-"]'));
 
+        actualBtn.onclick = () => {
             eyeComponents.forEach(component => {
                 component.classList.toggle("split")
             });
@@ -647,14 +649,29 @@ export const Display = ((doc) => {
             splitBtnIris.classList.toggle("hide-btn");
         };
 
+        actualBtn.addEventListener("closeViewBtn", function() {
+            eyeComponents.forEach(component => {
+                component.classList.remove("split")
+            });
+            
+            actualBtn.classList.remove("split");
+            splitBtnPupil.classList.add("hide-btn");
+            splitBtnIris.classList.add("hide-btn");
+            
+            if (state.currentView === "todo-list") {
+                iris.classList.remove("active");
+                pupil.classList.add("active");
+
+                switchToProjectGrid();
+            }
+        });
+
         btnContainer.appendChild(actualBtn);
         btnContainer.appendChild(splitBtnIris);
         btnContainer.appendChild(splitBtnPupil);
 
         return btnContainer;
     };
-
-
 
     const renderProjectGrid = () => {
         const projectGridOuter = doc.createElement('div');
@@ -800,12 +817,18 @@ export const Display = ((doc) => {
 
         app.appendChild(createProjectModalContainer);
 
+        const switchViewBtn = doc.getElementById('switch-view-btn');
+        const closeViewBtnEvent = new CustomEvent('closeViewBtn', {
+            target: switchViewBtn,
+        });
+
+        switchViewBtn.dispatchEvent(closeViewBtnEvent);
+
     };
 
     const handleCreateProjectNameInputEvent = (createProjectNameInput, todoInputContainer) => {
         const user = TodoApp.getCurrentUser();
         const uniqueName = user.checkUniqueProjectName(createProjectNameInput.value);
-        console.log("uniqueName => ", uniqueName);
         if (uniqueName !== -1) {
             const existingWarning = todoInputContainer.querySelector('[id^="warn-"]');
 
