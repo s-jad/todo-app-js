@@ -52,7 +52,7 @@ export const Display = ((doc) => {
 
         const prevUser = JSON.parse(localStorage.getItem("user"));
 
-        if (prevUser.name !== "") {
+        if (prevUser !== null) {
             const prevUserBtn = doc.createElement('button');
             prevUserBtn.id = "previous-user-btn";
             prevUserBtn.type = "button";
@@ -101,7 +101,7 @@ export const Display = ((doc) => {
         }, 100);
     }
 
-    const renderProjectDashboard = (username) => {
+    const renderProjectDashboard = (username, prevUser) => {
         const dashboardContainer = doc.createElement("div");
         dashboardContainer.id = "dashboard-container";
 
@@ -112,7 +112,17 @@ export const Display = ((doc) => {
         dashboardContainer.appendChild(header);
         dashboardContainer.appendChild(sidebar);
         dashboardContainer.appendChild(projectGrid);
+
         app.appendChild(dashboardContainer);
+
+        if (prevUser) {
+            const user = TodoApp.getCurrentUser();
+            const projects = user.projects;
+
+            projects.forEach(proj => {
+                renderNewProject(proj);
+            });
+        }
 
         removeWelcomeScreen();
     };
@@ -704,7 +714,7 @@ export const Display = ((doc) => {
         projectGrid.id = "project-grid";
 
         projectGridOuter.appendChild(projectGrid);
-
+        
         window.addEventListener("keypress", scrollProjects);
         return projectGridOuter;
     };
@@ -854,6 +864,7 @@ export const Display = ((doc) => {
 
     const handleCreateProjectNameInputEvent = (createProjectNameInput, todoInputContainer) => {
         const user = TodoApp.getCurrentUser();
+
         const uniqueName = user.checkUniqueProjectName(createProjectNameInput.value);
         if (uniqueName !== -1) {
             const existingWarning = todoInputContainer.querySelector('[id^="warn-"]');
