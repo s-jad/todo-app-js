@@ -4,10 +4,20 @@ import Todo from "./todo";
 import Project from "./project";
 
 export const UserEvents = (() => {
-    const switchToProjectDashboard = () => {
-        const welcomeInput = document.getElementById('welcome-input');
-        TodoApp.createNewUser(welcomeInput.value);
-        Display.renderProjectDashboard();
+    const switchToProjectDashboard = (ev) => {
+        const btn = ev.target;
+
+        if (btn.id === "welcome-confirm-btn") {
+
+            const welcomeInput = document.getElementById("welcome-input");
+            TodoApp.createNewUser(welcomeInput.value);
+            Display.renderProjectDashboard(welcomeInput.value);
+
+        } else if (btn.id === "previous-user-btn") {
+
+            const username = TodoApp.getPreviousUser();
+            Display.renderProjectDashboard(username);
+        }
     };
 
     const createNewProject = (ev) => {
@@ -21,12 +31,9 @@ export const UserEvents = (() => {
         const todoCards = Array.from(document.querySelectorAll('[id^="todo-input-card-"]'));
 
         let projectTodos = [];
-        
-
 
         todoCards.forEach(todoCard => {
             let priority = parseInt(todoCard.querySelector('[name^="new-todo-priority-"]').value);
-            
             priority = isNaN(priority) ? 10 : priority;
 
             const todo = new Todo(

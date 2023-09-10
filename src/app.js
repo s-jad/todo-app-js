@@ -19,6 +19,17 @@ export const TodoApp = (() => {
         const newUser = new User(username);
         setCurrentUserName(username)
         state.users.push(newUser);
+
+        localStorage.setItem("user", JSON.stringify(newUser));
+    };
+
+    const getPreviousUser = () => {
+        const user = JSON.parse(localStorage.getItem("user"));
+
+        setCurrentUserName(user.name);
+        state.users.push(user);
+        
+        return user.name;
     };
 
     const getCurrentUserName = () => {
@@ -60,9 +71,9 @@ export const TodoApp = (() => {
     return {
         startApp,
         createNewUser,
+        getPreviousUser,
         addProjectToUser,
         deleteProjectFromUser,
         getCurrentUser,
     };
-
 })();

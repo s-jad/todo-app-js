@@ -47,11 +47,32 @@ export const Display = ((doc) => {
         welcomeInput.placeholder = "Username";
         welcomeInput.maxLength = "20";
 
+        welcomeFlex.appendChild(welcomeTitle);
+        welcomeFlex.appendChild(welcomeInput);
+
+        const prevUser = JSON.parse(localStorage.getItem("user"));
+
+        if (prevUser.name !== "") {
+            const prevUserBtn = doc.createElement('button');
+            prevUserBtn.id = "previous-user-btn";
+            prevUserBtn.type = "button";
+            prevUserBtn.innerText = `Login as ${prevUser.name}?`;
+
+            prevUserBtn.onclick = (ev) => {
+                UserEvents.switchToProjectDashboard(ev);
+            };
+
+            welcomeFlex.appendChild(prevUserBtn);
+        }
+
         const welcomeConfirmBtn = doc.createElement('button');
         welcomeConfirmBtn.id = "welcome-confirm-btn";
         welcomeConfirmBtn.type = "button";
-        welcomeConfirmBtn.innerText = "Confirm";
-        welcomeConfirmBtn.onclick = UserEvents.switchToProjectDashboard;
+        welcomeConfirmBtn.innerText = "Create new user";
+        welcomeConfirmBtn.onclick = (ev) => {
+            UserEvents.switchToProjectDashboard(ev);
+        };
+
         welcomeConfirmBtn.disabled = true;
 
         welcomeInput.addEventListener("input", function(ev) {
@@ -63,8 +84,6 @@ export const Display = ((doc) => {
             }
         })
 
-        welcomeFlex.appendChild(welcomeTitle);
-        welcomeFlex.appendChild(welcomeInput);
         welcomeFlex.appendChild(welcomeConfirmBtn);
         welcomeFlex.addEventListener("shown.bs.welcomeFlex", setFocusToFirstInput(welcomeInput));
 
@@ -82,12 +101,11 @@ export const Display = ((doc) => {
         }, 100);
     }
 
-    const renderProjectDashboard = () => {
-        const welcomeInput = doc.getElementById("welcome-input");
+    const renderProjectDashboard = (username) => {
         const dashboardContainer = doc.createElement("div");
         dashboardContainer.id = "dashboard-container";
 
-        const header = renderHeader(welcomeInput.value);
+        const header = renderHeader(username);
         const projectGrid = renderProjectGrid();
         const sidebar = renderSidebar();
 
@@ -766,10 +784,10 @@ export const Display = ((doc) => {
                 <h2 id="create-project-title">Create a new Project</h2>
                 <label for="create-project-name" class="create-project-label"><span class="warn-hl">*</span> Name: </label>
                 <input type="text" value="" name="create-project-name" id="create-project-name-input" 
-                maxlength="60" class="required">
+                maxlength="40" class="required">
                 <label for="create-project-description" class="create-project-label">Description:</label>
                 <textarea type="text" value="" name="create-project-description" id="create-project-description-input" 
-                maxlength="150"></textarea>
+                maxlength="120"></textarea>
                 <label for="create-project-todo-count" class="create-project-label"><span class="warn-hl">*</span> Number of todos:</label>
                 <input type="number" value="" name="create-project-todo-count" 
                 id="create-project-todo-count-input" min="1" max="12" class="required">
