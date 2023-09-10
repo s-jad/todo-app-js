@@ -10,13 +10,13 @@ export const UserEvents = (() => {
         if (btn.id === "welcome-confirm-btn") {
 
             const welcomeInput = document.getElementById("welcome-input");
-            TodoApp.createNewUser(welcomeInput.value);
-            Display.renderProjectDashboard(welcomeInput.value);
+            TodoApp.createNewUser(welcomeInput.value, []);
+            Display.renderProjectDashboard(welcomeInput.value, false);
 
         } else if (btn.id === "previous-user-btn") {
 
             const username = TodoApp.getPreviousUser();
-            Display.renderProjectDashboard(username);
+            Display.renderProjectDashboard(username, true);
         }
     };
 
