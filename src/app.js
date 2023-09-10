@@ -13,10 +13,20 @@ export const TodoApp = (() => {
         const app = Display.renderApp();
         app.appendChild(Display.renderWelcomeScreen());
         document.body.appendChild(app);
+
+
+       window.addEventListener("beforeunload", function(event) {
+            event.preventDefault();
+            // Chrome requires returnValue to be set
+            event.returnValue = "";
+
+           const user = getCurrentUser();
+            localStorage.setItem("user", JSON.stringify(user))
+       });
     };
 
-    const createNewUser = (username) => {
-        const newUser = new User(username);
+    const createNewUser = (username, projects) => {
+        const newUser = new User(username, projects);
         setCurrentUserName(username)
         state.users.push(newUser);
 
@@ -24,11 +34,40 @@ export const TodoApp = (() => {
     };
 
     const getPreviousUser = () => {
-        const user = JSON.parse(localStorage.getItem("user"));
+        const userObj = JSON.parse(localStorage.getItem("user"));
+        
+        const projectArr = [];
+
+        userObj.projects.forEach(proj => {
+            const project = new Project(
+                proj.title,
+                proj.description,
+                [],
+            );
+
+            proj.todos.forEach(todoObj => {
+                const todo = new Todo(
+                    todoObj.title,
+                    todoObj.description,
+                    todoObj.dueDate,
+                    todoObj.priority,
+                    todoObj.notes,
+                    todoObj.checked,
+                );
+
+                project.addTodo(todo);
+            }); 
+
+            projectArr.push(project);
+        });
+
+        const user = new User(
+            userObj.name,
+            projectArr,
+        );
 
         setCurrentUserName(user.name);
         state.users.push(user);
-        
         return user.name;
     };
 
@@ -59,6 +98,8 @@ export const TodoApp = (() => {
 
         currentUser.addProject(project);
         Display.renderNewProject(project);
+         
+        localStorage.setItem("user", JSON.stringify(currentUser));
     };
 
     const deleteProjectFromUser = (projectTitle) => {
@@ -66,6 +107,8 @@ export const TodoApp = (() => {
         const userIndex = getCurrentUserIndex(userName);
         const currentUser = state.users[userIndex];
         currentUser.deleteProject(projectTitle);
+
+        localStorage.setItem("user", JSON.stringify(currentUser));
     };
 
     return {
