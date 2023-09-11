@@ -58,7 +58,12 @@ export const Display = ((doc) => {
         welcomeFlex.appendChild(welcomeTitle);
         welcomeFlex.appendChild(welcomeInput);
 
-        const prevUser = JSON.parse(localStorage.getItem("user"));
+        let prevUser = null;
+        const userJson = localStorage.getItem("user");
+
+        if (userJson !== null && userJson !== "undefined") {
+            prevUser = JSON.parse(localStorage.getItem("user"));
+        }
 
         if (prevUser !== null) {
             const prevUserBtn = doc.createElement('button');
@@ -132,7 +137,7 @@ export const Display = ((doc) => {
             });
         }
 
-        
+
         state.currentProjectGrid = projectGrid;
 
         const progressBarCount = JSON.parse(localStorage.getItem("progressBarCount"));
@@ -290,7 +295,7 @@ export const Display = ((doc) => {
 
     const switchToTodoList = () => {
         const dashboardContainer = doc.getElementById('dashboard-container');
-        
+
         const expandedProject = doc.querySelector(".expanded");
 
         if (expandedProject !== undefined && expandedProject !== null) {
@@ -303,7 +308,7 @@ export const Display = ((doc) => {
             setTimeout(() => {
                 const projectGrid = doc.getElementById('project-grid-outer');
                 dashboardContainer.removeChild(projectGrid);
-                        
+
                 window.removeEventListener("keypress", scrollProjects);
 
                 const todoListContainer = renderTodoListView();
@@ -1715,7 +1720,7 @@ export const Display = ((doc) => {
             const todoContainer = doc.createElement('div');
             todoContainer.classList.add('todo-container');
             todoContainer.tabIndex = (index + 1) * 2;
-            
+
             const checkBoxChecked = todo.checked;
 
             todoContainer.innerHTML = `
@@ -2184,7 +2189,7 @@ export const Display = ((doc) => {
 
         const todoIndex = ev.target.name.slice(ev.target.name.lastIndexOf("-") + 1);
         const projectTodoList = doc.querySelector('.project-todos-list');
-        
+
         const checkboxes = Array.from(projectTodoList.querySelectorAll('.todo-check'));
         const checkBoxContainer = ev.target.parentNode;
 
