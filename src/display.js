@@ -290,15 +290,40 @@ export const Display = ((doc) => {
 
     const switchToTodoList = () => {
         const dashboardContainer = doc.getElementById('dashboard-container');
-        const projectGrid = doc.getElementById('project-grid-outer');
-        dashboardContainer.removeChild(projectGrid);
+        
+        const expandedProject = doc.querySelector(".expanded");
 
-        window.removeEventListener("keypress", scrollProjects);
+        if (expandedProject !== undefined && expandedProject !== null) {
+            const shrinkBeforeSwitch = new CustomEvent("shrinkBeforeSwitch", {
+                target: expandedProject,
+            });
 
-        const todoListContainer = renderTodoListView();
-        dashboardContainer.appendChild(todoListContainer);
+            expandedProject.dispatchEvent(shrinkBeforeSwitch);
 
-        state.currentView = "todo-list";
+            setTimeout(() => {
+                const projectGrid = doc.getElementById('project-grid-outer');
+                dashboardContainer.removeChild(projectGrid);
+                        
+                window.removeEventListener("keypress", scrollProjects);
+
+                const todoListContainer = renderTodoListView();
+                dashboardContainer.appendChild(todoListContainer);
+
+                state.currentView = "todo-list";
+            }, 300);
+
+        } else {
+            const projectGrid = doc.getElementById('project-grid-outer');
+            dashboardContainer.removeChild(projectGrid);
+
+            window.removeEventListener("keypress", scrollProjects);
+
+            const todoListContainer = renderTodoListView();
+            dashboardContainer.appendChild(todoListContainer);
+
+            state.currentView = "todo-list";
+        }
+
     };
 
     const renderTodoListView = () => {
@@ -1619,6 +1644,7 @@ export const Display = ((doc) => {
             projectCard.style.animation = "";
             projectCard.removeEventListener('animationend', handleExpansionAnimationEnd);
             projectCard.addEventListener("click", renderShrunkProject);
+            projectCard.addEventListener("shrinkBeforeSwitch", renderShrunkProject);
         }, 350);
     };
 
