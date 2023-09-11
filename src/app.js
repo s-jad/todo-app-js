@@ -22,6 +22,7 @@ export const TodoApp = (() => {
             const user = getCurrentUser();
             const progressBarCount = Display.getProgressBarCount();
             const progressBarPercentages = Display.getProgressBarPercentages();
+
             localStorage.setItem("user", JSON.stringify(user));
             localStorage.setItem("progressBarCount", JSON.stringify(progressBarCount));
             localStorage.setItem("progressBarPercentages", JSON.stringify(progressBarPercentages));
@@ -49,6 +50,7 @@ export const TodoApp = (() => {
             );
 
             proj.todos.forEach(todoObj => {
+
                 const todo = new Todo(
                     todoObj.title,
                     todoObj.description,
@@ -94,6 +96,10 @@ export const TodoApp = (() => {
         return state.users[getCurrentUserIndex(getCurrentUserName())];
     };
 
+    const updateCurrentUser = (updatedUser) => {
+        state.users[getCurrentUserIndex(getCurrentUserName())] = updatedUser;
+    };
+
     const addProjectToUser = (project) => {
         const userName = getCurrentUserName();
         const userIndex = getCurrentUserIndex(userName);
@@ -121,5 +127,6 @@ export const TodoApp = (() => {
         addProjectToUser,
         deleteProjectFromUser,
         getCurrentUser,
+        updateCurrentUser,
     };
 })();

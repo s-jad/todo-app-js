@@ -131,6 +131,7 @@ export const Display = ((doc) => {
                 renderNewProject(proj);
             });
         }
+
         
         state.currentProjectGrid = projectGrid;
 
@@ -1602,7 +1603,6 @@ export const Display = ((doc) => {
             const currentProject = currentUser.getProject(currentProjectTitle);
 
             const todosToRender = currentProject.getAllTodos();
-
             renderTodosForProjectExpansion(todosToRender, projectTodoList);
 
             projectCard.appendChild(projectTodoListContainerOuter);
@@ -1689,6 +1689,8 @@ export const Display = ((doc) => {
             const todoContainer = doc.createElement('div');
             todoContainer.classList.add('todo-container');
             todoContainer.tabIndex = (index + 1) * 2;
+            
+            const checkBoxChecked = todo.checked;
 
             todoContainer.innerHTML = `
                 <div class="todo-title-checkbox-container">
@@ -1698,8 +1700,8 @@ export const Display = ((doc) => {
                     <div class="checkbox-container">
                         <input type="checkbox" name="todo-${index}" class="todo-check" 
                             tabindex="${((index + 1) * 2) + 1}"></input>
-                        <div class="todo-check-image-left unchecked"></div>
-                        <div class="todo-check-image-right unchecked"></div>
+                        <div class="todo-check-image-left ${checkBoxChecked ? 'checked' : 'unchecked'}"></div>
+                        <div class="todo-check-image-right ${checkBoxChecked ? 'checked' : 'unchecked'}"></div>
                     </div>
                     
                 </div>
@@ -1720,7 +1722,7 @@ export const Display = ((doc) => {
             const checkBox = todoContainer.querySelector('.todo-check');
             const checkBoxContainer = todoContainer.querySelector('.checkbox-container');
 
-            checkBox.checked = todo.checked;
+            checkBox.checked = checkBoxChecked;
 
             if (checkBox.checked) {
                 checkBoxContainer.style.border = "2px solid var(--contrast-green)";
@@ -2156,8 +2158,8 @@ export const Display = ((doc) => {
 
         const todoIndex = ev.target.name.slice(ev.target.name.lastIndexOf("-") + 1);
         const projectTodoList = doc.querySelector('.project-todos-list');
+        
         const checkboxes = Array.from(projectTodoList.querySelectorAll('.todo-check'));
-
         const checkBoxContainer = ev.target.parentNode;
 
         const user = TodoApp.getCurrentUser();

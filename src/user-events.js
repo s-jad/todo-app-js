@@ -42,6 +42,7 @@ export const UserEvents = (() => {
                 todoCard.querySelector('[name^="new-todo-due-date-"]').value,
                 priority,
                 todoCard.querySelector('[name^="new-todo-notes-"]').value,
+                false,
             );
 
             projectTodos.push(todo);
