@@ -25,6 +25,14 @@ export const Display = ((doc) => {
         return state.currentProjectGrid;
     }
 
+    const getProgressBarPercentages = () => {
+        return state.progressBarPercentages;
+    };
+
+    const getProgressBarCount = () => {
+        return state.progressBarCount;
+    };
+
     const getCurrentView = () => {
         return state.currentView;
     };
@@ -56,7 +64,7 @@ export const Display = ((doc) => {
             const prevUserBtn = doc.createElement('button');
             prevUserBtn.id = "previous-user-btn";
             prevUserBtn.type = "button";
-            prevUserBtn.innerText = `Login as ${prevUser.name}?`;
+            prevUserBtn.innerText = `Login as ${prevUser.name}`;
 
             prevUserBtn.onclick = (ev) => {
                 UserEvents.switchToProjectDashboard(ev);
@@ -123,6 +131,37 @@ export const Display = ((doc) => {
                 renderNewProject(proj);
             });
         }
+        
+        state.currentProjectGrid = projectGrid;
+
+        const progressBarCount = JSON.parse(localStorage.getItem("progressBarCount"));
+        state.progressBarCount = progressBarCount;
+
+        const progressBarPercentages = JSON.parse(localStorage.getItem("progressBarPercentages"));
+
+        const projectCards = Array.from(doc.querySelectorAll('[id^="project-card-"]'));
+
+        projectCards.forEach((card, index) => {
+            const progressBar = card.querySelector('.progress-bar');
+
+            progressBar.style.width = `${progressBarPercentages[index]}%`;
+
+            const progressbarIdNum = parseInt((progressBar.id).slice(progressBar.id.lastIndexOf("-") + 1));
+
+            state.progressBarPercentages[progressbarIdNum] = progressBarPercentages[index];
+
+            if (state.progressBarPercentages[progressbarIdNum] === 100) {
+                progressBar.style.background = "var(--contrast-green-glow)";
+                progressBar.style.boxShadow = `0 0 4px var(--contrast-green), 
+                    inset 0 0 1px var(--base-white),
+                    inset 0 0 4px var(--contrast-green-faded)`;
+            } else {
+                progressBar.style.background = "var(--contrast-red-glow)";
+                progressBar.style.boxShadow = `0 0 4px var(--contrast-red), 
+                    inset 0 0 1px var(--base-white),
+                    inset 0 0 4px var(--contrast-red-faded)`;
+            }
+        });
 
         removeWelcomeScreen();
     };
@@ -714,7 +753,7 @@ export const Display = ((doc) => {
         projectGrid.id = "project-grid";
 
         projectGridOuter.appendChild(projectGrid);
-        
+
         window.addEventListener("keypress", scrollProjects);
         return projectGridOuter;
     };
@@ -2245,6 +2284,8 @@ export const Display = ((doc) => {
         setFocusToFirstInput,
         getCurrentProjectGrid,
         getCurrentView,
+        getProgressBarCount,
+        getProgressBarPercentages,
         renderExpandedProject,
         renderShrunkProject,
         refreshProjectGrid,

@@ -14,15 +14,18 @@ export const TodoApp = (() => {
         app.appendChild(Display.renderWelcomeScreen());
         document.body.appendChild(app);
 
-
-       window.addEventListener("beforeunload", function(event) {
+        window.addEventListener("beforeunload", function(event) {
             event.preventDefault();
             // Chrome requires returnValue to be set
             event.returnValue = "";
 
-           const user = getCurrentUser();
-            localStorage.setItem("user", JSON.stringify(user))
-       });
+            const user = getCurrentUser();
+            const progressBarCount = Display.getProgressBarCount();
+            const progressBarPercentages = Display.getProgressBarPercentages();
+            localStorage.setItem("user", JSON.stringify(user));
+            localStorage.setItem("progressBarCount", JSON.stringify(progressBarCount));
+            localStorage.setItem("progressBarPercentages", JSON.stringify(progressBarPercentages));
+        });
     };
 
     const createNewUser = (username, projects) => {
@@ -35,7 +38,7 @@ export const TodoApp = (() => {
 
     const getPreviousUser = () => {
         const userObj = JSON.parse(localStorage.getItem("user"));
-        
+
         const projectArr = [];
 
         userObj.projects.forEach(proj => {
@@ -56,7 +59,7 @@ export const TodoApp = (() => {
                 );
 
                 project.addTodo(todo);
-            }); 
+            });
 
             projectArr.push(project);
         });
@@ -98,7 +101,7 @@ export const TodoApp = (() => {
 
         currentUser.addProject(project);
         Display.renderNewProject(project);
-         
+
         localStorage.setItem("user", JSON.stringify(currentUser));
     };
 
