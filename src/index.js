@@ -1,4 +1,4 @@
-import { TodoApp } from "./app";
-import "./style.css"
+import TodoApp from './app';
+import './style.css';
 
 TodoApp.startApp();

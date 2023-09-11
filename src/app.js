@@ -1,132 +1,132 @@
-import { Display } from "./display";
-import Project from "./project";
-import Todo from "./todo";
-import User from "./user";
+import Display from './display';
+import Project from './project';
+import Todo from './todo';
+import User from './user';
 
-export const TodoApp = (() => {
-    let state = {
-        currentUserName: "",
-        users: [],
-    };
+const TodoApp = (() => {
+  const state = {
+    currentUserName: '',
+    users: [],
+  };
+  const doc = document;
+  const win = window;
+  const ls = win.localStorage;
 
-    const startApp = () => {
-        const app = Display.renderApp();
-        app.appendChild(Display.renderWelcomeScreen());
-        document.body.appendChild(app);
+  const getCurrentUserName = () => state.currentUserName;
 
-        window.addEventListener("beforeunload", function(event) {
-            event.preventDefault();
-            // Chrome requires returnValue to be set
-            event.returnValue = "";
+  const setCurrentUserName = function setCurrentUserName(username) {
+    state.currentUserName = username;
+  };
 
-            const user = getCurrentUser();
-            const progressBarCount = Display.getProgressBarCount();
-            const progressBarPercentages = Display.getProgressBarPercentages();
+  const getCurrentUserIndex = (username) => {
+    const currentUserIndex = state.users.findIndex((user) => user.name === username);
 
-            localStorage.setItem("user", JSON.stringify(user));
-            localStorage.setItem("progressBarCount", JSON.stringify(progressBarCount));
-            localStorage.setItem("progressBarPercentages", JSON.stringify(progressBarPercentages));
-        });
-    };
+    if (currentUserIndex !== -1) {
+      return currentUserIndex;
+    }
+  };
 
-    const createNewUser = (username, projects) => {
-        const newUser = new User(username, projects);
-        setCurrentUserName(username)
-        state.users.push(newUser);
+  const getCurrentUser = () => state.users[getCurrentUserIndex(getCurrentUserName())];
 
-        localStorage.setItem("user", JSON.stringify(newUser));
-    };
+  const startApp = () => {
+    const app = Display.renderApp();
+    app.appendChild(Display.renderWelcomeScreen());
+    doc.body.appendChild(app);
 
-    const getPreviousUser = () => {
-        const userObj = JSON.parse(localStorage.getItem("user"));
+    win.addEventListener('beforeunload', (event) => {
+      event.preventDefault();
+      // Chrome requires returnValue to be set
+      event.returnValue = '';
 
-        const projectArr = [];
+      const user = getCurrentUser();
+      const progressBarCount = Display.getProgressBarCount();
+      const progressBarPercentages = Display.getProgressBarPercentages();
 
-        userObj.projects.forEach(proj => {
-            const project = new Project(
-                proj.title,
-                proj.description,
-                [],
-            );
+      ls.setItem('user', JSON.stringify(user));
+      ls.setItem('progressBarCount', JSON.stringify(progressBarCount));
+      ls.setItem('progressBarPercentages', JSON.stringify(progressBarPercentages));
+    });
+  };
 
-            proj.todos.forEach(todoObj => {
+  const createNewUser = (username, projects) => {
+    const newUser = new User(username, projects);
+    setCurrentUserName(username);
+    state.users.push(newUser);
 
-                const todo = new Todo(
-                    todoObj.title,
-                    todoObj.description,
-                    todoObj.dueDate,
-                    todoObj.priority,
-                    todoObj.notes,
-                    todoObj.checked,
-                );
+    ls.setItem('user', JSON.stringify(newUser));
+  };
 
-                project.addTodo(todo);
-            });
+  const getPreviousUser = () => {
+    const userObj = JSON.parse(ls.getItem('user'));
 
-            projectArr.push(project);
-        });
+    const projectArr = [];
 
-        const user = new User(
-            userObj.name,
-            projectArr,
+    userObj.projects.forEach((proj) => {
+      const project = new Project(
+        proj.title,
+        proj.description,
+        [],
+      );
+
+      proj.todos.forEach((todoObj) => {
+        const todo = new Todo(
+          todoObj.title,
+          todoObj.description,
+          todoObj.dueDate,
+          todoObj.priority,
+          todoObj.notes,
+          todoObj.checked,
         );
 
-        setCurrentUserName(user.name);
-        state.users.push(user);
-        return user.name;
-    };
+        project.addTodo(todo);
+      });
 
-    const getCurrentUserName = () => {
-        return state.currentUserName;
-    };
+      projectArr.push(project);
+    });
 
-    const setCurrentUserName = (username) => {
-        state.currentUserName = username;
-    };
+    const user = new User(
+      userObj.name,
+      projectArr,
+    );
 
-    const getCurrentUserIndex = (username) => {
-        const currentUserIndex = state.users.findIndex(user => user.name === username);
+    setCurrentUserName(user.name);
+    state.users.push(user);
+    return user.name;
+  };
 
-        if (currentUserIndex !== -1) {
-            return currentUserIndex;
-        }
-    };
+  const updateCurrentUser = (updatedUser) => {
+    state.users[getCurrentUserIndex(getCurrentUserName())] = updatedUser;
+  };
 
-    const getCurrentUser = () => {
-        return state.users[getCurrentUserIndex(getCurrentUserName())];
-    };
+  const addProjectToUser = (project) => {
+    const userName = getCurrentUserName();
+    const userIndex = getCurrentUserIndex(userName);
+    const currentUser = state.users[userIndex];
 
-    const updateCurrentUser = (updatedUser) => {
-        state.users[getCurrentUserIndex(getCurrentUserName())] = updatedUser;
-    };
+    currentUser.addProject(project);
+    Display.renderNewProject(project);
 
-    const addProjectToUser = (project) => {
-        const userName = getCurrentUserName();
-        const userIndex = getCurrentUserIndex(userName);
-        const currentUser = state.users[userIndex];
+    ls.setItem('user', JSON.stringify(currentUser));
+  };
 
-        currentUser.addProject(project);
-        Display.renderNewProject(project);
+  const deleteProjectFromUser = (projectTitle) => {
+    const userName = getCurrentUserName();
+    const userIndex = getCurrentUserIndex(userName);
+    const currentUser = state.users[userIndex];
+    currentUser.deleteProject(projectTitle);
 
-        localStorage.setItem("user", JSON.stringify(currentUser));
-    };
+    ls.setItem('user', JSON.stringify(currentUser));
+  };
 
-    const deleteProjectFromUser = (projectTitle) => {
-        const userName = getCurrentUserName();
-        const userIndex = getCurrentUserIndex(userName);
-        const currentUser = state.users[userIndex];
-        currentUser.deleteProject(projectTitle);
-
-        localStorage.setItem("user", JSON.stringify(currentUser));
-    };
-
-    return {
-        startApp,
-        createNewUser,
-        getPreviousUser,
-        addProjectToUser,
-        deleteProjectFromUser,
-        getCurrentUser,
-        updateCurrentUser,
-    };
+  return {
+    startApp,
+    createNewUser,
+    getPreviousUser,
+    addProjectToUser,
+    deleteProjectFromUser,
+    getCurrentUser,
+    updateCurrentUser,
+  };
 })();
+
+export default TodoApp;
