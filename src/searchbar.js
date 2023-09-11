@@ -93,7 +93,6 @@ export const SearchBar = ((doc) => {
             toggleSearchBarModeKeyPress(ev, searchBarContainer);
         });
 
-
         return searchBarContainer;
     };
 
@@ -609,11 +608,6 @@ export const SearchBar = ((doc) => {
 
         if (matches.size === 1) {
             const matchedRow = rows.filter(row => row.cells[0].innerText.trim() === matches.values().next().value);
-            console.log("matches[0] => ", matches[0]);
-            for (let i = 0; i < rows.length; i++) {
-                console.log(`rows[${i}] => `, rows[i].cells[0].innerText.trim());
-            }
-            console.log("matchedRow => ", matchedRow);
             matchedRow.forEach(match => match.classList.add('matched'));
 
         } else {
