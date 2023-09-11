@@ -141,9 +141,9 @@ export const SearchBar = ((doc) => {
         searchToggle.innerHTML = `
             <div id="search-toggle-container-inner">
                 <input type="radio" name="search-toggle-radio" id="search-toggle-projects" 
-                    class="invisible-radio small-btn" checked="true">
+                    class="invisible-radio small-btn" checked>
                 <input type="radio" name="search-toggle-radio" id="search-toggle-todos" 
-                    class="invisible-radio small-btn" checked="false">
+                    class="invisible-radio small-btn" ">
                 <div class="search-toggle-icon search-icon-projects">P</div>
                 <div class="search-toggle-icon search-icon-todos">T</div>
             </input>
